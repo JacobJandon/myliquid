@@ -75,7 +75,11 @@ export default async function DashboardPage() {
         <Stat
           label="Total value"
           value={formatUsd(snapshot.totalCents)}
-          sub={`${formatPct(snapshot.totalCents / yearAgo - 1, 1, true)} over 1 year · ${formatUsd(snapshot.totalCents - contributions, { sign: true })} total gain`}
+          sub={`${formatPct(snapshot.totalCents / yearAgo - 1, 1, true)} ${
+            (nav[0]?.date ?? today) > addDays(today, -300)
+              ? `since ${formatDate(nav[0]?.date ?? today)}`
+              : "over 1 year"
+          } · ${formatUsd(snapshot.totalCents - contributions, { sign: true })} total gain`}
         />
         <Stat
           label="Today"
@@ -85,7 +89,11 @@ export default async function DashboardPage() {
         <Stat
           label="Cash within 7 days"
           value={formatPct(week?.cumulativePct ?? 0, 0)}
-          sub={`${formatUsd(week?.cumulativeCents ?? 0)}. The rest is locked or gated.`}
+          sub={
+            (week?.cumulativePct ?? 0) >= 0.9995
+              ? `${formatUsd(week?.cumulativeCents ?? 0)}. Nothing is locked or gated.`
+              : `${formatUsd(week?.cumulativeCents ?? 0)}. The rest is locked or gated.`
+          }
         />
         <Stat
           label="Needs your attention"

@@ -117,6 +117,17 @@ export function LineChart({
     setHover(Math.max(0, Math.min(data.length - 1, i)));
   }
 
+  if (points.length < 2) {
+    return (
+      <div
+        ref={wrap}
+        className="flex h-40 w-full items-center justify-center rounded-xl border border-dashed border-line text-center text-sm text-muted"
+      >
+        History starts today. Advance the market to watch the value move.
+      </div>
+    );
+  }
+
   return (
     <div ref={wrap} className="w-full overflow-hidden">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
