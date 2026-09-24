@@ -147,7 +147,7 @@ export async function runClaudeLoop(opts: {
         };
       }
       const outcome = invokeTool(tool, use.input, ctx);
-      logEvent(ctx.db, {
+      logEvent(ctx.db, ctx.investorId, {
         runId: ctx.runId,
         agent,
         kind: "tool_call",

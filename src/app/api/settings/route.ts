@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { handle, json, parseBody } from "@/lib/api";
+import { requireApiInvestor } from "@/lib/auth/current";
 import { logEvent } from "@/lib/services/audit";
-import { resolveAlert, listAlerts } from "@/lib/services/alerts";
+import { listAlerts, resolveAlert } from "@/lib/services/alerts";
 import { getInvestor, getMandate, setRiskProfile, updateMandate } from "@/lib/services/repo";
 
 export const runtime = "nodejs";
@@ -24,32 +25,36 @@ const SettingsBody = z.object({
       readOnly: z.boolean(),
       killSwitch: z.boolean(),
       circuitBreakerPct: z.number().min(0.01).max(0.5),
-      disabledAgents: z.array(z.enum(["atlas", "quant", "scout", "ledger", "sentinel", "copilot"])),
+      disabledAgents: z.array(
+        z.enum(["atlas", "quant", "scout", "ledger", "sentinel", "copilot", "external"]),
+      ),
     })
     .partial()
     .optional(),
 });
 
-export const GET = handle(() => {
+export const GET = handle(async () => {
+  const investorId = await requireApiInvestor();
   const db = getDb();
-  return json({ investor: getInvestor(db), mandate: getMandate(db) });
+  return json({ investor: getInvestor(db, investorId), mandate: getMandate(db, investorId) });
 });
 
 /** Human-only: agents have no tool that can change settings or release the kill switch. */
 export const PATCH = handle(async (req: Request) => {
+  const investorId = await requireApiInvestor();
   const body = await parseBody(req, SettingsBody);
   const db = getDb();
   if (body.riskProfile) {
-    setRiskProfile(db, body.riskProfile);
-    logEvent(db, {
+    setRiskProfile(db, investorId, body.riskProfile);
+    logEvent(db, investorId, {
       agent: "user",
       kind: "system",
       title: `Risk profile set to ${body.riskProfile}`,
     });
   }
   if (body.mandate) {
-    const before = getMandate(db);
-    const after = updateMandate(db, {
+    const before = getMandate(db, investorId);
+    const after = updateMandate(db, investorId, {
       ...body.mandate,
       killReason:
         body.mandate.killSwitch && !before.killSwitch
@@ -57,15 +62,24 @@ export const PATCH = handle(async (req: Request) => {
           : before.killReason,
     });
     if (before.killSwitch && !after.killSwitch) {
-      for (const a of listAlerts(db, { openOnly: true })) {
-        if (a.code === "circuit_breaker" || a.code === "agents_paused") resolveAlert(db, a.id);
+      for (const a of listAlerts(db, investorId, { openOnly: true })) {
+        if (a.code === "circuit_breaker" || a.code === "agents_paused")
+          resolveAlert(db, investorId, a.id);
       }
-      logEvent(db, { agent: "user", kind: "system", title: "Agents resumed by the investor" });
+      logEvent(db, investorId, {
+        agent: "user",
+        kind: "system",
+        title: "Agents resumed by the investor",
+      });
     } else if (!before.killSwitch && after.killSwitch) {
-      logEvent(db, { agent: "user", kind: "system", title: "Kill switch pulled by the investor" });
+      logEvent(db, investorId, {
+        agent: "user",
+        kind: "system",
+        title: "Kill switch pulled by the investor",
+      });
     } else {
-      logEvent(db, { agent: "user", kind: "system", title: "Agent mandate updated" });
+      logEvent(db, investorId, { agent: "user", kind: "system", title: "Agent mandate updated" });
     }
   }
-  return json({ investor: getInvestor(db), mandate: getMandate(db) });
+  return json({ investor: getInvestor(db, investorId), mandate: getMandate(db, investorId) });
 });

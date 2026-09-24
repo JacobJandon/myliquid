@@ -10,12 +10,14 @@ import {
   LineChart,
   Lock,
   OctagonAlert,
+  Plug,
   ScrollText,
   ShieldCheck,
   TrendingUp,
 } from "lucide-react";
 import { AGENTS, DESK_AGENTS } from "@/lib/agents/registry";
 import { AgentAvatar, buttonClass } from "@/components/ui";
+import { GuestButton } from "@/components/auth/forms";
 
 const SLEEVES = [
   {
@@ -127,13 +129,21 @@ export default function LandingPage() {
           <a href="#guardrails" className="hover:text-fg">
             Guardrails
           </a>
+          <a href="#connect" className="hover:text-fg">
+            Connect
+          </a>
           <a href="#why" className="hover:text-fg">
             Why
           </a>
         </nav>
-        <Link href="/app" className={buttonClass("primary", "sm")}>
-          Open the app <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/login" className={buttonClass("ghost", "sm")}>
+            Log in
+          </Link>
+          <Link href="/signup" className={buttonClass("primary", "sm")}>
+            Get started <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
       </header>
 
       <main>
@@ -153,14 +163,15 @@ export default function LandingPage() {
               quickly you could get your money back.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/app" className={buttonClass("primary")}>
-                Open the demo <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link href="/app/copilot" className={buttonClass("secondary")}>
-                Talk to the Copilot
+              <GuestButton label="Try the live demo" variant="primary" />
+              <Link href="/signup" className={buttonClass("secondary")}>
+                Create an account
               </Link>
             </div>
-            <p className="mt-4 text-xs text-muted">Simulated markets and demo money. No sign-up.</p>
+            <p className="mt-4 text-xs text-muted">
+              The demo opens a private guest portfolio in one click, with no sign-up. Simulated
+              markets, demo money.
+            </p>
           </div>
 
           {/* Hero visual: a desk snapshot */}
@@ -324,6 +335,40 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Bring your own agent */}
+        <section id="connect" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="grid items-center gap-10 lg:grid-cols-2">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-line-strong px-3 py-1 text-xs text-fg-2">
+                <Plug className="h-3.5 w-3.5 text-accent" /> Model Context Protocol
+              </div>
+              <h2 className="mt-4 font-display text-4xl text-fg">Bring your own agent.</h2>
+              <p className="mt-3 text-fg-2">
+                Connect Claude, or any other MCP client, with a scoped API key. A read key sees your
+                portfolio, liquidity, deals and signals. A trade key can also propose trades and
+                rules. Everything it does passes the same checks and approvals as the desk, and it
+                can never withdraw money or change your guardrails.
+              </p>
+              <ul className="mt-5 space-y-1.5 text-sm text-fg-2">
+                <li>• Keys are hashed, shown once, and revocable in one click</li>
+                <li>• Every call lands in your audit log, attributed to the key</li>
+                <li>• Rate-limited, same-origin protected, and blocked by the kill switch</li>
+              </ul>
+            </div>
+            <pre className="overflow-x-auto rounded-3xl border border-line-strong bg-surface/90 p-6 text-[12px] leading-relaxed text-fg-2 shadow-2xl">
+              <code>{`$ claude mcp add --transport http myliquid \\
+    https://myliquid.app/api/mcp \\
+    --header "Authorization: Bearer mlk_..."
+
+> How liquid am I, and should I rebalance?
+
+  get_liquidity_ladder()   75% within 7 days
+  plan_rebalance()         cash +8pp over target
+  propose_rebalance()      waiting for your approval`}</code>
+            </pre>
+          </div>
+        </section>
+
         {/* Why */}
         <section id="why" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <h2 className="font-display text-4xl text-fg">
@@ -355,9 +400,12 @@ export default function LandingPage() {
               Run a desk cycle, approve a rebalance, try to buy the shipyard bond, and advance the
               market to watch settlements and gates.
             </p>
-            <Link href="/app" className={`${buttonClass("primary")} mt-8`}>
-              Open MyLiquid <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <GuestButton label="Try the live demo" variant="primary" />
+              <Link href="/signup" className={buttonClass("secondary")}>
+                Create an account
+              </Link>
+            </div>
           </div>
         </section>
       </main>

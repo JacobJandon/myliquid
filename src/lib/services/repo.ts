@@ -1,4 +1,4 @@
-import { DEMO_INVESTOR_ID, type Db } from "@/lib/db";
+import type { Db } from "@/lib/db";
 import { getRiskProfile, type RiskProfile } from "@/lib/domain/profiles";
 import type {
   AgentId,
@@ -10,39 +10,66 @@ import type {
   ValuationSource,
 } from "@/lib/domain/types";
 
-/** Low-level reads and writes shared by the services. */
+/** Low-level reads and writes shared by the services. Everything is scoped to one investor. */
+
+export type InvestorKind = "user" | "guest" | "demo";
 
 export interface Investor {
   id: string;
+  kind: InvestorKind;
   name: string;
-  email: string;
+  email: string | null;
   riskProfile: RiskProfileId;
   kycStatus: "verified" | "pending";
+  createdAt: string;
 }
 
-export function getInvestor(db: Db): Investor {
-  const row = db.prepare("SELECT * FROM investors WHERE id = ?").get(DEMO_INVESTOR_ID) as {
-    id: string;
-    name: string;
-    email: string;
-    risk_profile: RiskProfileId;
-    kyc_status: "verified" | "pending";
-  };
+interface InvestorRow {
+  id: string;
+  kind: InvestorKind;
+  name: string;
+  email: string | null;
+  risk_profile: RiskProfileId;
+  kyc_status: "verified" | "pending";
+  created_at: string;
+}
+
+function mapInvestor(row: InvestorRow): Investor {
   return {
     id: row.id,
+    kind: row.kind,
     name: row.name,
     email: row.email,
     riskProfile: row.risk_profile,
     kycStatus: row.kyc_status,
+    createdAt: row.created_at,
   };
 }
 
-export function getProfile(db: Db): RiskProfile {
-  return getRiskProfile(getInvestor(db).riskProfile);
+export function findInvestor(db: Db, investorId: string): Investor | null {
+  const row = db.prepare("SELECT * FROM investors WHERE id = ?").get(investorId) as
+    InvestorRow | undefined;
+  return row ? mapInvestor(row) : null;
 }
 
-export function setRiskProfile(db: Db, profile: RiskProfileId): void {
-  db.prepare("UPDATE investors SET risk_profile = ? WHERE id = ?").run(profile, DEMO_INVESTOR_ID);
+export function getInvestor(db: Db, investorId: string): Investor {
+  const investor = findInvestor(db, investorId);
+  if (!investor) throw new Error("Investor not found");
+  return investor;
+}
+
+export function listInvestorIds(db: Db): string[] {
+  return (db.prepare("SELECT id FROM investors ORDER BY created_at").all() as { id: string }[]).map(
+    (r) => r.id,
+  );
+}
+
+export function getProfile(db: Db, investorId: string): RiskProfile {
+  return getRiskProfile(getInvestor(db, investorId).riskProfile);
+}
+
+export function setRiskProfile(db: Db, investorId: string, profile: RiskProfileId): void {
+  db.prepare("UPDATE investors SET risk_profile = ? WHERE id = ?").run(profile, investorId);
 }
 
 interface MandateRow {
@@ -60,10 +87,25 @@ interface MandateRow {
   disabled_agents: string;
 }
 
-export function getMandate(db: Db): AgentMandate {
+export const DEFAULT_MANDATE: AgentMandate = {
+  autonomy: "propose",
+  autoExecuteLimitCents: 2_500_00,
+  agentBudgetCents: 25_000_00,
+  perOrderCapCents: 10_000_00,
+  dailyCapCents: 25_000_00,
+  maxOrdersPerDay: 10,
+  allowedSleeves: ["index", "trading", "bitcoin"],
+  readOnly: false,
+  killSwitch: false,
+  killReason: null,
+  circuitBreakerPct: 0.05,
+  disabledAgents: [],
+};
+
+export function getMandate(db: Db, investorId: string): AgentMandate {
   const r = db
     .prepare("SELECT * FROM mandates WHERE investor_id = ?")
-    .get(DEMO_INVESTOR_ID) as MandateRow;
+    .get(investorId) as MandateRow;
   return {
     autonomy: r.autonomy,
     autoExecuteLimitCents: r.auto_execute_limit_cents,
@@ -80,8 +122,34 @@ export function getMandate(db: Db): AgentMandate {
   };
 }
 
-export function updateMandate(db: Db, patch: Partial<AgentMandate>): AgentMandate {
-  const m = { ...getMandate(db), ...patch };
+export function insertMandate(db: Db, investorId: string, m: AgentMandate = DEFAULT_MANDATE): void {
+  db.prepare(
+    `INSERT INTO mandates (investor_id, autonomy, auto_execute_limit_cents, agent_budget_cents, per_order_cap_cents,
+      daily_cap_cents, max_orders_per_day, allowed_sleeves, read_only, kill_switch, kill_reason, circuit_breaker_pct, disabled_agents)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).run(
+    investorId,
+    m.autonomy,
+    m.autoExecuteLimitCents,
+    m.agentBudgetCents,
+    m.perOrderCapCents,
+    m.dailyCapCents,
+    m.maxOrdersPerDay,
+    JSON.stringify(m.allowedSleeves),
+    m.readOnly ? 1 : 0,
+    m.killSwitch ? 1 : 0,
+    m.killReason,
+    m.circuitBreakerPct,
+    JSON.stringify(m.disabledAgents),
+  );
+}
+
+export function updateMandate(
+  db: Db,
+  investorId: string,
+  patch: Partial<AgentMandate>,
+): AgentMandate {
+  const m = { ...getMandate(db, investorId), ...patch };
   db.prepare(
     `UPDATE mandates SET autonomy = ?, auto_execute_limit_cents = ?, agent_budget_cents = ?, per_order_cap_cents = ?,
       daily_cap_cents = ?, max_orders_per_day = ?, allowed_sleeves = ?, read_only = ?, kill_switch = ?, kill_reason = ?,
@@ -99,24 +167,22 @@ export function updateMandate(db: Db, patch: Partial<AgentMandate>): AgentMandat
     m.killSwitch ? m.killReason : null,
     m.circuitBreakerPct,
     JSON.stringify(m.disabledAgents),
-    DEMO_INVESTOR_ID,
+    investorId,
   );
-  return m;
+  return getMandate(db, investorId);
 }
 
-export function getCash(db: Db): number {
+export function getCash(db: Db, investorId: string): number {
   const row = db
     .prepare("SELECT cash_cents FROM accounts WHERE investor_id = ?")
-    .get(DEMO_INVESTOR_ID) as {
-    cash_cents: number;
-  };
+    .get(investorId) as { cash_cents: number };
   return row.cash_cents;
 }
 
-export function adjustCash(db: Db, deltaCents: number): void {
+export function adjustCash(db: Db, investorId: string, deltaCents: number): void {
   db.prepare("UPDATE accounts SET cash_cents = cash_cents + ? WHERE investor_id = ?").run(
     deltaCents,
-    DEMO_INVESTOR_ID,
+    investorId,
   );
 }
 
@@ -129,10 +195,10 @@ interface LotRow {
   locked_until: string | null;
 }
 
-export function getLots(db: Db): Lot[] {
+export function getLots(db: Db, investorId: string): Lot[] {
   const rows = db
     .prepare("SELECT * FROM lots WHERE investor_id = ? AND units > 1e-9 ORDER BY acquired_on, id")
-    .all(DEMO_INVESTOR_ID) as LotRow[];
+    .all(investorId) as LotRow[];
   return rows.map((r) => ({
     id: r.id,
     productId: r.product_id,
@@ -144,19 +210,19 @@ export function getLots(db: Db): Lot[] {
 }
 
 /** Units already promised to queued redemption requests, per product. */
-export function reservedUnits(db: Db): Map<string, number> {
+export function reservedUnits(db: Db, investorId: string): Map<string, number> {
   const rows = db
     .prepare(
       "SELECT product_id, SUM(units) AS units FROM orders WHERE investor_id = ? AND status = 'queued' GROUP BY product_id",
     )
-    .all(DEMO_INVESTOR_ID) as { product_id: string; units: number }[];
+    .all(investorId) as { product_id: string; units: number }[];
   return new Map(rows.map((r) => [r.product_id, r.units]));
 }
 
 /** Lots minus units reserved by queued redemptions (FIFO). What can still be sold. */
-export function getAvailableLots(db: Db): Lot[] {
-  const reserved = reservedUnits(db);
-  return getLots(db).map((lot) => {
+export function getAvailableLots(db: Db, investorId: string): Lot[] {
+  const reserved = reservedUnits(db, investorId);
+  return getLots(db, investorId).map((lot) => {
     const r = reserved.get(lot.productId) ?? 0;
     if (r <= 0) return lot;
     const take = Math.min(r, lot.units);
@@ -164,6 +230,8 @@ export function getAvailableLots(db: Db): Lot[] {
     return { ...lot, units: lot.units - take };
   });
 }
+
+// ── Shared market data ──────────────────────────────────────────────────────
 
 export function latestPrices(db: Db, onOrBefore: string): Map<string, PricePoint> {
   const rows = db
@@ -184,12 +252,11 @@ export function latestPrices(db: Db, onOrBefore: string): Map<string, PricePoint
 }
 
 export function priceHistory(db: Db, productId: string, fromDate?: string): PricePoint[] {
-  const rows = db
+  return db
     .prepare(
       "SELECT date, price, source FROM prices WHERE product_id = ? AND date >= ? ORDER BY date",
     )
     .all(productId, fromDate ?? "0000-00-00") as PricePoint[];
-  return rows;
 }
 
 export function currentPrice(db: Db, productId: string, date: string): number | null {

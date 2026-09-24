@@ -33,13 +33,34 @@ export async function parseBody<S extends z.ZodType>(req: Request, schema: S): P
   return parsed.data;
 }
 
-/** Wraps a handler so thrown errors become JSON responses. */
+/**
+ * Rejects cross-site state-changing requests: if the browser sent an Origin
+ * header, it must match the host serving the API.
+ */
+export function assertSameOrigin(req: Request): void {
+  if (req.method === "GET" || req.method === "HEAD") return;
+  const origin = req.headers.get("origin");
+  if (!origin) return;
+  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
+  let originHost: string;
+  try {
+    originHost = new URL(origin).host;
+  } catch {
+    throw new HttpError(403, "Invalid origin");
+  }
+  if (!host || originHost !== host) throw new HttpError(403, "Cross-site request blocked");
+}
+
+/** Wraps a handler so thrown errors become JSON responses, and checks the request's origin. */
 export function handle<A extends unknown[]>(fn: (...args: A) => Promise<Response> | Response) {
   return async (...args: A): Promise<Response> => {
     try {
+      if (args[0] instanceof Request) assertSameOrigin(args[0]);
       return await fn(...args);
     } catch (err) {
       if (err instanceof HttpError) return json({ error: err.message }, err.status);
+      // Next.js signals redirects and similar control flow with thrown errors; let them through.
+      if (err && typeof err === "object" && "digest" in err) throw err;
       const message = err instanceof Error ? err.message : String(err);
       return json({ error: message }, 400);
     }

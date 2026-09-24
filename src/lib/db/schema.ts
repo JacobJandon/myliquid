@@ -1,9 +1,10 @@
 /**
  * SQLite schema. Product definitions live in code (`domain/catalog.ts`); the
  * database holds everything that changes: prices, lots, orders, agent activity.
- * Money is stored as integer cents.
+ * Money is stored as integer cents. Everything except prices and deal reviews
+ * (the shared market) is scoped to an investor.
  */
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS meta (
@@ -13,12 +14,36 @@ CREATE TABLE IF NOT EXISTS meta (
 
 CREATE TABLE IF NOT EXISTS investors (
   id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL DEFAULT 'user',
   name TEXT NOT NULL,
-  email TEXT NOT NULL,
+  email TEXT,
+  password_hash TEXT,
   risk_profile TEXT NOT NULL,
   kyc_status TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
+CREATE UNIQUE INDEX IF NOT EXISTS investors_email ON investors(email) WHERE email IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  created_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS sessions_investor ON sessions(investor_id);
+
+CREATE TABLE IF NOT EXISTS api_keys (
+  id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  name TEXT NOT NULL,
+  prefix TEXT NOT NULL,
+  key_hash TEXT NOT NULL UNIQUE,
+  scopes TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  last_used_at TEXT,
+  revoked_at TEXT
+);
+CREATE INDEX IF NOT EXISTS api_keys_investor ON api_keys(investor_id);
 
 CREATE TABLE IF NOT EXISTS mandates (
   investor_id TEXT PRIMARY KEY REFERENCES investors(id),
@@ -149,6 +174,7 @@ CREATE TABLE IF NOT EXISTS rules (
 
 CREATE TABLE IF NOT EXISTS agent_runs (
   id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
   agent TEXT NOT NULL,
   trigger TEXT NOT NULL,
   mode TEXT NOT NULL,
@@ -162,6 +188,7 @@ CREATE TABLE IF NOT EXISTS agent_runs (
 
 CREATE TABLE IF NOT EXISTS agent_events (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
   run_id TEXT,
   agent TEXT NOT NULL,
   kind TEXT NOT NULL,
@@ -170,7 +197,8 @@ CREATE TABLE IF NOT EXISTS agent_events (
   sim_date TEXT NOT NULL,
   created_at TEXT NOT NULL
 );
-CREATE INDEX IF NOT EXISTS agent_events_created ON agent_events(created_at);
+CREATE INDEX IF NOT EXISTS agent_events_investor ON agent_events(investor_id, id);
+CREATE INDEX IF NOT EXISTS agent_runs_investor ON agent_runs(investor_id, started_at);
 
 CREATE TABLE IF NOT EXISTS chat_messages (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -129,7 +129,8 @@ export interface PortfolioSnapshot {
   sleeves: Record<Sleeve, { valueCents: number; weight: number }>;
 }
 
-export type AgentId = "atlas" | "quant" | "scout" | "ledger" | "sentinel" | "copilot";
+/** The desk agents, the Copilot, and "external": an agent the investor connects over MCP. */
+export type AgentId = "atlas" | "quant" | "scout" | "ledger" | "sentinel" | "copilot" | "external";
 
 /** Who initiated an action. Agents are distinguished so the audit log can attribute them. */
 export type Actor = "user" | "autopilot" | AgentId;

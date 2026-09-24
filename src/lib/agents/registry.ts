@@ -140,6 +140,37 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
     routine: "",
     accent: "#e8ecf4",
   },
+  external: {
+    id: "external",
+    name: "Your agent",
+    role: "Connected over MCP",
+    summary:
+      "An AI you connect with an API key, such as Claude or another MCP client. It uses the desk's tools under the same guardrails.",
+    cannot: [
+      "Withdraw money or change guardrails",
+      "Trade without a trade-scoped key",
+      "Skip Sentinel's checks or your approval settings",
+    ],
+    tools: [
+      "get_portfolio",
+      "get_liquidity_ladder",
+      "list_products",
+      "get_market_signals",
+      "list_deals",
+      "review_valuations",
+      "check_portfolio_risk",
+      "plan_rebalance",
+      "preview_trade",
+      "list_autopilot_rules",
+      "get_recent_activity",
+      "propose_trade",
+      "propose_rebalance",
+      "create_autopilot_rule",
+      "pause_all_agents",
+    ],
+    routine: "",
+    accent: "#c9d1e0",
+  },
 };
 
 export const DESK_AGENTS: AgentId[] = ["ledger", "scout", "sentinel", "atlas", "quant"];

@@ -1,7 +1,9 @@
 # Architecture
 
 MyLiquid is a single Next.js 16 app (App Router, TypeScript, Tailwind v4) with a
-SQLite database. The code is layered so the rules that matter for money live in
+SQLite database. It is multi-user: every portfolio, order, proposal, alert, rule,
+chat and audit event belongs to one investor. The simulated market (prices and
+Scout's deal reviews) is shared. The code is layered so the rules that matter for money live in
 pure, tested functions, and everything above them (agents, API, UI) goes through
 the same service layer.
 
@@ -19,6 +21,25 @@ the same service layer.
                         ▼
                     lib/db (better-sqlite3)  schema, seed
 ```
+
+## Accounts, sessions and connected agents
+
+- `lib/auth`: scrypt password hashes and random session tokens. Only a SHA-256
+  of each token is stored, in an httpOnly, SameSite=Lax cookie (`ml_session`).
+  Pages call `requireInvestor()` (which redirects to `/login`). Route handlers call
+  `requireApiInvestor()` (which returns 401). Mutating API requests with a foreign
+  `Origin` are rejected.
+- `services/investors.ts`: creates accounts with a starter (sample portfolio
+  backfilled from market history, or $100k of cash). It also upgrades guests to
+  users, resets or deletes accounts, and prunes guests older than 7 days.
+- `services/apiKeys.ts` and `lib/mcp/server.ts`: scoped keys (`mlk_…`, stored
+  hashed, shown once) and a stateless Streamable HTTP MCP server built on the
+  official SDK. Tools are the same `AgentTool`s the desk uses, filtered by scope
+  and run as the `external` agent. Requests are rate-limited per key.
+- `services/sim.ts`: one market clock for everyone. `ensureMarketCurrent` catches
+  the market up to the real date on each app or MCP request. Each simulated day
+  settles, gates, records NAV, checks circuit breakers and runs autopilot rules
+  for every investor.
 
 ## Layers
 
@@ -83,6 +104,11 @@ watch tool calls happen live.
 4. Rejected deals can never be bought, whether by a person or an agent.
 5. Locked lots can never be sold before `locked_until`.
 6. The audit log (`agent_events`) is append-only.
+7. Every service call is scoped by `investorId`. Lookups by id (orders,
+   proposals, alerts, rules, keys) always also match the investor, so one user can
+   never act on another's records.
+8. Session cookies can reach cash, settings and account deletion. API keys can
+   only reach the MCP tool list for their scope.
 
 ## Tests
 
@@ -97,3 +123,8 @@ watch tool calls happen live.
 - `claude-loop.test.ts`: the Claude loop against a local mock of the Messages
   streaming API. It checks request shape (model, adaptive thinking, fallbacks,
   eager tool streaming), the tool-result round trip and transcript storage.
+- `services.test.ts` (accounts): investor isolation, passwords, sessions, guest
+  upgrade, reset and delete, API keys.
+- `mcp.test.ts`: drives the real `/api/mcp` route with JSON-RPC. It covers auth,
+  origin checks, scope filtering, read tools, and trade proposals from an external
+  agent (including the blocked shipyard bond).

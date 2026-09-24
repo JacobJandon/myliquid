@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db";
+import { requireInvestor } from "@/lib/auth/current";
 import { PRODUCTS, isLiquid } from "@/lib/domain/catalog";
 import { listRules } from "@/lib/services/rules";
 import { RulesPanel } from "@/components/app/RulesPanel";
@@ -6,8 +7,9 @@ import { RulesPanel } from "@/components/app/RulesPanel";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Autopilot" };
 
-export default function AutopilotPage() {
-  const rules = listRules(getDb()).map((r) => ({
+export default async function AutopilotPage() {
+  const { id: investorId } = await requireInvestor();
+  const rules = listRules(getDb(), investorId).map((r) => ({
     id: r.id,
     name: r.name,
     status: r.status,

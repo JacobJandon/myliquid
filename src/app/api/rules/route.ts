@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { amountUsd, handle, json, parseBody, toCents } from "@/lib/api";
+import { requireApiInvestor } from "@/lib/auth/current";
 import { createRule, listRules } from "@/lib/services/rules";
 
 export const runtime = "nodejs";
@@ -21,10 +22,19 @@ const RuleBody = z.object({
   name: z.string().max(120).optional(),
 });
 
-export const GET = handle(() => json({ rules: listRules(getDb()) }));
+export const GET = handle(async () =>
+  json({ rules: listRules(getDb(), await requireApiInvestor()) }),
+);
 
 export const POST = handle(async (req: Request) => {
+  const investorId = await requireApiInvestor();
   const body = await parseBody(req, RuleBody);
-  const rule = createRule(getDb(), { ...body, amountCents: toCents(body.amountUsd) }, "user");
-  return json({ rule });
+  return json({
+    rule: createRule(
+      getDb(),
+      investorId,
+      { ...body, amountCents: toCents(body.amountUsd) },
+      "user",
+    ),
+  });
 });

@@ -1,7 +1,7 @@
 import http from "node:http";
 import type { AddressInfo } from "node:net";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { openDatabase, setDb } from "@/lib/db";
+import { DEMO_INVESTOR_ID, getDb, openDatabase, setDb } from "@/lib/db";
 import type { DeskEvent } from "../events";
 
 /**
@@ -116,7 +116,7 @@ describe("Claude agent loop (mock API)", () => {
   it("streams text, runs the tool, and stores the conversation", async () => {
     const { copilotChat, getTranscript } = await import("../runner");
     const events: DeskEvent[] = [];
-    await copilotChat("How is my portfolio?", (e) => events.push(e));
+    await copilotChat(DEMO_INVESTOR_ID, "How is my portfolio?", (e: DeskEvent) => events.push(e));
 
     expect(events.find((e) => e.type === "run_started")).toMatchObject({ mode: "claude" });
     expect(events.find((e) => e.type === "tool_call")).toMatchObject({ tool: "get_portfolio" });
@@ -148,7 +148,7 @@ describe("Claude agent loop (mock API)", () => {
     const second = requests[1]!.body.messages as { role: string; content: { type: string }[] }[];
     expect(second.at(-1)!.content.every((b) => b.type === "tool_result")).toBe(true);
 
-    const transcript = getTranscript();
+    const transcript = getTranscript(getDb(), DEMO_INVESTOR_ID);
     expect(transcript.map((t) => t.role)).toEqual(["user", "assistant"]);
     expect(transcript[1]!.tools).toEqual(["get_portfolio"]);
     expect(transcript[1]!.text).toContain("eight positions");

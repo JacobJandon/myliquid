@@ -115,10 +115,17 @@ export function Stat({
   className?: string;
 }) {
   return (
-    <div className={clsx("rounded-2xl border border-line bg-surface/80 px-5 py-4", className)}>
+    <div
+      className={clsx(
+        "min-w-0 rounded-2xl border border-line bg-surface/80 px-4 py-3 sm:px-5 sm:py-4",
+        className,
+      )}
+    >
       <div className="text-xs text-muted">{label}</div>
-      <div className="mt-1 text-2xl font-semibold tracking-tight text-fg">{value}</div>
-      {sub && <div className="mt-1 text-xs text-fg-2">{sub}</div>}
+      <div className="mt-1 truncate text-xl font-semibold tracking-tight text-fg sm:text-2xl">
+        {value}
+      </div>
+      {sub && <div className="mt-1 text-[11px] leading-snug text-fg-2 sm:text-xs">{sub}</div>}
     </div>
   );
 }

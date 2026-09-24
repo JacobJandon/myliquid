@@ -1,6 +1,6 @@
-import { DEMO_INVESTOR_ID, newId, nowIso, simDate, type Db } from "@/lib/db";
+import { newId, nowIso, simDate, type Db } from "@/lib/db";
 import { getProduct } from "@/lib/domain/catalog";
-import { diffDays } from "@/lib/domain/dates";
+import { addDays, diffDays } from "@/lib/domain/dates";
 import {
   RULE_COOLDOWN_DAYS,
   describeRule,
@@ -13,11 +13,12 @@ import { logEvent } from "./audit";
 import { getSnapshot } from "./portfolio";
 import { agentTrade, type AgentTradeResult } from "./proposals";
 import { priceHistory } from "./repo";
-import { addDays } from "@/lib/domain/dates";
 
 /** Autopilot rules: plain-language strategies compiled into triggers that Quant watches daily. */
 
-function mapRule(r: Record<string, unknown>): AutopilotRule & { createdBy: string } {
+export type RuleWithMeta = AutopilotRule & { createdBy: string };
+
+function mapRule(r: Record<string, unknown>): RuleWithMeta {
   return {
     id: r.id as string,
     name: r.name as string,
@@ -32,10 +33,10 @@ function mapRule(r: Record<string, unknown>): AutopilotRule & { createdBy: strin
   };
 }
 
-export function listRules(db: Db): (AutopilotRule & { createdBy: string })[] {
+export function listRules(db: Db, investorId: string): RuleWithMeta[] {
   const rows = db
     .prepare("SELECT * FROM rules WHERE investor_id = ? ORDER BY created_at DESC")
-    .all(DEMO_INVESTOR_ID) as Record<string, unknown>[];
+    .all(investorId) as Record<string, unknown>[];
   return rows.map(mapRule);
 }
 
@@ -48,7 +49,12 @@ export interface NewRule {
   name?: string;
 }
 
-export function createRule(db: Db, input: NewRule, createdBy: string): AutopilotRule {
+export function createRule(
+  db: Db,
+  investorId: string,
+  input: NewRule,
+  createdBy: string,
+): RuleWithMeta {
   const product = getProduct(input.productId);
   if (!product) throw new Error(`Unknown product ${input.productId}`);
   if (product.liquidity.redemption !== "daily" && product.liquidity.redemption !== "instant") {
@@ -64,7 +70,7 @@ export function createRule(db: Db, input: NewRule, createdBy: string): Autopilot
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)`,
   ).run(
     id,
-    DEMO_INVESTOR_ID,
+    investorId,
     name,
     input.productId,
     input.condition,
@@ -74,32 +80,43 @@ export function createRule(db: Db, input: NewRule, createdBy: string): Autopilot
     createdBy,
     nowIso(),
   );
-  logEvent(db, { agent: createdBy, kind: "system", title: `Autopilot rule created: ${name}` });
-  return listRules(db).find((r) => r.id === id)!;
+  logEvent(db, investorId, {
+    agent: createdBy,
+    kind: "system",
+    title: `Autopilot rule created: ${name}`,
+  });
+  return listRules(db, investorId).find((r) => r.id === id)!;
 }
 
-export function setRuleStatus(db: Db, id: string, status: "active" | "paused"): void {
+export function setRuleStatus(
+  db: Db,
+  investorId: string,
+  id: string,
+  status: "active" | "paused",
+): void {
   db.prepare("UPDATE rules SET status = ? WHERE id = ? AND investor_id = ?").run(
     status,
     id,
-    DEMO_INVESTOR_ID,
+    investorId,
   );
 }
 
-export function deleteRule(db: Db, id: string): void {
-  db.prepare("DELETE FROM rules WHERE id = ? AND investor_id = ?").run(id, DEMO_INVESTOR_ID);
+export function deleteRule(db: Db, investorId: string, id: string): void {
+  db.prepare("DELETE FROM rules WHERE id = ? AND investor_id = ?").run(id, investorId);
 }
 
 /** Quant evaluates every active rule against today's prices. Triggered rules go through `agentTrade`. */
 export function evaluateRules(
   db: Db,
+  investorId: string,
   runId?: string | null,
 ): { rule: AutopilotRule; result: AgentTradeResult }[] {
   const today = simDate(db);
-  const snapshot = getSnapshot(db, today);
+  const rules = listRules(db, investorId).filter((r) => r.status === "active");
+  if (rules.length === 0) return [];
+  const snapshot = getSnapshot(db, investorId, today);
   const fired: { rule: AutopilotRule; result: AgentTradeResult }[] = [];
-  for (const rule of listRules(db)) {
-    if (rule.status !== "active") continue;
+  for (const rule of rules) {
     if (rule.lastTriggeredOn && diffDays(rule.lastTriggeredOn, today) < RULE_COOLDOWN_DAYS)
       continue;
     const history = priceHistory(db, rule.productId, addDays(today, -365));
@@ -118,6 +135,7 @@ export function evaluateRules(
     db.prepare("UPDATE rules SET last_triggered_on = ? WHERE id = ?").run(today, rule.id);
     const result = agentTrade(
       db,
+      investorId,
       "quant",
       { productId: rule.productId, side: rule.action, amountCents: rule.amountCents },
       `Autopilot rule triggered: ${rule.name}`,

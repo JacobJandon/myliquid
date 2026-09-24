@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireInvestor } from "@/lib/auth/current";
 import { getDb, simDate } from "@/lib/db";
 import { PRODUCTS, SLEEVE_LABELS } from "@/lib/domain/catalog";
 import { formatPrice, formatUsd } from "@/lib/domain/money";
@@ -31,10 +32,13 @@ const SECTIONS: { sleeve: InvestableSleeve; blurb: string }[] = [
   },
 ];
 
-export default function InvestPage() {
+export default async function InvestPage() {
+  const { id: investorId } = await requireInvestor();
   const db = getDb();
   const prices = latestPrices(db, simDate(db));
-  const held = new Map(getSnapshot(db).holdings.map((h) => [h.product.id, h.valueCents]));
+  const held = new Map(
+    getSnapshot(db, investorId).holdings.map((h) => [h.product.id, h.valueCents]),
+  );
 
   return (
     <div className="space-y-10">

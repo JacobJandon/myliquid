@@ -23,7 +23,7 @@ function caller(ctx: ToolContext, emit: (e: DeskEvent) => void) {
     if (!tool) throw new Error(`Unknown tool ${name}`);
     emit({ type: "tool_call", agent: ctx.agent, tool: name, input });
     const outcome = invokeTool(tool, input, ctx);
-    logEvent(ctx.db, {
+    logEvent(ctx.db, ctx.investorId, {
       runId: ctx.runId,
       agent: ctx.agent,
       kind: "tool_call",
@@ -184,8 +184,8 @@ function quantRoutine(call: Call, ctx: ToolContext): string {
   ];
 
   // At most one tactical trim: an overweight liquid sleeve that is also in a downtrend.
-  const snap = getSnapshot(ctx.db);
-  const profile = getProfile(ctx.db);
+  const snap = getSnapshot(ctx.db, ctx.investorId);
+  const profile = getProfile(ctx.db, ctx.investorId);
   const candidates = signals
     .filter((s) => s.trend === "downtrend")
     .map((s) => {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireInvestor } from "@/lib/auth/current";
 import { getDb, simDate } from "@/lib/db";
 import { SLEEVE_LABELS } from "@/lib/domain/catalog";
 import { addDays, formatDate } from "@/lib/domain/dates";
@@ -13,7 +14,7 @@ import {
   getSnapshot,
 } from "@/lib/services/portfolio";
 import { listProposals } from "@/lib/services/proposals";
-import { getInvestor, getProfile } from "@/lib/services/repo";
+import { getProfile } from "@/lib/services/repo";
 import { AlertsList } from "@/components/app/AlertsList";
 import { CashPanel } from "@/components/app/CashPanel";
 import { ProposalInbox } from "@/components/app/ProposalInbox";
@@ -34,22 +35,25 @@ function toPlainText(md: string): string {
     .trim();
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const investor = await requireInvestor();
+  const investorId = investor.id;
   const db = getDb();
-  const investor = getInvestor(db);
-  const profile = getProfile(db);
-  const snapshot = getSnapshot(db);
-  const ladder = getLadder(db, snapshot);
-  const nav = getNavHistory(db, 366);
-  const proposals = listProposals(db, { status: "pending" });
-  const alerts = listAlerts(db, { openOnly: true }).filter((a) => a.severity !== "info");
-  const runs = lastRunByAgent(db);
+  const profile = getProfile(db, investorId);
+  const snapshot = getSnapshot(db, investorId);
+  const ladder = getLadder(db, investorId, snapshot);
+  const nav = getNavHistory(db, investorId, 366);
+  const proposals = listProposals(db, investorId, { status: "pending" });
+  const alerts = listAlerts(db, investorId, { openOnly: true }).filter(
+    (a) => a.severity !== "info",
+  );
+  const runs = lastRunByAgent(db, investorId);
   const today = simDate(db);
 
   const yesterday = nav.findLast((p) => p.date < today)?.totalCents ?? snapshot.totalCents;
   const yearAgo =
     nav.find((p) => p.date >= addDays(today, -365))?.totalCents ?? snapshot.totalCents;
-  const contributions = getNetContributions(db);
+  const contributions = getNetContributions(db, investorId);
   const week = ladder.find((b) => b.id === "week");
 
   return (
@@ -67,7 +71,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <Stat
           label="Total value"
           value={formatUsd(snapshot.totalCents)}
@@ -89,6 +93,26 @@ export default function DashboardPage() {
           sub={`${proposals.length} proposal${proposals.length === 1 ? "" : "s"} · ${alerts.length} alert${alerts.length === 1 ? "" : "s"}`}
         />
       </div>
+
+      {(snapshot.holdings.length === 0 || runs.size === 0) && (
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/10 to-accent-2/10 p-5">
+          <div>
+            <div className="font-medium text-fg">
+              {snapshot.holdings.length === 0
+                ? "Your agents are ready to build your first portfolio."
+                : "Your agents haven't looked at this portfolio yet."}
+            </div>
+            <p className="mt-1 max-w-2xl text-sm text-fg-2">
+              {snapshot.holdings.length === 0
+                ? `Run the desk cycle: Scout screens the deals, Sentinel checks your ${profile.label.toLowerCase()} limits, and Atlas proposes an allocation for you to approve.`
+                : "Run the desk cycle: Ledger checks the valuations, Scout screens the deals, Sentinel checks your limits and liquidity, and Atlas proposes fixes for you to approve."}
+            </p>
+          </div>
+          <LinkButton href="/app/agents" variant="primary">
+            Open the agent desk
+          </LinkButton>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="min-w-0 space-y-6 xl:col-span-2">

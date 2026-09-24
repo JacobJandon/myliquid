@@ -44,6 +44,7 @@ import { createRule, listRules, setRuleStatus } from "@/lib/services/rules";
 
 export interface ToolContext {
   db: Db;
+  investorId: string;
   agent: AgentId;
   runId: string | null;
 }
@@ -85,7 +86,7 @@ const productIdSchema = z
 const amountUsdSchema = z.number().positive().max(10_000_000).describe("Order size in US dollars");
 
 function tradingBlockedReason(ctx: ToolContext): string | null {
-  const mandate = getMandate(ctx.db);
+  const mandate = getMandate(ctx.db, ctx.investorId);
   if (mandate.killSwitch)
     return `All agents are paused (kill switch${mandate.killReason ? `: ${mandate.killReason}` : ""}). Only the investor can resume them.`;
   if (mandate.disabledAgents.includes(ctx.agent))
@@ -101,9 +102,9 @@ const getPortfolio = defineTool({
     "Current portfolio: total value, cash, each sleeve's weight vs target, and every holding with its lock-up status.",
   schema: z.object({}),
   trades: false,
-  run: (_input, { db }) => {
-    const snap = getSnapshot(db);
-    const profile = getProfile(db);
+  run: (_input, { db, investorId }) => {
+    const snap = getSnapshot(db, investorId);
+    const profile = getProfile(db, investorId);
     return {
       date: snap.date,
       riskProfile: {
@@ -146,8 +147,8 @@ const getLiquidityLadder = defineTool({
     "How much of the portfolio could become cash, and when: today, within 7 days, 90 days, 1 year, 5 years, or later. Takes settlement, notice periods, gates and lock-ups into account.",
   schema: z.object({}),
   trades: false,
-  run: (_input, { db }) => {
-    const ladder = getLadder(db);
+  run: (_input, { db, investorId }) => {
+    const ladder = getLadder(db, investorId);
     return {
       buckets: ladder.map((b) => ({
         bucket: b.label,
@@ -171,8 +172,8 @@ const listProducts = defineTool({
     "The product shelf: every fund, asset and private deal with price, liquidity terms, valuation source and minimum investment.",
   schema: z.object({}),
   trades: false,
-  run: (_input, { db }) => {
-    const snap = getSnapshot(db);
+  run: (_input, { db, investorId }) => {
+    const snap = getSnapshot(db, investorId);
     return {
       products: PRODUCTS.map((p) => {
         const holding = snap.holdings.find((h) => h.product.id === p.id);
@@ -269,12 +270,12 @@ const reviewDeal = defineTool({
     "Scout's diligence on one private deal: runs the red-flag checklist, saves the score and verdict, and returns the memo.",
   schema: z.object({ productId: productIdSchema }),
   trades: false,
-  run: ({ productId }, { db, agent, runId }) => {
+  run: ({ productId }, { db, investorId, agent, runId }) => {
     const facts = getDealFacts(productId);
     if (!facts) return { error: `${productId} is not a private deal.` };
     const result = scoreDeal(facts);
     saveDealReview(db, result, simDate(db), agent === "copilot" ? "scout" : agent);
-    logEvent(db, {
+    logEvent(db, investorId, {
       runId,
       agent: "scout",
       kind: "tool_result",
@@ -296,9 +297,9 @@ const reviewValuations = defineTool({
     "Ledger's valuation review of every privately valued product: flags stale marks, originator (self) marks and suspiciously smooth returns, and raises alerts.",
   schema: z.object({}),
   trades: false,
-  run: (_input, { db, runId }) => {
+  run: (_input, { db, investorId, runId }) => {
     const today = simDate(db);
-    const held = new Set(getSnapshot(db).holdings.map((h) => h.product.id));
+    const held = new Set(getSnapshot(db, investorId).holdings.map((h) => h.product.id));
     const findings = PRODUCTS.filter((p) => p.valuation.source !== "market").flatMap((p) =>
       reviewValuation(p, priceHistory(db, p.id, addDays(today, -240)), today).map((f) => ({
         ...f,
@@ -310,7 +311,7 @@ const reviewValuations = defineTool({
       if (f.severity === "info") continue;
       const code = `valuation_${f.code}`;
       open.push({ code, productId: f.productId });
-      raiseAlert(db, {
+      raiseAlert(db, investorId, {
         agent: "ledger",
         severity: f.severity,
         code,
@@ -320,7 +321,7 @@ const reviewValuations = defineTool({
         runId,
       });
     }
-    resolveMissing(db, "ledger", open);
+    resolveMissing(db, investorId, "ledger", open);
     return {
       date: today,
       findings: findings.map((f) => ({
@@ -340,16 +341,16 @@ const checkPortfolioRisk = defineTool({
     "Sentinel's risk review: checks the portfolio against the investor's limits (illiquid share, bitcoin, single-deal concentration, cash buffer) and raises alerts.",
   schema: z.object({}),
   trades: false,
-  run: (_input, { db, runId }) => {
-    const snap = getSnapshot(db);
-    const ladder = getLadder(db, snap);
+  run: (_input, { db, investorId, runId }) => {
+    const snap = getSnapshot(db, investorId);
+    const ladder = getLadder(db, investorId, snap);
     const week = ladder.find((b) => b.id === "week")?.cumulativePct ?? 0;
-    const findings = reviewPortfolioRisk(snap, getProfile(db), week);
+    const findings = reviewPortfolioRisk(snap, getProfile(db, investorId), week);
     const open: { code: string; productId?: string | null }[] = [];
     for (const f of findings) {
       if (f.severity === "info") continue;
       open.push({ code: f.code, productId: f.productId ?? null });
-      raiseAlert(db, {
+      raiseAlert(db, investorId, {
         agent: "sentinel",
         severity: f.severity,
         code: f.code,
@@ -359,7 +360,7 @@ const checkPortfolioRisk = defineTool({
         runId,
       });
     }
-    resolveMissing(db, "sentinel", [
+    resolveMissing(db, investorId, "sentinel", [
       ...open,
       { code: "circuit_breaker" },
       { code: "agents_paused" },
@@ -377,11 +378,11 @@ const planRebalanceTool = defineTool({
     "Atlas's rebalancing plan: drift per sleeve vs target and the trades that would fix it. Read-only; nothing is proposed.",
   schema: z.object({}),
   trades: false,
-  run: (_input, { db }) => {
+  run: (_input, { db, investorId }) => {
     const plan = planRebalance(
-      getSnapshot(db),
-      getProfile(db),
-      getAvailableLots(db),
+      getSnapshot(db, investorId),
+      getProfile(db, investorId),
+      getAvailableLots(db, investorId),
       eligibleIlliquidProducts(db),
     );
     return {
@@ -418,9 +419,10 @@ const previewTrade = defineTool({
   description: "Runs Sentinel's pre-trade checks on a hypothetical order without placing it.",
   schema: tradeInput,
   trades: false,
-  run: ({ productId, side, amountUsd }, { db, agent }) => {
+  run: ({ productId, side, amountUsd }, { db, investorId, agent }) => {
     const preview = previewOrder(
       db,
+      investorId,
       { productId, side, amountCents: Math.round(amountUsd * 100) },
       agent,
     );
@@ -445,9 +447,10 @@ const proposeTrade = defineTool({
       .describe("Why, in one or two sentences, for the investor"),
   }),
   trades: true,
-  run: ({ productId, side, amountUsd, rationale }, { db, agent, runId }) => {
+  run: ({ productId, side, amountUsd, rationale }, { db, investorId, agent, runId }) => {
     const result = agentTrade(
       db,
+      investorId,
       agent,
       { productId, side, amountCents: Math.round(amountUsd * 100) },
       rationale,
@@ -488,8 +491,8 @@ const proposeRebalance = defineTool({
       .describe("Summary for the investor of why to rebalance now"),
   }),
   trades: true,
-  run: ({ rationale }, { db, agent, runId }) => {
-    const pending = listProposals(db, { status: "pending" }).find((p) =>
+  run: ({ rationale }, { db, investorId, agent, runId }) => {
+    const pending = listProposals(db, investorId, { status: "pending" }).find((p) =>
       p.title.startsWith("Rebalance"),
     );
     if (pending)
@@ -498,15 +501,15 @@ const proposeRebalance = defineTool({
         proposalId: pending.id,
         note: "A rebalance proposal is already waiting for the investor.",
       };
-    const profile = getProfile(db);
+    const profile = getProfile(db, investorId);
     const plan = planRebalance(
-      getSnapshot(db),
+      getSnapshot(db, investorId),
       profile,
-      getAvailableLots(db),
+      getAvailableLots(db, investorId),
       eligibleIlliquidProducts(db),
     );
     if (plan.trades.length === 0) return { outcome: "nothing_to_do", notes: plan.notes };
-    const created = createProposal(db, {
+    const created = createProposal(db, investorId, {
       agent: agent === "copilot" ? "atlas" : agent,
       title: `Rebalance to ${profile.label} targets (${plan.trades.length} orders)`,
       rationale: [
@@ -545,8 +548,8 @@ const listAutopilotRules = defineTool({
     "The investor's autopilot rules (plain-language strategies Quant watches every day), with status and when each last fired.",
   schema: z.object({}),
   trades: false,
-  run: (_input, { db }) => ({
-    rules: listRules(db).map((r) => ({
+  run: (_input, { db, investorId }) => ({
+    rules: listRules(db, investorId).map((r) => ({
       id: r.id,
       rule: r.name,
       status: r.status,
@@ -573,10 +576,11 @@ const createAutopilotRule = defineTool({
     name: z.string().max(120).optional(),
   }),
   trades: true,
-  run: (input, { db, agent }) => {
+  run: (input, { db, investorId, agent }) => {
     try {
       const rule = createRule(
         db,
+        investorId,
         {
           productId: input.productId,
           condition: input.condition,
@@ -587,7 +591,7 @@ const createAutopilotRule = defineTool({
         },
         agent,
       );
-      setRuleStatus(db, rule.id, "paused");
+      setRuleStatus(db, investorId, rule.id, "paused");
       return {
         outcome: "created_paused",
         ruleId: rule.id,
@@ -605,9 +609,9 @@ const getRecentActivity = defineTool({
   description: "Recent audit-log events, pending proposals and open alerts.",
   schema: z.object({ limit: z.number().int().min(1).max(50).optional() }),
   trades: false,
-  run: ({ limit }, { db }) => ({
+  run: ({ limit }, { db, investorId }) => ({
     mandate: (() => {
-      const m = getMandate(db);
+      const m = getMandate(db, investorId);
       return {
         autonomy: m.autonomy,
         killSwitch: m.killSwitch,
@@ -615,17 +619,17 @@ const getRecentActivity = defineTool({
         autoExecuteLimit: formatUsd(m.autoExecuteLimitCents),
       };
     })(),
-    pendingProposals: listProposals(db, { status: "pending" }).map((p) => ({
+    pendingProposals: listProposals(db, investorId, { status: "pending" }).map((p) => ({
       id: p.id,
       agent: p.agent,
       title: p.title,
     })),
-    openAlerts: listAlerts(db, { openOnly: true, limit: 20 }).map((a) => ({
+    openAlerts: listAlerts(db, investorId, { openOnly: true, limit: 20 }).map((a) => ({
       severity: a.severity,
       agent: a.agent,
       title: a.title,
     })),
-    events: listEvents(db, { limit: limit ?? 15 }).map((e) => ({
+    events: listEvents(db, investorId, { limit: limit ?? 15 }).map((e) => ({
       at: e.simDate,
       agent: e.agent,
       event: e.title,
@@ -639,9 +643,9 @@ const pauseAllAgents = defineTool({
     "Pulls the kill switch: pauses every agent and autopilot rule. Only the investor can resume. Use only for a real emergency.",
   schema: z.object({ reason: z.string().min(5).max(300) }),
   trades: false,
-  run: ({ reason }, { db, agent, runId }) => {
-    updateMandate(db, { killSwitch: true, killReason: `${agent}: ${reason}` });
-    raiseAlert(db, {
+  run: ({ reason }, { db, investorId, agent, runId }) => {
+    updateMandate(db, investorId, { killSwitch: true, killReason: `${agent}: ${reason}` });
+    raiseAlert(db, investorId, {
       agent: "sentinel",
       severity: "critical",
       code: "agents_paused",

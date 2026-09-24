@@ -1,0 +1,10 @@
+import { handle, json } from "@/lib/api";
+import { endSession } from "@/lib/auth/current";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export const POST = handle(async () => {
+  await endSession();
+  return json({ ok: true });
+});

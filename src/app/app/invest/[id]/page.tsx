@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requireInvestor } from "@/lib/auth/current";
 import { notFound } from "next/navigation";
 import { getDb, simDate } from "@/lib/db";
 import { SLEEVE_LABELS, getDealFacts, getProduct } from "@/lib/domain/catalog";
@@ -22,15 +23,16 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const product = getProduct(decodeURIComponent(id));
   if (!product) notFound();
 
+  const { id: investorId } = await requireInvestor();
   const db = getDb();
   const today = simDate(db);
   const history = priceHistory(db, product.id, addDays(today, -366));
-  const snapshot = getSnapshot(db);
+  const snapshot = getSnapshot(db, investorId);
   const holding = snapshot.holdings.find((h) => h.product.id === product.id);
-  const lots = getLots(db).filter((l) => l.productId === product.id);
+  const lots = getLots(db, investorId).filter((l) => l.productId === product.id);
   const price = history.at(-1)?.price ?? product.startPrice;
   const sellableCents = Math.round(
-    unlockedUnits(getAvailableLots(db), product.id, today) * price * 100,
+    unlockedUnits(getAvailableLots(db, investorId), product.id, today) * price * 100,
   );
   const deal = getDealFacts(product.id);
   const review = deal ? getDealReview(db, product.id) : null;

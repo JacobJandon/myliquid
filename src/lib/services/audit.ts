@@ -1,7 +1,6 @@
 import { newId, nowIso, simDate, type Db } from "@/lib/db";
-import type { Actor } from "@/lib/domain/types";
 
-/** Append-only audit trail of everything agents (and people) do on the platform. */
+/** Append-only audit trail of everything agents (and people) do, per investor. */
 
 export type EventKind =
   | "run_started"
@@ -19,7 +18,7 @@ export type EventKind =
 export interface AgentEvent {
   id: number;
   runId: string | null;
-  agent: Actor | "system";
+  agent: string;
   kind: EventKind;
   title: string;
   payload: unknown;
@@ -29,6 +28,7 @@ export interface AgentEvent {
 
 export function logEvent(
   db: Db,
+  investorId: string,
   event: {
     runId?: string | null;
     agent: string;
@@ -38,8 +38,9 @@ export function logEvent(
   },
 ): void {
   db.prepare(
-    "INSERT INTO agent_events (run_id, agent, kind, title, payload, sim_date, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    "INSERT INTO agent_events (investor_id, run_id, agent, kind, title, payload, sim_date, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
   ).run(
+    investorId,
     event.runId ?? null,
     event.agent,
     event.kind,
@@ -52,10 +53,11 @@ export function logEvent(
 
 export function listEvents(
   db: Db,
+  investorId: string,
   opts: { limit?: number; runId?: string; agent?: string } = {},
 ): AgentEvent[] {
-  const where: string[] = [];
-  const params: unknown[] = [];
+  const where = ["investor_id = ?"];
+  const params: unknown[] = [investorId];
   if (opts.runId) {
     where.push("run_id = ?");
     params.push(opts.runId);
@@ -65,13 +67,11 @@ export function listEvents(
     params.push(opts.agent);
   }
   const rows = db
-    .prepare(
-      `SELECT * FROM agent_events ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY id DESC LIMIT ?`,
-    )
+    .prepare(`SELECT * FROM agent_events WHERE ${where.join(" AND ")} ORDER BY id DESC LIMIT ?`)
     .all(...params, opts.limit ?? 100) as {
     id: number;
     run_id: string | null;
-    agent: Actor;
+    agent: string;
     kind: EventKind;
     title: string;
     payload: string | null;
@@ -103,12 +103,18 @@ export interface AgentRun {
   finishedAt: string | null;
 }
 
-export function startRun(db: Db, agent: string, trigger: string, mode: AgentRun["mode"]): string {
+export function startRun(
+  db: Db,
+  investorId: string,
+  agent: string,
+  trigger: string,
+  mode: AgentRun["mode"],
+): string {
   const id = newId("run");
   db.prepare(
-    "INSERT INTO agent_runs (id, agent, trigger, mode, status, sim_date, started_at) VALUES (?, ?, ?, ?, 'running', ?, ?)",
-  ).run(id, agent, trigger, mode, simDate(db), nowIso());
-  logEvent(db, {
+    "INSERT INTO agent_runs (id, investor_id, agent, trigger, mode, status, sim_date, started_at) VALUES (?, ?, ?, ?, ?, 'running', ?, ?)",
+  ).run(id, investorId, agent, trigger, mode, simDate(db), nowIso());
+  logEvent(db, investorId, {
     runId: id,
     agent,
     kind: "run_started",
@@ -129,10 +135,10 @@ export function finishRun(db: Db, id: string, result: { summary?: string; error?
   );
 }
 
-export function listRuns(db: Db, limit = 20): AgentRun[] {
+export function listRuns(db: Db, investorId: string, limit = 20): AgentRun[] {
   const rows = db
-    .prepare("SELECT * FROM agent_runs ORDER BY started_at DESC LIMIT ?")
-    .all(limit) as {
+    .prepare("SELECT * FROM agent_runs WHERE investor_id = ? ORDER BY started_at DESC LIMIT ?")
+    .all(investorId, limit) as {
     id: string;
     agent: string;
     trigger: string;
@@ -158,8 +164,8 @@ export function listRuns(db: Db, limit = 20): AgentRun[] {
   }));
 }
 
-export function lastRunByAgent(db: Db): Map<string, AgentRun> {
+export function lastRunByAgent(db: Db, investorId: string): Map<string, AgentRun> {
   const map = new Map<string, AgentRun>();
-  for (const run of listRuns(db, 200)) if (!map.has(run.agent)) map.set(run.agent, run);
+  for (const run of listRuns(db, investorId, 200)) if (!map.has(run.agent)) map.set(run.agent, run);
   return map;
 }

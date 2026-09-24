@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db";
+import { requireInvestor } from "@/lib/auth/current";
 import { formatUsd } from "@/lib/domain/money";
 import { AGENTS, DESK_AGENTS } from "@/lib/agents/registry";
 import { agentMode, modelName } from "@/lib/agents/llm";
@@ -10,10 +11,11 @@ import { AgentAvatar, Badge, Card, LinkButton } from "@/components/ui";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Agent desk" };
 
-export default function AgentsPage() {
+export default async function AgentsPage() {
+  const { id: investorId } = await requireInvestor();
   const db = getDb();
-  const mandate = getMandate(db);
-  const last = lastRunByAgent(db);
+  const mandate = getMandate(db, investorId);
+  const last = lastRunByAgent(db, investorId);
   const mode = agentMode();
 
   const cards: DeskAgentCard[] = DESK_AGENTS.map((id) => {
@@ -35,7 +37,7 @@ export default function AgentsPage() {
     };
   });
 
-  const history = listRuns(db, 15);
+  const history = listRuns(db, investorId, 15);
 
   return (
     <div className="space-y-6">

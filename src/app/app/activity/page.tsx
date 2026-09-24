@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db";
+import { requireInvestor } from "@/lib/auth/current";
 import { requireProduct } from "@/lib/domain/catalog";
 import { formatUsd } from "@/lib/domain/money";
 import { listEvents } from "@/lib/services/audit";
@@ -17,11 +18,12 @@ const STATUS_TONE: Record<string, Tone> = {
   cancelled: "neutral",
 };
 
-export default function ActivityPage() {
+export default async function ActivityPage() {
+  const { id: investorId } = await requireInvestor();
   const db = getDb();
-  const orders = listOrders(db, 60);
-  const cash = listCashMovements(db, 20);
-  const events = listEvents(db, { limit: 120 });
+  const orders = listOrders(db, investorId, 60);
+  const cash = listCashMovements(db, investorId, 20);
+  const events = listEvents(db, investorId, { limit: 120 });
 
   return (
     <div className="space-y-6">

@@ -8,6 +8,6 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts"],
-    env: { MYLIQUID_DB_PATH: ":memory:", ANTHROPIC_API_KEY: "" },
+    env: { MYLIQUID_DB_PATH: ":memory:", ANTHROPIC_API_KEY: "", MYLIQUID_MARKET_CLOCK: "manual" },
   },
 });

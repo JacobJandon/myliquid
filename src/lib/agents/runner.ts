@@ -2,7 +2,7 @@ import type {
   BetaContentBlockParam,
   BetaMessageParam,
 } from "@anthropic-ai/sdk/resources/beta/messages/messages";
-import { DEMO_INVESTOR_ID, getDb, nowIso, simDate, type Db } from "@/lib/db";
+import { getDb, nowIso, simDate, type Db } from "@/lib/db";
 import type { AgentId } from "@/lib/domain/types";
 import { finishRun, logEvent, startRun } from "@/lib/services/audit";
 import { getMandate } from "@/lib/services/repo";
@@ -18,6 +18,7 @@ type Emit = (event: DeskEvent) => void;
 const TRADING_AGENTS: AgentId[] = ["atlas", "quant"];
 
 export async function runAgentRoutine(
+  investorId: string,
   agentId: AgentId,
   trigger: "manual" | "cycle",
   emit: Emit,
@@ -25,10 +26,10 @@ export async function runAgentRoutine(
 ): Promise<{ ok: boolean; summary: string }> {
   const db = getDb();
   const def = AGENTS[agentId];
-  const mandate = getMandate(db);
+  const mandate = getMandate(db, investorId);
 
   if (mandate.disabledAgents.includes(agentId)) {
-    emit({ type: "notice", agent: agentId, message: `${def.name} is disabled in Settings.` });
+    emit({ type: "notice", agent: agentId, message: `${def.name} is disabled in Guardrails.` });
     return { ok: false, summary: "Disabled" };
   }
   if (mandate.killSwitch && TRADING_AGENTS.includes(agentId)) {
@@ -37,9 +38,9 @@ export async function runAgentRoutine(
   }
 
   let mode = agentMode();
-  const runId = startRun(db, agentId, trigger, mode);
+  const runId = startRun(db, investorId, agentId, trigger, mode);
   emit({ type: "run_started", agent: agentId, runId, mode });
-  const ctx = { db, agent: agentId, runId };
+  const ctx = { db, investorId, agent: agentId, runId };
 
   let summary = "";
   try {
@@ -76,7 +77,7 @@ export async function runAgentRoutine(
       emit({ type: "text", agent: agentId, delta: summary });
     }
     finishRun(db, runId, { summary });
-    logEvent(db, {
+    logEvent(db, investorId, {
       runId,
       agent: agentId,
       kind: "run_finished",
@@ -88,7 +89,12 @@ export async function runAgentRoutine(
   } catch (err) {
     const message = describeApiError(err);
     finishRun(db, runId, { error: message });
-    logEvent(db, { runId, agent: agentId, kind: "error", title: `${def.name} failed: ${message}` });
+    logEvent(db, investorId, {
+      runId,
+      agent: agentId,
+      kind: "error",
+      title: `${def.name} failed: ${message}`,
+    });
     emit({ type: "error", agent: agentId, message });
     emit({ type: "run_finished", agent: agentId, runId, summary: message, ok: false });
     return { ok: false, summary: message };
@@ -96,10 +102,14 @@ export async function runAgentRoutine(
 }
 
 /** Runs the whole desk in dependency order: marks first, then diligence, risk, strategy, trading. */
-export async function runDeskCycle(emit: Emit, signal?: AbortSignal): Promise<void> {
+export async function runDeskCycle(
+  investorId: string,
+  emit: Emit,
+  signal?: AbortSignal,
+): Promise<void> {
   for (const agent of DESK_AGENTS) {
     if (signal?.aborted) break;
-    await runAgentRoutine(agent, "cycle", emit, signal);
+    await runAgentRoutine(investorId, agent, "cycle", emit, signal);
   }
 }
 
@@ -112,26 +122,25 @@ interface ChatRow {
   created_at: string;
 }
 
-function loadHistory(db: Db): BetaMessageParam[] {
+function loadHistory(db: Db, investorId: string): BetaMessageParam[] {
   const rows = db
     .prepare("SELECT * FROM chat_messages WHERE investor_id = ? ORDER BY id")
-    .all(DEMO_INVESTOR_ID) as ChatRow[];
+    .all(investorId) as ChatRow[];
   return rows.map((r) => ({
     role: r.role,
     content: JSON.parse(r.content) as BetaMessageParam["content"],
   }));
 }
 
-function appendHistory(db: Db, messages: BetaMessageParam[]): void {
+function appendHistory(db: Db, investorId: string, messages: BetaMessageParam[]): void {
   const insert = db.prepare(
     "INSERT INTO chat_messages (investor_id, role, content, created_at) VALUES (?, ?, ?, ?)",
   );
-  for (const m of messages)
-    insert.run(DEMO_INVESTOR_ID, m.role, JSON.stringify(m.content), nowIso());
+  for (const m of messages) insert.run(investorId, m.role, JSON.stringify(m.content), nowIso());
 }
 
-export function clearChat(db: Db = getDb()): void {
-  db.prepare("DELETE FROM chat_messages WHERE investor_id = ?").run(DEMO_INVESTOR_ID);
+export function clearChat(db: Db, investorId: string): void {
+  db.prepare("DELETE FROM chat_messages WHERE investor_id = ?").run(investorId);
 }
 
 export interface TranscriptItem {
@@ -142,10 +151,10 @@ export interface TranscriptItem {
 }
 
 /** A display-friendly view of the stored conversation (tool results are folded into the turn that called them). */
-export function getTranscript(db: Db = getDb()): TranscriptItem[] {
+export function getTranscript(db: Db, investorId: string): TranscriptItem[] {
   const rows = db
     .prepare("SELECT * FROM chat_messages WHERE investor_id = ? ORDER BY id")
-    .all(DEMO_INVESTOR_ID) as ChatRow[];
+    .all(investorId) as ChatRow[];
   const items: TranscriptItem[] = [];
   for (const r of rows) {
     const content = JSON.parse(r.content) as string | BetaContentBlockParam[];
@@ -173,6 +182,7 @@ export function getTranscript(db: Db = getDb()): TranscriptItem[] {
 }
 
 export async function copilotChat(
+  investorId: string,
   message: string,
   emit: Emit,
   signal?: AbortSignal,
@@ -180,13 +190,17 @@ export async function copilotChat(
   const db = getDb();
   const text = message.trim().slice(0, 4000);
   if (!text) return;
-  const history = loadHistory(db);
+  const history = loadHistory(db, investorId);
   const userTurn: BetaMessageParam = { role: "user", content: text };
-  appendHistory(db, [userTurn]);
-  logEvent(db, { agent: "user", kind: "message", title: `Asked Copilot: ${text.slice(0, 200)}` });
+  appendHistory(db, investorId, [userTurn]);
+  logEvent(db, investorId, {
+    agent: "user",
+    kind: "message",
+    title: `Asked Copilot: ${text.slice(0, 200)}`,
+  });
 
   const def = AGENTS.copilot;
-  const ctx = { db, agent: "copilot" as const, runId: null };
+  const ctx = { db, investorId, agent: "copilot" as const, runId: null };
   let mode = agentMode();
   emit({ type: "run_started", agent: "copilot", runId: "chat", mode });
 
@@ -212,7 +226,7 @@ export async function copilotChat(
               } satisfies BetaMessageParam,
             ]
           : result.appended;
-      appendHistory(db, appended);
+      appendHistory(db, investorId, appended);
       emit({
         type: "run_finished",
         agent: "copilot",
@@ -234,6 +248,6 @@ export async function copilotChat(
 
   const reply = offlineCopilot(text, ctx, emit);
   emit({ type: "text", agent: "copilot", delta: reply });
-  appendHistory(db, [{ role: "assistant", content: [{ type: "text", text: reply }] }]);
+  appendHistory(db, investorId, [{ role: "assistant", content: [{ type: "text", text: reply }] }]);
   emit({ type: "run_finished", agent: "copilot", runId: "chat", summary: reply, ok: true });
 }

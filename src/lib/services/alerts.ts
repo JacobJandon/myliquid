@@ -1,4 +1,4 @@
-import { DEMO_INVESTOR_ID, newId, nowIso, simDate, type Db } from "@/lib/db";
+import { newId, nowIso, simDate, type Db } from "@/lib/db";
 import type { Severity } from "@/lib/domain/types";
 import { logEvent } from "./audit";
 
@@ -21,6 +21,7 @@ export interface Alert {
  */
 export function raiseAlert(
   db: Db,
+  investorId: string,
   a: {
     agent: string;
     severity: Severity;
@@ -35,13 +36,13 @@ export function raiseAlert(
     .prepare(
       "SELECT id FROM alerts WHERE investor_id = ? AND code = ? AND COALESCE(product_id, '') = COALESCE(?, '') AND resolved_at IS NULL",
     )
-    .get(DEMO_INVESTOR_ID, a.code, a.productId ?? null) as { id: string } | undefined;
+    .get(investorId, a.code, a.productId ?? null) as { id: string } | undefined;
   const today = simDate(db);
   if (existing) {
     db.prepare(
       "UPDATE alerts SET severity = ?, title = ?, detail = ?, created_on = ?, agent = ? WHERE id = ?",
     ).run(a.severity, a.title, a.detail, today, a.agent, existing.id);
-    return getAlert(db, existing.id)!;
+    return getAlert(db, investorId, existing.id)!;
   }
   const id = newId("alt");
   db.prepare(
@@ -49,7 +50,7 @@ export function raiseAlert(
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     id,
-    DEMO_INVESTOR_ID,
+    investorId,
     a.agent,
     a.severity,
     a.code,
@@ -59,36 +60,37 @@ export function raiseAlert(
     today,
     nowIso(),
   );
-  logEvent(db, {
+  logEvent(db, investorId, {
     runId: a.runId,
     agent: a.agent,
     kind: "alert",
     title: `${a.severity.toUpperCase()}: ${a.title}`,
     payload: { detail: a.detail },
   });
-  return getAlert(db, id)!;
+  return getAlert(db, investorId, id)!;
 }
 
 /** Resolves open alerts from `agent` whose code is no longer reported. */
 export function resolveMissing(
   db: Db,
+  investorId: string,
   agent: string,
-  codesStillOpen: { code: string; productId?: string | null }[],
+  stillOpen: { code: string; productId?: string | null }[],
 ): void {
-  const open = listAlerts(db, { openOnly: true }).filter((a) => a.agent === agent);
-  for (const alert of open) {
-    const stillOpen = codesStillOpen.some(
+  for (const alert of listAlerts(db, investorId, { openOnly: true }).filter(
+    (a) => a.agent === agent,
+  )) {
+    const open = stillOpen.some(
       (c) => c.code === alert.code && (c.productId ?? null) === alert.productId,
     );
-    if (!stillOpen) resolveAlert(db, alert.id);
+    if (!open) resolveAlert(db, investorId, alert.id);
   }
 }
 
-export function resolveAlert(db: Db, id: string): void {
-  db.prepare("UPDATE alerts SET resolved_at = ? WHERE id = ? AND resolved_at IS NULL").run(
-    nowIso(),
-    id,
-  );
+export function resolveAlert(db: Db, investorId: string, id: string): void {
+  db.prepare(
+    "UPDATE alerts SET resolved_at = ? WHERE id = ? AND investor_id = ? AND resolved_at IS NULL",
+  ).run(nowIso(), id, investorId);
 }
 
 function mapAlert(r: Record<string, unknown>): Alert {
@@ -106,20 +108,25 @@ function mapAlert(r: Record<string, unknown>): Alert {
   };
 }
 
-export function getAlert(db: Db, id: string): Alert | undefined {
-  const row = db.prepare("SELECT * FROM alerts WHERE id = ?").get(id) as
-    Record<string, unknown> | undefined;
+export function getAlert(db: Db, investorId: string, id: string): Alert | undefined {
+  const row = db
+    .prepare("SELECT * FROM alerts WHERE id = ? AND investor_id = ?")
+    .get(id, investorId) as Record<string, unknown> | undefined;
   return row ? mapAlert(row) : undefined;
 }
 
 const SEVERITY_ORDER = "CASE severity WHEN 'critical' THEN 0 WHEN 'warn' THEN 1 ELSE 2 END";
 
-export function listAlerts(db: Db, opts: { openOnly?: boolean; limit?: number } = {}): Alert[] {
+export function listAlerts(
+  db: Db,
+  investorId: string,
+  opts: { openOnly?: boolean; limit?: number } = {},
+): Alert[] {
   const rows = db
     .prepare(
       `SELECT * FROM alerts WHERE investor_id = ? ${opts.openOnly ? "AND resolved_at IS NULL" : ""}
        ORDER BY resolved_at IS NOT NULL, ${SEVERITY_ORDER}, created_at DESC LIMIT ?`,
     )
-    .all(DEMO_INVESTOR_ID, opts.limit ?? 100) as Record<string, unknown>[];
+    .all(investorId, opts.limit ?? 100) as Record<string, unknown>[];
   return rows.map(mapAlert);
 }

@@ -1,25 +1,31 @@
-import { DEMO_INVESTOR_ID, getMeta, nowIso, setMeta, simDate, type Db } from "@/lib/db";
+import { getMeta, nowIso, setMeta, simDate, type Db } from "@/lib/db";
 import { PRODUCTS, requireProduct } from "@/lib/domain/catalog";
-import { addDays, isQuarterEnd, nextRedemptionWindow } from "@/lib/domain/dates";
+import {
+  addDays,
+  diffDays,
+  isQuarterEnd,
+  nextRedemptionWindow,
+  toIsoDate,
+} from "@/lib/domain/dates";
 import { hashToUnit, simulateNextPoint } from "@/lib/domain/market";
 import { formatPct, formatUsd } from "@/lib/domain/money";
 import type { PricePoint } from "@/lib/domain/types";
-import { logEvent } from "./audit";
 import { raiseAlert } from "./alerts";
+import { logEvent } from "./audit";
 import { removeUnitsFifo } from "./orders";
 import { getSnapshot, recordNav } from "./portfolio";
-import { adjustCash, getMandate, updateMandate } from "./repo";
+import { adjustCash, getMandate, listInvestorIds, updateMandate } from "./repo";
 import { evaluateRules } from "./rules";
 
 /**
- * The market clock. Advancing a day moves prices, settles trades, runs quarterly
- * redemption windows, checks the circuit breaker and lets Quant evaluate autopilot rules.
+ * The market clock. It is shared by every investor. Advancing a day moves prices,
+ * then for each investor settles trades, runs quarterly redemption windows,
+ * records NAV, checks the circuit breaker and lets Quant evaluate autopilot rules.
  */
 
 export interface DayReport {
   date: string;
-  navCents: number;
-  navChangePct: number;
+  /** Events for the investor who asked for the report (if any). */
   events: string[];
 }
 
@@ -31,46 +37,47 @@ function lastPoint(db: Db, productId: string): PricePoint {
     .get(productId) as PricePoint;
 }
 
-function lastAppraisalDate(db: Db, productId: string): string {
-  const row = db
-    .prepare("SELECT MAX(date) AS d FROM prices WHERE product_id = ?")
-    .get(productId) as { d: string };
-  return row.d;
-}
-
 /** Simulated share of a fund's NAV that all investors ask to redeem in a window (2%–10%). */
 export function simulatedRedemptionDemand(productId: string, windowDate: string): number {
   return 0.02 + 0.08 * hashToUnit(`demand:${productId}:${windowDate}`);
 }
 
-export function advanceOneDay(db: Db): DayReport {
-  const events: string[] = [];
-  const before = getSnapshot(db);
+export function advanceOneDay(db: Db, reportFor?: string): DayReport {
+  const investors = listInvestorIds(db);
+  const before = new Map(investors.map((id) => [id, getSnapshot(db, id).totalCents]));
   const today = addDays(simDate(db), 1);
+  const events = new Map<string, string[]>(investors.map((id) => [id, []]));
+  const note = (investorId: string, e: string) => events.get(investorId)?.push(e);
 
   db.transaction(() => {
     setMeta(db, "sim_date", today);
 
-    // 1. Prices and appraisals
+    // 1. Prices and appraisals (shared market)
     const insert = db.prepare(
       "INSERT OR REPLACE INTO prices (product_id, date, price, source) VALUES (?, ?, ?, ?)",
     );
     for (const product of PRODUCTS) {
       const last = lastPoint(db, product.id);
-      const next = simulateNextPoint(product, last, lastAppraisalDate(db, product.id), today);
+      const next = simulateNextPoint(product, last, last.date, today);
       if (next) insert.run(product.id, next.date, next.price, next.source);
     }
 
     // 2. Settle sale proceeds
     const settling = db
       .prepare(
-        "SELECT id, product_id, filled_cents FROM orders WHERE investor_id = ? AND status = 'settling' AND settle_on <= ?",
+        "SELECT id, investor_id, product_id, filled_cents FROM orders WHERE status = 'settling' AND settle_on <= ?",
       )
-      .all(DEMO_INVESTOR_ID, today) as { id: string; product_id: string; filled_cents: number }[];
+      .all(today) as {
+      id: string;
+      investor_id: string;
+      product_id: string;
+      filled_cents: number;
+    }[];
     for (const o of settling) {
-      adjustCash(db, o.filled_cents);
+      adjustCash(db, o.investor_id, o.filled_cents);
       db.prepare("UPDATE orders SET status = 'settled' WHERE id = ?").run(o.id);
-      events.push(
+      note(
+        o.investor_id,
         `${formatUsd(o.filled_cents)} from ${requireProduct(o.product_id).name} settled to cash`,
       );
     }
@@ -78,25 +85,23 @@ export function advanceOneDay(db: Db): DayReport {
     // 3. Settle withdrawals
     const withdrawals = db
       .prepare(
-        "SELECT id, amount_cents FROM cash_movements WHERE investor_id = ? AND status = 'settling' AND settle_on <= ?",
+        "SELECT id, investor_id, amount_cents FROM cash_movements WHERE status = 'settling' AND settle_on <= ?",
       )
-      .all(DEMO_INVESTOR_ID, today) as { id: string; amount_cents: number }[];
+      .all(today) as { id: string; investor_id: string; amount_cents: number }[];
     for (const w of withdrawals) {
       db.prepare("UPDATE cash_movements SET status = 'settled' WHERE id = ?").run(w.id);
-      events.push(`Withdrawal of ${formatUsd(w.amount_cents)} arrived at the bank`);
+      note(w.investor_id, `Withdrawal of ${formatUsd(w.amount_cents)} arrived at the bank`);
     }
 
     // 4. Quarterly redemption windows (with gates)
     if (isQuarterEnd(today)) {
       const queued = db
-        .prepare(
-          "SELECT * FROM orders WHERE investor_id = ? AND status = 'queued' AND window_on <= ?",
-        )
-        .all(DEMO_INVESTOR_ID, today) as {
+        .prepare("SELECT * FROM orders WHERE status = 'queued' AND window_on <= ?")
+        .all(today) as {
         id: string;
+        investor_id: string;
         product_id: string;
         units: number;
-        amount_cents: number;
         placed_by: string;
       }[];
       for (const q of queued) {
@@ -105,7 +110,7 @@ export function advanceOneDay(db: Db): DayReport {
         const demand = simulatedRedemptionDemand(product.id, today);
         const gate = product.liquidity.gatePct ?? 1;
         const fillRatio = demand > gate ? gate / demand : 1;
-        const units = removeUnitsFifo(db, product.id, q.units * fillRatio, today);
+        const units = removeUnitsFifo(db, q.investor_id, product.id, q.units * fillRatio, today);
         const proceeds = Math.round(units * price * 100);
         const settleOn = addDays(today, product.liquidity.settlementDays);
         db.prepare(
@@ -120,7 +125,7 @@ export function advanceOneDay(db: Db): DayReport {
              VALUES (?, ?, ?, 'sell', ?, 0, ?, ?, 'queued', ?, 0, ?, ?, ?, '[]', ?)`,
           ).run(
             `${q.id}_r${today.replace(/-/g, "")}`,
-            DEMO_INVESTOR_ID,
+            q.investor_id,
             product.id,
             Math.round(remainingUnits * price * 100),
             remainingUnits,
@@ -131,7 +136,7 @@ export function advanceOneDay(db: Db): DayReport {
             `Rolled over: the ${today} window was gated`,
             nowIso(),
           );
-          raiseAlert(db, {
+          raiseAlert(db, q.investor_id, {
             agent: "sentinel",
             severity: "warn",
             code: "redemption_gated",
@@ -139,11 +144,13 @@ export function advanceOneDay(db: Db): DayReport {
             title: `${product.name} redemption was pro-rated`,
             detail: `Investors asked for ${formatPct(demand)} of the fund but the gate is ${formatPct(gate, 0)}, so ${formatPct(fillRatio, 0)} of your request was filled. The rest rolls to ${nextWindow}.`,
           });
-          events.push(
+          note(
+            q.investor_id,
             `${product.name} window: ${formatPct(fillRatio, 0)} filled (gated), remainder rolls to ${nextWindow}`,
           );
         } else {
-          events.push(
+          note(
+            q.investor_id,
             `${product.name} redemption filled in full: ${formatUsd(proceeds)}, settles ${settleOn}`,
           );
         }
@@ -151,47 +158,65 @@ export function advanceOneDay(db: Db): DayReport {
     }
   })();
 
-  // 5. NAV and circuit breaker
-  const after = getSnapshot(db);
-  recordNav(db, after);
-  const change = before.totalCents > 0 ? after.totalCents / before.totalCents - 1 : 0;
-  const mandate = getMandate(db);
-  if (change <= -mandate.circuitBreakerPct && !mandate.killSwitch) {
-    updateMandate(db, {
-      killSwitch: true,
-      killReason: `Circuit breaker: portfolio fell ${formatPct(change)} on ${today}`,
-    });
-    raiseAlert(db, {
-      agent: "sentinel",
-      severity: "critical",
-      code: "circuit_breaker",
-      title: "Circuit breaker tripped. All agents paused.",
-      detail: `The portfolio fell ${formatPct(change)} in one day (threshold ${formatPct(mandate.circuitBreakerPct, 0)}). Review, then resume agents in Settings.`,
-    });
-    events.push("Circuit breaker tripped: all agents paused");
-  }
-
-  // 6. Autopilot rules (skipped while agents are paused)
-  if (!getMandate(db).killSwitch) {
-    for (const { rule, result } of evaluateRules(db)) {
-      events.push(`Autopilot "${rule.name}": ${result.outcome}`);
+  for (const investorId of investors) {
+    // 5. NAV and circuit breaker
+    const after = getSnapshot(db, investorId);
+    recordNav(db, investorId, after);
+    const prev = before.get(investorId) ?? after.totalCents;
+    const change = prev > 0 ? after.totalCents / prev - 1 : 0;
+    const mandate = getMandate(db, investorId);
+    if (change <= -mandate.circuitBreakerPct && !mandate.killSwitch) {
+      updateMandate(db, investorId, {
+        killSwitch: true,
+        killReason: `Circuit breaker: portfolio fell ${formatPct(change)} on ${today}`,
+      });
+      raiseAlert(db, investorId, {
+        agent: "sentinel",
+        severity: "critical",
+        code: "circuit_breaker",
+        title: "Circuit breaker tripped. All agents paused.",
+        detail: `The portfolio fell ${formatPct(change)} in one day (threshold ${formatPct(mandate.circuitBreakerPct, 0)}). Review, then resume agents in Guardrails.`,
+      });
+      note(investorId, "Circuit breaker tripped: all agents paused");
     }
+
+    // 6. Autopilot rules (skipped while agents are paused)
+    if (!getMandate(db, investorId).killSwitch) {
+      for (const { rule, result } of evaluateRules(db, investorId))
+        note(investorId, `Autopilot "${rule.name}": ${result.outcome}`);
+    }
+
+    for (const e of events.get(investorId) ?? [])
+      logEvent(db, investorId, { agent: "system", kind: "system", title: e });
   }
 
-  for (const e of events) logEvent(db, { agent: "system", kind: "system", title: e });
-  return { date: today, navCents: after.totalCents, navChangePct: change, events };
+  return { date: today, events: reportFor ? (events.get(reportFor) ?? []) : [] };
 }
 
-export function advanceDays(db: Db, days: number): DayReport[] {
+export function advanceDays(db: Db, days: number, reportFor?: string): DayReport[] {
   const n = Math.max(1, Math.min(Math.floor(days), 90));
   const reports: DayReport[] = [];
-  for (let i = 0; i < n; i++) reports.push(advanceOneDay(db));
-  logEvent(db, {
-    agent: "system",
-    kind: "system",
-    title: `Market advanced ${n} day${n === 1 ? "" : "s"} to ${simDate(db)}`,
-  });
+  for (let i = 0; i < n; i++) reports.push(advanceOneDay(db, reportFor));
+  if (reportFor)
+    logEvent(db, reportFor, {
+      agent: "system",
+      kind: "system",
+      title: `Market advanced ${n} day${n === 1 ? "" : "s"} to ${simDate(db)}`,
+    });
   return reports;
+}
+
+/**
+ * Keeps the simulated market in step with the calendar: if real time has moved
+ * past the market date, advance to today (up to 90 days at a time). Disabled with
+ * MYLIQUID_MARKET_CLOCK=manual.
+ */
+export function ensureMarketCurrent(db: Db): number {
+  if (process.env.MYLIQUID_MARKET_CLOCK === "manual") return 0;
+  const behind = diffDays(simDate(db), toIsoDate(new Date()));
+  if (behind <= 0) return 0;
+  advanceDays(db, Math.min(behind, 90));
+  return Math.min(behind, 90);
 }
 
 export function historyStart(db: Db): string {

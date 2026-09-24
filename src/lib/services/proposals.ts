@@ -1,4 +1,4 @@
-import { DEMO_INVESTOR_ID, newId, nowIso, simDate, type Db } from "@/lib/db";
+import { newId, nowIso, simDate, type Db } from "@/lib/db";
 import { requireProduct } from "@/lib/domain/catalog";
 import { formatUsd } from "@/lib/domain/money";
 import type { AgentId, CheckResult, OrderIntent } from "@/lib/domain/types";
@@ -48,21 +48,23 @@ function mapProposal(r: Record<string, unknown>): Proposal {
   };
 }
 
-export function getProposal(db: Db, id: string): Proposal | undefined {
-  const row = db.prepare("SELECT * FROM proposals WHERE id = ?").get(id) as
-    Record<string, unknown> | undefined;
+export function getProposal(db: Db, investorId: string, id: string): Proposal | undefined {
+  const row = db
+    .prepare("SELECT * FROM proposals WHERE id = ? AND investor_id = ?")
+    .get(id, investorId) as Record<string, unknown> | undefined;
   return row ? mapProposal(row) : undefined;
 }
 
 export function listProposals(
   db: Db,
+  investorId: string,
   opts: { status?: ProposalStatus; limit?: number } = {},
 ): Proposal[] {
   const rows = db
     .prepare(
       `SELECT * FROM proposals WHERE investor_id = ? ${opts.status ? "AND status = ?" : ""} ORDER BY created_at DESC LIMIT ?`,
     )
-    .all(...[DEMO_INVESTOR_ID, ...(opts.status ? [opts.status] : []), opts.limit ?? 50]) as Record<
+    .all(...[investorId, ...(opts.status ? [opts.status] : []), opts.limit ?? 50]) as Record<
     string,
     unknown
   >[];
@@ -76,6 +78,7 @@ export type CreateProposalResult =
 /** Creates a proposal from the orders that pass the (human-approved) pre-trade checks. */
 export function createProposal(
   db: Db,
+  investorId: string,
   input: {
     agent: AgentId;
     title: string;
@@ -88,7 +91,7 @@ export function createProposal(
   const keptChecks: CheckResult[][] = [];
   const dropped: { order: ProposedOrder; checks: CheckResult[] }[] = [];
   for (const order of input.orders) {
-    const preview = previewOrder(db, order, input.agent);
+    const preview = previewOrder(db, investorId, order, input.agent);
     if (preview.blocked) dropped.push({ order, checks: preview.checks });
     else {
       kept.push(order);
@@ -108,7 +111,7 @@ export function createProposal(
      VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
   ).run(
     id,
-    DEMO_INVESTOR_ID,
+    investorId,
     input.agent,
     input.title,
     input.rationale,
@@ -117,14 +120,14 @@ export function createProposal(
     simDate(db),
     nowIso(),
   );
-  logEvent(db, {
+  logEvent(db, investorId, {
     runId: input.runId,
     agent: input.agent,
     kind: "proposal",
     title: `Proposed: ${input.title}`,
     payload: { proposalId: id, orders: kept },
   });
-  return { ok: true, proposal: getProposal(db, id)!, dropped };
+  return { ok: true, proposal: getProposal(db, investorId, id)!, dropped };
 }
 
 export type AgentTradeResult =
@@ -138,15 +141,16 @@ export type AgentTradeResult =
  */
 export function agentTrade(
   db: Db,
+  investorId: string,
   agent: AgentId,
   intent: ProposedOrder,
   rationale: string,
   runId?: string | null,
 ): AgentTradeResult {
-  const mandate = getMandate(db);
-  const humanPath = previewOrder(db, intent, agent);
+  const mandate = getMandate(db, investorId);
+  const humanPath = previewOrder(db, investorId, intent, agent);
   if (humanPath.blocked) {
-    logEvent(db, {
+    logEvent(db, investorId, {
       runId,
       agent,
       kind: "order",
@@ -159,10 +163,14 @@ export function agentTrade(
   let whyNotAuto =
     "Your autonomy setting is propose-only, so every agent trade needs your approval.";
   if (mandate.autonomy === "bounded") {
-    const autoPath = previewOrder(db, intent, agent, { autonomous: true });
+    const autoPath = previewOrder(db, investorId, intent, agent, { autonomous: true });
     const overLimit = intent.amountCents > mandate.autoExecuteLimitCents;
     if (!autoPath.blocked && !overLimit) {
-      const order = executeOrder(db, intent, agent, { autonomous: true, note: rationale, runId });
+      const order = executeOrder(db, investorId, intent, agent, {
+        autonomous: true,
+        note: rationale,
+        runId,
+      });
       return { outcome: "executed", order, checks: autoPath.checks };
     }
     whyNotAuto = overLimit
@@ -174,7 +182,7 @@ export function agentTrade(
   }
 
   const product = requireProduct(intent.productId);
-  const created = createProposal(db, {
+  const created = createProposal(db, investorId, {
     agent,
     title: `${intent.side === "buy" ? "Buy" : "Sell"} ${formatUsd(intent.amountCents)} of ${product.name}`,
     rationale,
@@ -186,8 +194,8 @@ export function agentTrade(
 }
 
 /** A human approves: every order is re-checked against the current portfolio and executed. */
-export function approveProposal(db: Db, id: string): Proposal {
-  const proposal = getProposal(db, id);
+export function approveProposal(db: Db, investorId: string, id: string): Proposal {
+  const proposal = getProposal(db, investorId, id);
   if (!proposal) throw new Error("Proposal not found");
   if (proposal.status !== "pending") throw new Error(`Proposal is already ${proposal.status}`);
   const orderIds: string[] = [];
@@ -198,7 +206,7 @@ export function approveProposal(db: Db, id: string): Proposal {
     a.side === b.side ? 0 : a.side === "sell" ? -1 : 1,
   );
   for (const intent of ordered) {
-    const order = executeOrder(db, intent, proposal.agent, {
+    const order = executeOrder(db, investorId, intent, proposal.agent, {
       proposalId: id,
       note: `Approved proposal: ${proposal.title}`,
     });
@@ -221,34 +229,30 @@ export function approveProposal(db: Db, id: string): Proposal {
       : executed === 0
         ? "failed"
         : "partially_executed";
-  db.prepare("UPDATE proposals SET status = ?, decided_at = ?, result = ? WHERE id = ?").run(
-    status,
-    nowIso(),
-    JSON.stringify({ orderIds, messages }),
-    id,
-  );
-  logEvent(db, {
+  db.prepare(
+    "UPDATE proposals SET status = ?, decided_at = ?, result = ? WHERE id = ? AND investor_id = ?",
+  ).run(status, nowIso(), JSON.stringify({ orderIds, messages }), id, investorId);
+  logEvent(db, investorId, {
     agent: "user",
     kind: "proposal",
     title: `Approved "${proposal.title}" (${status.replace("_", " ")})`,
     payload: { proposalId: id },
   });
-  return getProposal(db, id)!;
+  return getProposal(db, investorId, id)!;
 }
 
-export function rejectProposal(db: Db, id: string): Proposal {
-  const proposal = getProposal(db, id);
+export function rejectProposal(db: Db, investorId: string, id: string): Proposal {
+  const proposal = getProposal(db, investorId, id);
   if (!proposal) throw new Error("Proposal not found");
   if (proposal.status !== "pending") throw new Error(`Proposal is already ${proposal.status}`);
-  db.prepare("UPDATE proposals SET status = 'rejected', decided_at = ? WHERE id = ?").run(
-    nowIso(),
-    id,
-  );
-  logEvent(db, {
+  db.prepare(
+    "UPDATE proposals SET status = 'rejected', decided_at = ? WHERE id = ? AND investor_id = ?",
+  ).run(nowIso(), id, investorId);
+  logEvent(db, investorId, {
     agent: "user",
     kind: "proposal",
     title: `Rejected "${proposal.title}"`,
     payload: { proposalId: id },
   });
-  return getProposal(db, id)!;
+  return getProposal(db, investorId, id)!;
 }

@@ -2,6 +2,7 @@
 
 import clsx from "clsx";
 import { OctagonAlert, Power } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { AgentMandate, RiskProfileId } from "@/lib/domain/types";
 import { postJson, useAction } from "@/components/client";
@@ -291,23 +292,72 @@ export function SettingsForm({
   );
 }
 
-export function ResetDemo() {
-  const { run, pending } = useAction();
+export function AccountActions({ isGuest }: { isGuest: boolean }) {
+  const { run, pending, error } = useAction();
+  const router = useRouter();
   return (
-    <button
-      className={buttonClass("secondary", "sm")}
-      disabled={pending}
-      onClick={() => {
-        if (
-          window.confirm(
-            "Reset the demo? This wipes all trades, agent activity and settings, then re-seeds a fresh year of history.",
-          )
-        ) {
-          void run(() => postJson("/api/demo/reset"));
-        }
-      }}
-    >
-      Reset demo data
-    </button>
+    <div className="flex flex-wrap items-center gap-2">
+      <button
+        className={buttonClass("secondary", "sm")}
+        disabled={pending}
+        onClick={() => {
+          if (
+            window.confirm(
+              "Start over with a year-old sample portfolio? This wipes your trades, agent activity, rules and chat.",
+            )
+          ) {
+            void run(() => postJson("/api/account/reset", { starter: "sample" }));
+          }
+        }}
+      >
+        Reset to sample portfolio
+      </button>
+      <button
+        className={buttonClass("secondary", "sm")}
+        disabled={pending}
+        onClick={() => {
+          if (
+            window.confirm(
+              "Start over with $100,000 in demo cash and no holdings? This wipes your trades, agent activity, rules and chat.",
+            )
+          ) {
+            void run(() => postJson("/api/account/reset", { starter: "cash" }));
+          }
+        }}
+      >
+        Reset to cash
+      </button>
+      <button
+        className={buttonClass("ghost", "sm")}
+        disabled={pending}
+        onClick={async () => {
+          await postJson("/api/auth/logout");
+          router.push("/");
+          router.refresh();
+        }}
+      >
+        Log out
+      </button>
+      <button
+        className={buttonClass("danger", "sm")}
+        disabled={pending}
+        onClick={async () => {
+          if (
+            window.confirm(
+              isGuest
+                ? "Delete this guest account?"
+                : "Permanently delete your account and all of its data?",
+            )
+          ) {
+            await postJson("/api/account", undefined, "DELETE");
+            router.push("/");
+            router.refresh();
+          }
+        }}
+      >
+        Delete account
+      </button>
+      {error && <span className="text-xs text-critical">{error}</span>}
+    </div>
   );
 }
