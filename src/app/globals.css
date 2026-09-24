@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+/*
+ * MyLiquid theme. Every color is a token here, so the look can be restyled
+ * (e.g. to match a brand guide) without touching components.
+ */
+:root {
+  --bg: #070a11;
+  --surface: #0e131e;
+  --surface-2: #141a27;
+  --surface-3: #1b2232;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --fg: #eef1f7;
+  --fg-2: #aeb6c7;
+  --muted: #7c869a;
+
+  --accent: #2ee6c5; /* "liquid" aqua */
+  --accent-ink: #04201b;
+  --accent-2: #8b7cff; /* agent violet */
+
+  /* Status (reserved; always paired with an icon + label) */
+  --good: #0ca30c;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+
+  /* Sleeve identity (validated categorical order for the dark surface) */
+  --sleeve-index: #3987e5;
+  --sleeve-trading: #d95926;
+  --sleeve-bitcoin: #199e70;
+  --sleeve-business: #c98500;
+  --sleeve-private: #d55181;
+  --sleeve-cash: #6b7385;
+
+  --grid: rgba(255, 255, 255, 0.06);
+  --axis: rgba(255, 255, 255, 0.18);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-2: var(--accent-2);
+  --color-good: var(--good);
+  --color-warning: var(--warning);
+  --color-serious: var(--serious);
+  --color-critical: var(--critical);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.bg-glow {
+  background:
+    radial-gradient(60rem 30rem at 15% -10%, rgba(46, 230, 197, 0.12), transparent 60%),
+    radial-gradient(50rem 30rem at 95% 0%, rgba(139, 124, 255, 0.14), transparent 60%),
+    var(--bg);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Markdown rendered from agents */
+.prose-agent {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--fg);
+}
+.prose-agent p {
+  margin: 0.4rem 0;
+}
+.prose-agent ul {
+  list-style: disc;
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+.prose-agent ol {
+  list-style: decimal;
+  padding-left: 1.2rem;
+  margin: 0.4rem 0;
+}
+.prose-agent li {
+  margin: 0.15rem 0;
+}
+.prose-agent strong {
+  color: var(--fg);
+  font-weight: 600;
+}
+.prose-agent em {
+  color: var(--fg-2);
+}
+.prose-agent blockquote {
+  border-left: 2px solid var(--accent);
+  padding-left: 0.75rem;
+  color: var(--fg-2);
+  margin: 0.5rem 0;
+}
+.prose-agent table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+  font-variant-numeric: tabular-nums;
+}
+.prose-agent th,
+.prose-agent td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+}
+.prose-agent th {
+  color: var(--muted);
+  font-weight: 500;
+}
+.prose-agent code {
+  background: var(--surface-3);
+  border-radius: 4px;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.8em;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.animate-pulse-dot {
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
