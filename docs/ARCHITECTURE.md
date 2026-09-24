@@ -68,7 +68,12 @@ the same service layer.
   - Portfolio health comes from open alerts and the 7-day liquid share, and mood
     comes from health and vitals.
   - Levels and stages; XP rules with daily caps (habits only, never trading
-    volume); deterministic daily quests; the liquidity quiz; speech.
+    volume); deterministic daily quests; speech.
+  - `playQuiz`: questions about the investor's own portfolio (7-day liquidity,
+    cash share, biggest position). The answer is always true, and `getQuiz` never
+    sends it to the client.
+  - `researchSnacks`: the true facts that feeding serves, in rotation.
+  - `hearts` and `ageInDays` for the device's stats screen.
 - `payments.ts`: fictional merchants and categories, and `evaluatePayment`, the
   card policy.
   - *Hard checks* decline: card, category, per-payment, daily, monthly, wallet.
@@ -88,8 +93,9 @@ the same service layer.
   withdrawals, runs quarterly redemption windows with gates (pro-rated, remainder
   rolls over), records NAV, trips the circuit breaker, and lets Quant evaluate
   autopilot rules.
-- `companion.ts`: `getCompanionView` and the care actions (check-in, feed, play,
-  sleep/wake, customize). `awardXp` enforces daily caps, completes quests and
+- `companion.ts`: `getCompanionView` (vitals, XP, quests, age, 7-day liquidity,
+  and `presence`, the desk's latest work) and the care actions (check-in, feed,
+  play, sleep/wake, customize). `awardXp` enforces daily caps, completes quests and
   logs level-ups. Sleep and wake go through the mandate's kill switch, and wake is
   human-only.
 - `payments.ts`: Agent Pay.
@@ -171,8 +177,9 @@ watch tool calls happen live.
 - `mcp.test.ts`: drives the real `/api/mcp` route with JSON-RPC. It covers auth,
   origin checks, scope filtering, read tools, trade proposals from an external
   agent (including the blocked shipyard bond), and pay-scope payments.
-- `companion-payments.test.ts`: vitals decay, levels, streaks, quests, the quiz,
+- `companion-payments.test.ts`: vitals decay, levels, streaks, quests, quiz
+  truthfulness across kinds, research snacks, stats hearts,
   and the card policy's approve, needs-approval and decline decisions.
-- `pet-pay.test.ts`: adoption and customization, XP caps, feed, play, sleep and
-  wake, wallet funding, terminal payments, owner approvals, blocked categories,
+- `pet-pay.test.ts`: adoption and customization, XP caps, rotating snacks, quizzes
+  (one right answer, kept server-side), sleep and wake, age and presence, wallet funding, terminal payments, owner approvals, blocked categories,
   frozen cards, empty wallets, and x402 purchases (402 → 200).

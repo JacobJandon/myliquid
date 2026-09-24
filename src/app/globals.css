@@ -98,7 +98,12 @@ body {
 }
 
 .highlight {
-  background: linear-gradient(transparent 58%, var(--accent-2) 58%, var(--accent-2) 92%, transparent 92%);
+  background: linear-gradient(
+    transparent 58%,
+    var(--accent-2) 58%,
+    var(--accent-2) 92%,
+    transparent 92%
+  );
   padding: 0 0.08em;
 }
 
@@ -310,6 +315,140 @@ body {
 .float-z {
   animation: float-z 2.4s ease-out infinite;
 }
+/* LCD event animations: stepped, like a real 1-bit screen */
+@keyframes lcd-banner {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  8%,
+  85% {
+    opacity: 1;
+  }
+  30%,
+  38% {
+    opacity: 0;
+  }
+}
+@keyframes lcd-bite {
+  0% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  30% {
+    clip-path: inset(0 0 0 28%);
+  }
+  60% {
+    clip-path: inset(0 0 0 56%);
+  }
+  85% {
+    clip-path: inset(0 0 0 84%);
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0 0 100%);
+    opacity: 0;
+  }
+}
+@keyframes lcd-chomp {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  15%,
+  45%,
+  75% {
+    transform: scale(1.06, 0.9);
+  }
+  30%,
+  60%,
+  90% {
+    transform: scale(1, 1);
+  }
+}
+@keyframes lcd-ball {
+  0% {
+    left: 8%;
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-120%);
+  }
+  50% {
+    left: 78%;
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(-120%);
+  }
+  100% {
+    left: 8%;
+    transform: translateY(0);
+  }
+}
+@keyframes lcd-pop {
+  0% {
+    transform: translateY(40%);
+    opacity: 0;
+  }
+  20%,
+  75% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-60%);
+    opacity: 0;
+  }
+}
+@keyframes lcd-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  25%,
+  50%,
+  75% {
+    opacity: 1;
+  }
+  37%,
+  62% {
+    opacity: 0;
+  }
+}
+@keyframes lcd-flash {
+  0%,
+  30%,
+  60%,
+  100% {
+    filter: none;
+  }
+  15%,
+  45% {
+    filter: invert(1) hue-rotate(180deg);
+  }
+}
+.lcd-banner {
+  animation: lcd-banner 2.4s steps(1, end) forwards;
+}
+.lcd-bite {
+  animation: lcd-bite 2.2s steps(1, end) forwards;
+}
+.lcd-chomp {
+  animation: lcd-chomp 2.2s steps(1, end);
+}
+.lcd-ball {
+  animation: lcd-ball 1.8s ease-in-out 1 forwards;
+}
+.lcd-pop {
+  animation: lcd-pop 2.2s ease-out forwards;
+}
+.lcd-twinkle {
+  animation: lcd-twinkle 2.2s steps(1, end) forwards;
+}
+.lcd-flash {
+  animation: lcd-flash 1.2s steps(1, end);
+}
 .toast-float {
   animation: float-up 2.8s ease-out forwards;
 }
@@ -321,6 +460,9 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .lcd-ball,
+  .lcd-chomp,
+  .lcd-flash,
   .pet-bounce,
   .pet-wiggle,
   .pet-shake,

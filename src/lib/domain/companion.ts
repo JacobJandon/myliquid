@@ -243,7 +243,7 @@ export const QUESTS: Record<QuestId, { title: (pet: string) => string; completed
   desk: { title: () => "Run your agent desk", completedBy: "desk_cycle" },
   decide: { title: () => "Approve or reject a proposal", completedBy: "decide_proposal" },
   feed: { title: (pet) => `Feed ${pet} a research snack`, completedBy: "feed" },
-  play: { title: () => "Ace the liquidity quiz", completedBy: "play" },
+  play: { title: () => "Ace a quiz in Play", completedBy: "play" },
   pay: { title: () => "Pay for something with your agent card", completedBy: "agent_payment" },
 };
 
@@ -266,29 +266,157 @@ export function questsForDay(investorId: string, day: string): QuestId[] {
   return picked;
 }
 
-// ── The liquidity quiz (Play) ───────────────────────────────────────────────
+// ── Play: quizzes about your own portfolio ──────────────────────────────────
+
+export type QuizKind = "liquidity" | "cash" | "largest";
 
 export interface Quiz {
+  kind: QuizKind;
   question: string;
   options: string[];
   answerIndex: number;
+  explanation: string;
 }
 
-/** "How much of your money could be cash within 7 days?" with the true answer and two decoys. */
-export function liquidityQuiz(liquidWeekPct: number, seed: string): Quiz {
-  const truth = Math.round(liquidWeekPct * 100);
+/** What a quiz can ask about. */
+export interface QuizFacts {
+  liquidWeekPct: number;
+  cashPct: number;
+  /** Holdings by descending weight. */
+  holdings: { name: string; weight: number }[];
+}
+
+function shuffled<T>(values: T[], seed: string): { order: number[]; values: T[] } {
+  const order = values.map((_, i) => i).sort((x, y) => hash(`${seed}:${x}`) - hash(`${seed}:${y}`));
+  return { order, values: order.map((i) => values[i]!) };
+}
+
+/** A percentage question: the true answer and two decoys on either side. */
+function percentChoices(
+  truthPct: number,
+  seed: string,
+): { options: string[]; answerIndex: number } {
+  const truth = Math.round(truthPct * 100);
   const offsets = [-25, -15, 15, 25].filter((o) => truth + o >= 0 && truth + o <= 100);
   const h = hash(seed);
   const a = offsets[h % offsets.length] ?? 20;
   const rest = offsets.filter((o) => Math.sign(o) !== Math.sign(a));
   const b = rest[(h >>> 3) % Math.max(rest.length, 1)] ?? -a;
-  const values = [truth, truth + a, truth + b].map((v) => Math.max(0, Math.min(100, v)));
-  const order = [0, 1, 2].sort((x, y) => hash(`${seed}:${x}`) - hash(`${seed}:${y}`));
+  const values = [truth, truth + a, truth + b].map((v) => `${Math.max(0, Math.min(100, v))}%`);
+  const { order, values: options } = shuffled(values, seed);
+  return { options, answerIndex: order.indexOf(0) };
+}
+
+/** Quiz kinds that make sense for this portfolio. */
+export function quizKinds(facts: QuizFacts): QuizKind[] {
+  const kinds: QuizKind[] = ["liquidity"];
+  if (facts.holdings.length > 0) kinds.push("cash");
+  if (facts.holdings.length >= 3) kinds.push("largest");
+  return kinds;
+}
+
+/** Play: a question about the investor's own portfolio, chosen by seed. The answer is always true. */
+export function playQuiz(facts: QuizFacts, seed: string): Quiz {
+  const kinds = quizKinds(facts);
+  const kind = kinds[hash(`kind:${seed}`) % kinds.length]!;
+  if (kind === "largest") {
+    const { order, values } = shuffled(
+      facts.holdings.slice(0, 3).map((h) => h.name),
+      seed,
+    );
+    const top = facts.holdings[0]!;
+    return {
+      kind,
+      question: "Which is your biggest position?",
+      options: values,
+      answerIndex: order.indexOf(0),
+      explanation: `${top.name} is ${(top.weight * 100).toFixed(1)}% of the portfolio. Anything above 25% in one position deserves a second look.`,
+    };
+  }
+  if (kind === "cash") {
+    return {
+      kind,
+      question: "How much of your portfolio is cash right now?",
+      ...percentChoices(facts.cashPct, seed),
+      explanation: "A small cash buffer is healthy, but idle cash drifts away from your targets.",
+    };
+  }
   return {
+    kind,
     question: "How much of your money could be cash within 7 days?",
-    options: order.map((i) => `${values[i]}%`),
-    answerIndex: order.indexOf(0),
+    ...percentChoices(facts.liquidWeekPct, seed),
+    explanation:
+      "Settlement, notice periods, quarterly gates and lock-ups all count. The liquidity ladder shows the details.",
   };
+}
+
+// ── Feed: research snacks ───────────────────────────────────────────────────
+
+export interface SnackFacts {
+  totalCents: number;
+  dayChangeCents: number;
+  liquidWeekPct: number;
+  cashCents: number;
+  topHolding: { name: string; weight: number } | null;
+  lockedPositions: number;
+  nextUnlock: string | null;
+  pendingProposals: number;
+  pendingPayments: number;
+  walletCents: number;
+}
+
+/** Whole dollars for big sums, where cents are noise. */
+function roundDollars(cents: number): string {
+  return formatDollars(Math.round(cents / 100) * 100);
+}
+
+/** True, useful facts about the portfolio. Feeding serves one of them. */
+export function researchSnacks(f: SnackFacts): string[] {
+  const snacks: string[] = [];
+  const prev = f.totalCents - f.dayChangeCents;
+  const pct = prev !== 0 ? (f.dayChangeCents / prev) * 100 : 0;
+  snacks.push(
+    `Your portfolio is ${roundDollars(f.totalCents)}, ${f.dayChangeCents >= 0 ? "up" : "down"} ${roundDollars(Math.abs(f.dayChangeCents))} (${Math.abs(pct).toFixed(2)}%) on the last market day.`,
+  );
+  snacks.push(`${Math.round(f.liquidWeekPct * 100)}% of your money could be cash within 7 days.`);
+  if (f.topHolding) {
+    snacks.push(
+      `Your biggest position is ${f.topHolding.name} at ${(f.topHolding.weight * 100).toFixed(1)}% of the portfolio.`,
+    );
+  }
+  if (f.lockedPositions > 0) {
+    snacks.push(
+      `${f.lockedPositions} position${f.lockedPositions === 1 ? " is" : "s are"} locked${f.nextUnlock ? `. The next unlock is ${f.nextUnlock}` : ""}.`,
+    );
+  }
+  snacks.push(`You hold ${roundDollars(f.cashCents)} in cash.`);
+  if (f.pendingProposals || f.pendingPayments) {
+    const parts = [
+      f.pendingProposals
+        ? `${f.pendingProposals} proposal${f.pendingProposals === 1 ? "" : "s"}`
+        : null,
+      f.pendingPayments
+        ? `${f.pendingPayments} payment${f.pendingPayments === 1 ? "" : "s"}`
+        : null,
+    ].filter(Boolean);
+    snacks.push(
+      `${parts.join(" and ")} ${parts.length > 1 || f.pendingProposals > 1 || f.pendingPayments > 1 ? "are" : "is"} waiting for your OK.`,
+    );
+  }
+  if (f.walletCents > 0) snacks.push(`The agent wallet holds ${formatDollars(f.walletCents)}.`);
+  return snacks;
+}
+
+// ── Stats screen ────────────────────────────────────────────────────────────
+
+/** Tamagotchi-style hearts: 0–4 filled for a 0–100 meter. */
+export function hearts(value: number): number {
+  return Math.max(0, Math.min(4, Math.round(value / 25)));
+}
+
+/** Whole days since the pet was adopted. */
+export function ageInDays(bornAt: string, now: Date): number {
+  return Math.max(0, Math.floor((now.getTime() - Date.parse(bornAt)) / 86_400_000));
 }
 
 // ── Thoughts ────────────────────────────────────────────────────────────────

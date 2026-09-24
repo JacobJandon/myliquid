@@ -40,11 +40,13 @@ function isActive(pathname: string, href: string) {
 export function Sidebar({
   pendingCount,
   alertCount,
+  paymentCount,
   user,
   pet,
 }: {
   pendingCount: number;
   alertCount: number;
+  paymentCount: number;
   user: { name: string; email: string | null; kind: string };
   pet: Pick<CompanionView, "name" | "color" | "level"> & {
     stage: Stage;
@@ -73,7 +75,8 @@ export function Sidebar({
         </Link>
         {NAV.map(({ href, label, icon: Icon }) => {
           const active = isActive(pathname, href);
-          const count = href === "/app" ? pendingCount + alertCount : 0;
+          const count =
+            href === "/app" ? pendingCount + alertCount : href === "/app/pay" ? paymentCount : 0;
           return (
             <Link
               key={href}

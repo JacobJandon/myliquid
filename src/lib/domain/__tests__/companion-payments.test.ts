@@ -3,14 +3,19 @@ import {
   checkinBonus,
   computeVitals,
   levelForXp,
+  ageInDays,
+  hearts,
   levelProgress,
-  liquidityQuiz,
   petThought,
+  playQuiz,
   questsForDay,
+  quizKinds,
+  researchSnacks,
   stageForLevel,
   streakAfterCheckin,
   type CompanionRecord,
   type PortfolioSignals,
+  type QuizFacts,
 } from "../companion";
 import {
   DEFAULT_CARD_POLICY,
@@ -91,10 +96,52 @@ describe("companion vitals", () => {
     expect(questsForDay("inv_a", "2026-09-24")).toEqual(q);
   });
 
-  it("builds a quiz whose answer is the true liquidity", () => {
-    const quiz = liquidityQuiz(0.75, "seed");
-    expect(quiz.options[quiz.answerIndex]).toBe("75%");
-    expect(new Set(quiz.options).size).toBe(3);
+  it("plays quizzes about the real portfolio, always with a true answer", () => {
+    const facts: QuizFacts = {
+      liquidWeekPct: 0.75,
+      cashPct: 0.13,
+      holdings: [
+        { name: "Global Equity Index", weight: 0.28 },
+        { name: "Private Credit Fund I", weight: 0.12 },
+        { name: "Bitcoin", weight: 0.05 },
+      ],
+    };
+    expect(quizKinds(facts)).toEqual(["liquidity", "cash", "largest"]);
+    expect(quizKinds({ ...facts, holdings: [] })).toEqual(["liquidity"]);
+    const seen = new Set<string>();
+    for (let i = 0; i < 40; i++) {
+      const quiz = playQuiz(facts, `seed-${i}`);
+      seen.add(quiz.kind);
+      expect(new Set(quiz.options).size).toBe(3);
+      const answer = quiz.options[quiz.answerIndex];
+      if (quiz.kind === "liquidity") expect(answer).toBe("75%");
+      if (quiz.kind === "cash") expect(answer).toBe("13%");
+      if (quiz.kind === "largest") expect(answer).toBe("Global Equity Index");
+      expect(quiz.explanation.length).toBeGreaterThan(20);
+    }
+    expect(seen.size).toBe(3);
+  });
+
+  it("serves true research snacks and Tamagotchi-style stats", () => {
+    const snacks = researchSnacks({
+      totalCents: 262_158_00,
+      dayChangeCents: -3_246_00,
+      liquidWeekPct: 0.75,
+      cashCents: 34_000_00,
+      topHolding: { name: "Global Equity Index", weight: 0.277 },
+      lockedPositions: 2,
+      nextUnlock: "2029-09-24",
+      pendingProposals: 1,
+      pendingPayments: 0,
+      walletCents: 0,
+    });
+    expect(snacks[0]).toBe(
+      "Your portfolio is $262,158, down $3,246 (1.22%) on the last market day.",
+    );
+    expect(snacks).toContain("1 proposal is waiting for your OK.");
+    expect(snacks).toContain("2 positions are locked. The next unlock is 2029-09-24.");
+    expect([hearts(0), hearts(49), hearts(51), hearts(100)]).toEqual([0, 2, 2, 4]);
+    expect(ageInDays("2026-09-20T12:00:00Z", NOW)).toBe(4);
   });
 
   it("speaks from state", () => {

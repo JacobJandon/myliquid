@@ -49,21 +49,38 @@ describe("living agent", () => {
     expect(view.level).toBeGreaterThanOrEqual(2);
   });
 
-  it("gets fed, plays the liquidity quiz, and sleeping is the kill switch", () => {
+  it("gets fed a different research snack each time", () => {
     const before = getCompanionView(db, ID).vitals.fullness;
-    expect(feed(db, ID).message).toMatch(/Research snack/);
+    const first = feed(db, ID).message;
+    expect(first).toMatch(/^Nom! Research snack: Your portfolio is \$[\d,]+/);
     expect(getCompanionView(db, ID).vitals.fullness).toBeGreaterThan(before);
+    const second = feed(db, ID).message;
+    expect(second).not.toBe(first);
+  });
 
+  it("plays quizzes with exactly one right answer that stays on the server", () => {
     const quiz = getQuiz(db, ID);
-    const result = play(db, ID, quiz.answerIndex, quiz.seed);
-    expect(result.correct).toBe(true);
+    expect(quiz).not.toHaveProperty("answerIndex");
+    const results = [0, 1, 2].map((i) => play(db, ID, i, quiz.seed));
+    expect(results.filter((r) => r.correct)).toHaveLength(1);
     expect(() => play(db, ID, 0, "someone-else:2026")).toThrow();
+  });
 
+  it("sleeping is the kill switch, and only waking releases it", () => {
     sleep(db, ID);
     expect(getMandate(db, ID).killSwitch).toBe(true);
     expect(getCompanionView(db, ID).vitals.mood).toBe("sleeping");
     wake(db, ID);
     expect(getMandate(db, ID).killSwitch).toBe(false);
+  });
+
+  it("knows its age, the portfolio's liquidity and the desk's latest work", () => {
+    const view = getCompanionView(db, ID);
+    expect(view.ageDays).toBe(0);
+    expect(view.liquidPct).toBeGreaterThan(0);
+    expect(view.presence?.agent).toBe("sentinel"); // the account-opening note
+    for (let i = 0; i < 7; i++) awardXp(db, ID, "decide_proposal");
+    expect(getCompanionView(db, ID).presence?.title).toMatch(/reached level 2/);
   });
 });
 

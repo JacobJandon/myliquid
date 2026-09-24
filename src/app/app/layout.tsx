@@ -7,7 +7,7 @@ import { listAlerts } from "@/lib/services/alerts";
 import { listProposals } from "@/lib/services/proposals";
 import { getMandate } from "@/lib/services/repo";
 import { ensureMarketCurrent } from "@/lib/services/sim";
-import { getCompanionView } from "@/lib/services/companion";
+import { getCompanionView, pendingPaymentCount } from "@/lib/services/companion";
 import type { Stage } from "@/lib/domain/companion";
 import { MobileNav, Sidebar } from "@/components/app/Sidebar";
 import { SimControls } from "@/components/app/SimControls";
@@ -34,6 +34,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Sidebar
             pendingCount={pending}
             alertCount={alerts}
+            paymentCount={pendingPaymentCount(db, investor.id)}
             user={{ name: investor.name, email: investor.email, kind: investor.kind }}
             pet={{
               name: pet.name,

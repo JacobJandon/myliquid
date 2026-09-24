@@ -1,4 +1,4 @@
-import { nowIso, type Db } from "@/lib/db";
+import { nowIso, simDate, type Db } from "@/lib/db";
 import {
   XP_RULES,
   QUESTS,
@@ -9,10 +9,12 @@ import {
   currentJoy,
   isPetColor,
   levelForXp,
+  ageInDays,
   levelProgress,
-  liquidityQuiz,
   petThought,
+  playQuiz,
   questsForDay,
+  researchSnacks,
   stageForLevel,
   streakAfterCheckin,
   type CompanionRecord,
@@ -20,14 +22,14 @@ import {
   type PortfolioSignals,
   type QuestId,
   type Quiz,
+  type QuizFacts,
   type Vitals,
   type XpAction,
 } from "@/lib/domain/companion";
-import { formatUsd } from "@/lib/domain/money";
 import { getMerchant } from "@/lib/domain/payments";
 import { listAlerts, resolveAlert } from "./alerts";
 import { logEvent } from "./audit";
-import { getLadder, getSnapshot } from "./portfolio";
+import { getLadder, getNavHistory, getSnapshot } from "./portfolio";
 import { listProposals } from "./proposals";
 import { getMandate, updateMandate } from "./repo";
 
@@ -236,13 +238,7 @@ export function portfolioSignals(db: Db, investorId: string): PortfolioSignals {
   const wallet = db
     .prepare("SELECT balance_cents FROM wallets WHERE investor_id = ?")
     .get(investorId) as { balance_cents: number } | undefined;
-  const pendingPayments = (
-    db
-      .prepare(
-        "SELECT COUNT(*) AS n FROM payments WHERE investor_id = ? AND status = 'pending_approval'",
-      )
-      .get(investorId) as { n: number }
-  ).n;
+  const pendingPayments = pendingPaymentCount(db, investorId);
   const last = db
     .prepare(
       "SELECT merchant_id, amount_cents, created_at FROM payments WHERE investor_id = ? AND status = 'approved' ORDER BY created_at DESC LIMIT 1",
@@ -271,6 +267,43 @@ export function portfolioSignals(db: Db, investorId: string): PortfolioSignals {
   };
 }
 
+export function pendingPaymentCount(db: Db, investorId: string): number {
+  return (
+    db
+      .prepare(
+        "SELECT COUNT(*) AS n FROM payments WHERE investor_id = ? AND status = 'pending_approval'",
+      )
+      .get(investorId) as { n: number }
+  ).n;
+}
+
+/** The desk's most recent piece of work, for the "latest" line in the pet room. */
+export interface Presence {
+  agent: string;
+  title: string;
+  minutesAgo: number;
+}
+
+const WORKING_AGENTS = ["atlas", "quant", "scout", "ledger", "sentinel", "copilot", "external"];
+
+export function latestPresence(db: Db, investorId: string, now = new Date()): Presence | null {
+  const row = db
+    .prepare(
+      `SELECT agent, title, created_at FROM agent_events
+       WHERE investor_id = ? AND agent IN (${WORKING_AGENTS.map(() => "?").join(", ")})
+         AND kind IN ('run_finished', 'proposal', 'alert', 'order', 'system')
+       ORDER BY id DESC LIMIT 1`,
+    )
+    .get(investorId, ...WORKING_AGENTS) as
+    { agent: string; title: string; created_at: string } | undefined;
+  if (!row) return null;
+  return {
+    agent: row.agent,
+    title: row.title.length > 140 ? `${row.title.slice(0, 137)}…` : row.title,
+    minutesAgo: Math.max(0, Math.round((now.getTime() - Date.parse(row.created_at)) / 60_000)),
+  };
+}
+
 export interface QuestView {
   id: QuestId;
   title: string;
@@ -292,6 +325,11 @@ export interface CompanionView {
   thought: string;
   quests: QuestView[];
   xpToday: number;
+  /** Days since adoption, for the stats screen. */
+  ageDays: number;
+  /** Share of the portfolio that could be cash within 7 days. */
+  liquidPct: number;
+  presence: Presence | null;
 }
 
 export function getCompanionView(db: Db, investorId: string, now = new Date()): CompanionView {
@@ -335,6 +373,9 @@ export function getCompanionView(db: Db, investorId: string, now = new Date()): 
     }),
     quests,
     xpToday,
+    ageDays: ageInDays(c.bornAt, now),
+    liquidPct: signals.liquidWeekPct,
+    presence: latestPresence(db, investorId, now),
   };
 }
 
@@ -381,32 +422,52 @@ export function feed(db: Db, investorId: string): ActionResult {
   }
   adjustVitals(db, investorId, { fullness: 35, joy: 5 });
   const snapshot = getSnapshot(db, investorId);
-  const facts: string[] = [];
-  const top = snapshot.holdings[0];
-  if (top)
-    facts.push(
-      `Your biggest position is ${top.product.name} at ${(top.weight * 100).toFixed(1)}% of the portfolio.`,
-    );
+  const today = simDate(db);
+  const yesterday =
+    getNavHistory(db, investorId, 10).findLast((p) => p.date < today)?.totalCents ??
+    snapshot.totalCents;
+  const signals = portfolioSignals(db, investorId);
   const locked = snapshot.holdings.filter((h) => h.lockedValueCents > 0);
-  if (locked.length) {
-    const next = locked
-      .map((h) => h.nextUnlock)
-      .filter(Boolean)
-      .sort()[0];
-    facts.push(
-      `${locked.length} position${locked.length === 1 ? " is" : "s are"} locked. The next unlock is ${next}.`,
-    );
-  }
-  facts.push(`You hold ${formatUsd(snapshot.cashCents)} in cash.`);
-  const fact = facts[Math.floor(Date.now() / 60_000) % facts.length];
+  const top = snapshot.holdings[0];
+  const snacks = researchSnacks({
+    totalCents: snapshot.totalCents,
+    dayChangeCents: snapshot.totalCents - yesterday,
+    liquidWeekPct: signals.liquidWeekPct,
+    cashCents: snapshot.cashCents,
+    topHolding: top ? { name: top.product.name, weight: top.weight } : null,
+    lockedPositions: locked.length,
+    nextUnlock:
+      locked
+        .map((h) => h.nextUnlock)
+        .filter((d): d is string => !!d)
+        .sort()[0] ?? null,
+    pendingProposals: signals.pendingProposals,
+    pendingPayments: signals.pendingPayments,
+    walletCents: signals.walletCents,
+  });
+  // A different snack each feeding: rotate by how many times it has eaten today.
+  const fact = snacks[countToday(db, investorId, "feed", realDay()) % snacks.length]!;
   const xp = awardXp(db, investorId, "feed");
-  return { message: `Nom. Research snack digested: ${fact}`, xp };
+  return { message: `Nom! Research snack: ${fact}`, xp };
 }
 
-export function getQuiz(db: Db, investorId: string, now = new Date()): Quiz & { seed: string } {
+function quizFacts(db: Db, investorId: string): QuizFacts {
+  const snapshot = getSnapshot(db, investorId);
+  const ladder = getLadder(db, investorId, snapshot);
+  return {
+    liquidWeekPct: ladder.find((b) => b.id === "week")?.cumulativePct ?? 0,
+    cashPct: snapshot.totalCents > 0 ? snapshot.cashCents / snapshot.totalCents : 1,
+    holdings: snapshot.holdings.map((h) => ({ name: h.product.name, weight: h.weight })),
+  };
+}
+
+/** The quiz the client sees. The answer and explanation stay on the server. */
+export type QuizView = Omit<Quiz, "answerIndex" | "explanation"> & { seed: string };
+
+export function getQuiz(db: Db, investorId: string, now = new Date()): QuizView {
   const seed = `${investorId}:${now.toISOString().slice(0, 13)}`;
-  const week = getLadder(db, investorId).find((b) => b.id === "week")?.cumulativePct ?? 0;
-  return { ...liquidityQuiz(week, seed), seed };
+  const { kind, question, options } = playQuiz(quizFacts(db, investorId), seed);
+  return { kind, question, options, seed };
 }
 
 export function play(
@@ -417,8 +478,7 @@ export function play(
 ): ActionResult & { correct: boolean; answer: string } {
   const c = getCompanionRecord(db, investorId);
   if (!seed.startsWith(`${investorId}:`)) throw new Error("Invalid quiz");
-  const week = getLadder(db, investorId).find((b) => b.id === "week")?.cumulativePct ?? 0;
-  const quiz = liquidityQuiz(week, seed);
+  const quiz = playQuiz(quizFacts(db, investorId), seed);
   const correct = answerIndex === quiz.answerIndex;
   const answer = quiz.options[quiz.answerIndex]!;
   adjustVitals(db, investorId, { joy: correct ? 25 : 8, energy: -8 });
@@ -426,12 +486,17 @@ export function play(
     return {
       correct,
       answer,
-      message: `Close! It's ${answer}. Settlement, notice periods and lock-ups all count. The liquidity ladder shows the details.`,
+      message: `Close! It's ${answer}. ${quiz.explanation}`,
       xp: { awarded: 0, levelUp: null, questsCompleted: [] },
     };
   }
   const xp = awardXp(db, investorId, "play");
-  return { correct, answer, message: `Yes! ${answer}. ${c.name} does a little splash.`, xp };
+  return {
+    correct,
+    answer,
+    message: `Yes! ${answer}. ${c.name} does a little splash. ${quiz.explanation}`,
+    xp,
+  };
 }
 
 /** Putting the pet to sleep is the kill switch: every agent and autopilot rule pauses. */

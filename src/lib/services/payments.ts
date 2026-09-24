@@ -496,7 +496,7 @@ function attemptPayment(
     logEvent(db, investorId, {
       agent: input.initiatedBy,
       kind: "order",
-      title: `${input.channel === "x402" ? "x402 " : ""}Payment ${status.replace("_", " ")}: ${formatUsd(input.amountCents)} at ${merchant.name}`,
+      title: `${input.channel === "x402" ? "x402 payment" : "Payment"} ${status.replace("_", " ")}: ${formatUsd(input.amountCents)} at ${merchant.name}`,
       payload: { paymentId: id, decision },
     });
   })();

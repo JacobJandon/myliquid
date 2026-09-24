@@ -34,10 +34,21 @@ companions and YC-era product sites. See
   mood also reflects your portfolio: open risk alerts or a book that is mostly
   locked up make it anxious.
 - **Care actions have a point.**
-  - *Feed* gives it a research snack: one true fact about your portfolio.
-  - *Play* is a liquidity quiz.
+  - *Feed* gives it a research snack: a different true fact about your portfolio
+    each time, such as the day's change, 7-day liquidity, the biggest position,
+    lock-ups, or what's waiting for your OK.
+  - *Play* is a quiz about your own portfolio: 7-day liquidity, cash share or
+    biggest position. It explains the answer, which stays on the server.
   - *Talk* opens the chat, where the pet answers with live tool calls.
   - *Put to sleep* is the kill switch. Every agent stops, and only you can wake it.
+- **It reacts on its screen.** The LCD plays short 1-bit animations: *HI!* with a
+  heart on check-in, *YUM!* while it chomps a snack, a bouncing ball when you win at
+  Play, and sparkles on a level-up. When it evolves, the screen flashes.
+- **Tap the screen for stats**, like a real Tamagotchi: age, hearts for hunger,
+  happiness, energy and portfolio health, and how much of your money could be cash
+  within 7 days.
+- **It shows what the desk just did**, for example *"Latest: Sentinel finished ·
+  2m ago"*.
 - **It evolves:** Drop → Droplet → Splash → Wave → Tide over ten levels. XP comes
   only from habits: daily check-ins, deciding proposals, reviewing alerts, three
   daily quests, and a little from work the desk does. Each habit has a daily cap.
@@ -137,8 +148,8 @@ and start with $100,000 of demo cash or the sample portfolio.
 
 Things to try:
 
-1. **Home.** Your pet checks in when you visit. Press *Feed*, then *Play* the
-   liquidity quiz, and watch the XP and quests.
+1. **Home.** Your pet checks in when you visit. Press *Feed*, then *Play*, tap the
+   screen for its stats, and watch the XP and quests.
 2. **Agent Pay.** Top up the wallet. Open `/terminal` in another tab, charge a
    coffee, and tap the code. Then charge the $64 grocery run and approve it from
    *Waiting for your OK*. Buy a premium report for 50¢.

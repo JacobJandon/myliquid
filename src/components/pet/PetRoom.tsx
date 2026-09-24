@@ -6,22 +6,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { PET_COLORS, STAGES, type PetColor, type Stage } from "@/lib/domain/companion";
-import type { CompanionView } from "@/lib/services/companion";
+import type { CompanionView, QuizView } from "@/lib/services/companion";
+import { AGENTS } from "@/lib/agents/registry";
 import { postJson } from "@/components/client";
 import { buttonClass } from "@/components/ui";
 import { PixelPet } from "./PixelPet";
-import { DeviceButton, TamaDevice } from "./TamaDevice";
+import { DeviceButton, TamaDevice, type LcdEvent, type LcdEventKind } from "./TamaDevice";
 
-interface Quiz {
-  question: string;
-  options: string[];
-  seed: string;
+function ago(minutes: number): string {
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
+  return `${Math.floor(minutes / 1440)}d ago`;
 }
 
 interface ActionResponse {
   message: string;
   companion: CompanionView;
-  quiz: Quiz;
+  quiz: QuizView;
   xp?: {
     awarded: number;
     levelUp: { level: number; stage: string; evolved: boolean } | null;
@@ -74,7 +76,13 @@ function Meter({ label, value, icon }: { label: string; value: number; icon: str
   );
 }
 
-export function PetRoom({ initial, initialQuiz }: { initial: CompanionView; initialQuiz: Quiz }) {
+export function PetRoom({
+  initial,
+  initialQuiz,
+}: {
+  initial: CompanionView;
+  initialQuiz: QuizView;
+}) {
   const router = useRouter();
   const [pet, setPet] = useState(initial);
   const [quiz, setQuiz] = useState(initialQuiz);
@@ -84,8 +92,20 @@ export function PetRoom({ initial, initialQuiz }: { initial: CompanionView; init
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [customizing, setCustomizing] = useState(false);
   const [name, setName] = useState(initial.name);
+  const [event, setEvent] = useState<LcdEvent | null>(null);
+  const [screenMode, setScreenMode] = useState<"pet" | "stats">("pet");
   const toastId = useRef(0);
+  const eventId = useRef(0);
   const checkedIn = useRef(initial.checkedInToday);
+
+  /** Plays a short animation on the device's screen. */
+  function fire(kind: LcdEventKind) {
+    eventId.current += 1;
+    const id = eventId.current;
+    setScreenMode("pet");
+    setEvent({ kind, id });
+    setTimeout(() => setEvent((e) => (e?.id === id ? null : e)), 2600);
+  }
 
   function toast(text: string, tone: Toast["tone"] = "xp") {
     toastId.current += 1;
@@ -110,7 +130,10 @@ export function PetRoom({ initial, initialQuiz }: { initial: CompanionView; init
             : `Level ${res.xp.levelUp.level}!`,
           "level",
         );
-      }
+        fire(res.xp.levelUp.evolved ? "evolve" : "levelup");
+      } else if (body.action === "checkin" && res.xp?.awarded) fire("hello");
+      else if (body.action === "feed" && res.xp?.awarded) fire("eat");
+      else if (body.action === "play" && res.correct) fire("play");
       if (opts.refresh) router.refresh();
       return res;
     } catch (err) {
@@ -144,6 +167,17 @@ export function PetRoom({ initial, initialQuiz }: { initial: CompanionView; init
             color={pet.color}
             level={pet.level}
             size={250}
+            event={event}
+            screenMode={screenMode}
+            stats={{
+              ageDays: pet.ageDays,
+              fullness: pet.vitals.fullness,
+              joy: pet.vitals.joy,
+              energy: pet.vitals.energy,
+              health: pet.vitals.health,
+              liquidPct: pet.liquidPct,
+            }}
+            onScreenClick={() => setScreenMode((m) => (m === "pet" ? "stats" : "pet"))}
             buttons={
               <>
                 <DeviceButton
@@ -163,7 +197,7 @@ export function PetRoom({ initial, initialQuiz }: { initial: CompanionView; init
               </>
             }
           />
-          <div className="pointer-events-none absolute inset-x-0 top-6 flex flex-col items-center gap-1">
+          <div className="pointer-events-none absolute inset-x-0 -top-3 z-10 flex flex-wrap justify-center gap-1">
             {toasts.map((t) => (
               <span
                 key={t.id}
@@ -176,6 +210,9 @@ export function PetRoom({ initial, initialQuiz }: { initial: CompanionView; init
               </span>
             ))}
           </div>
+          <p className="mt-3 font-pixel text-[10px] uppercase text-muted">
+            {screenMode === "stats" ? "Tap the screen to go back" : "Tap the screen for stats"}
+          </p>
         </div>
 
         {/* Status */}
@@ -198,6 +235,32 @@ export function PetRoom({ initial, initialQuiz }: { initial: CompanionView; init
               <Palette className="h-4 w-4" />
             </button>
           </div>
+
+          {pet.presence && (
+            <div className="flex min-w-0 items-center gap-2 text-xs text-fg-2">
+              <span
+                className={clsx(
+                  "h-2 w-2 shrink-0 rounded-full",
+                  sleeping ? "bg-muted" : "animate-pulse-dot bg-good",
+                )}
+                aria-hidden
+              />
+              <span className="shrink-0 font-pixel text-[10px] uppercase text-muted">Latest</span>
+              <span className="truncate">
+                {(() => {
+                  const who =
+                    pet.presence.agent === "copilot"
+                      ? pet.name
+                      : (AGENTS[pet.presence.agent as keyof typeof AGENTS]?.name ??
+                        pet.presence.agent);
+                  return pet.presence.title.startsWith(who)
+                    ? pet.presence.title
+                    : `${who}: ${pet.presence.title}`;
+                })()}
+              </span>
+              <span className="shrink-0 text-muted">· {ago(pet.presence.minutesAgo)}</span>
+            </div>
+          )}
 
           {customizing && (
             <form
