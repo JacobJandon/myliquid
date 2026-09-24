@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 const KeyBody = z.object({
   name: z.string().trim().min(1).max(60),
-  scopes: z.array(z.enum(["read", "trade"])).min(1),
+  scopes: z.array(z.enum(["read", "trade", "pay"])).min(1),
 });
 
 export const GET = handle(async () =>

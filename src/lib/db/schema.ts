@@ -4,7 +4,7 @@
  * Money is stored as integer cents. Everything except prices and deal reviews
  * (the shared market) is scoped to an investor.
  */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS meta (
@@ -214,4 +214,97 @@ CREATE TABLE IF NOT EXISTS nav_history (
   total_cents INTEGER NOT NULL,
   PRIMARY KEY (investor_id, date)
 );
+
+-- The investor's living agent (a "Liquid"). Vitals decay in real time.
+CREATE TABLE IF NOT EXISTS companions (
+  investor_id TEXT PRIMARY KEY REFERENCES investors(id),
+  name TEXT NOT NULL,
+  color TEXT NOT NULL,
+  born_at TEXT NOT NULL,
+  xp INTEGER NOT NULL DEFAULT 0,
+  fullness REAL NOT NULL,
+  fullness_at TEXT NOT NULL,
+  energy REAL NOT NULL,
+  energy_at TEXT NOT NULL,
+  joy REAL NOT NULL,
+  joy_at TEXT NOT NULL,
+  streak INTEGER NOT NULL DEFAULT 0,
+  last_checkin_day TEXT,
+  last_level INTEGER NOT NULL DEFAULT 1
+);
+
+-- One row per XP award, so daily caps and quests can be computed.
+CREATE TABLE IF NOT EXISTS companion_log (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  action TEXT NOT NULL,
+  xp INTEGER NOT NULL,
+  note TEXT,
+  day TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS companion_log_investor ON companion_log(investor_id, day);
+
+-- Agent Pay: the agent's own funded wallet (the hard ceiling on agent spending).
+CREATE TABLE IF NOT EXISTS wallets (
+  investor_id TEXT PRIMARY KEY REFERENCES investors(id),
+  balance_cents INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS wallet_ledger (
+  id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  kind TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  ref TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS wallet_ledger_investor ON wallet_ledger(investor_id, created_at);
+
+-- A tokenized agent card with its spending policy.
+CREATE TABLE IF NOT EXISTS agent_cards (
+  id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL UNIQUE REFERENCES investors(id),
+  last4 TEXT NOT NULL,
+  token TEXT NOT NULL,
+  status TEXT NOT NULL,
+  per_payment_limit_cents INTEGER NOT NULL,
+  approval_threshold_cents INTEGER NOT NULL,
+  daily_limit_cents INTEGER NOT NULL,
+  monthly_limit_cents INTEGER NOT NULL,
+  allowed_categories TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+-- Payment requests created by merchant terminals. Anyone's agent can tap to pay one.
+CREATE TABLE IF NOT EXISTS payment_requests (
+  id TEXT PRIMARY KEY,
+  code TEXT NOT NULL UNIQUE,
+  merchant_id TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  description TEXT NOT NULL,
+  status TEXT NOT NULL,
+  investor_id TEXT REFERENCES investors(id),
+  payment_id TEXT,
+  created_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS payments (
+  id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  card_id TEXT,
+  merchant_id TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  channel TEXT NOT NULL,
+  status TEXT NOT NULL,
+  initiated_by TEXT NOT NULL,
+  request_id TEXT,
+  description TEXT NOT NULL,
+  checks TEXT NOT NULL,
+  reason TEXT,
+  created_at TEXT NOT NULL,
+  decided_at TEXT
+);
+CREATE INDEX IF NOT EXISTS payments_investor ON payments(investor_id, created_at);
 `;

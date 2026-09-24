@@ -5,6 +5,7 @@ import type {
 import { getDb, nowIso, simDate, type Db } from "@/lib/db";
 import type { AgentId } from "@/lib/domain/types";
 import { finishRun, logEvent, startRun } from "@/lib/services/audit";
+import { adjustVitals, awardXp, petName, spendEnergy } from "@/lib/services/companion";
 import { getMandate } from "@/lib/services/repo";
 import type { DeskEvent } from "./events";
 import { agentMode, describeApiError, runClaudeLoop } from "./llm";
@@ -85,6 +86,8 @@ export async function runAgentRoutine(
       payload: { summary },
     });
     emit({ type: "run_finished", agent: agentId, runId, summary, ok: true });
+    spendEnergy(db, investorId, 4);
+    awardXp(db, investorId, "agent_run");
     return { ok: true, summary };
   } catch (err) {
     const message = describeApiError(err);
@@ -107,10 +110,12 @@ export async function runDeskCycle(
   emit: Emit,
   signal?: AbortSignal,
 ): Promise<void> {
+  let completed = 0;
   for (const agent of DESK_AGENTS) {
     if (signal?.aborted) break;
-    await runAgentRoutine(investorId, agent, "cycle", emit, signal);
+    if ((await runAgentRoutine(investorId, agent, "cycle", emit, signal)).ok) completed += 1;
   }
+  if (completed > 0) awardXp(getDb(), investorId, "desk_cycle");
 }
 
 // ── Copilot chat ────────────────────────────────────────────────────────────
@@ -196,8 +201,10 @@ export async function copilotChat(
   logEvent(db, investorId, {
     agent: "user",
     kind: "message",
-    title: `Asked Copilot: ${text.slice(0, 200)}`,
+    title: `Asked ${petName(db, investorId)}: ${text.slice(0, 200)}`,
   });
+  // Talking to the pet cheers it up; work tires it a little.
+  adjustVitals(db, investorId, { joy: 3, energy: -2 });
 
   const def = AGENTS.copilot;
   const ctx = { db, investorId, agent: "copilot" as const, runId: null };
@@ -208,7 +215,7 @@ export async function copilotChat(
     try {
       const result = await runClaudeLoop({
         agent: "copilot",
-        system: systemPrompt(def),
+        system: systemPrompt(def, { petName: petName(db, investorId) }),
         tools: toolsFor(def.tools),
         messages: [...history, userTurn],
         ctx,

@@ -60,7 +60,7 @@ export function RulesPanel({
 
   return (
     <div className="space-y-6">
-      <form onSubmit={create} className="rounded-2xl border border-line bg-surface/80 p-5">
+      <form onSubmit={create} className="rounded-2xl border border-line bg-surface p-5">
         <div className="mb-3 text-sm font-medium text-fg">New rule</div>
         <div className="flex flex-wrap items-center gap-2 text-sm text-fg-2">
           <span>When</span>
@@ -132,7 +132,7 @@ export function RulesPanel({
           {rules.map((r) => (
             <li
               key={r.id}
-              className="flex items-center gap-3 rounded-xl border border-line bg-surface/80 p-4"
+              className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4"
             >
               <AgentAvatar agent={r.createdBy} size="sm" />
               <div className="min-w-0 flex-1">

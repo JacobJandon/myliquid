@@ -43,6 +43,7 @@ export function KeyManager({ keys, endpoint }: { keys: ApiKey[]; endpoint: strin
   const { run, pending, error } = useAction();
   const [name, setName] = useState("Claude");
   const [trade, setTrade] = useState(false);
+  const [pay, setPay] = useState(false);
   const [created, setCreated] = useState<string | null>(null);
 
   async function create(e: React.FormEvent) {
@@ -50,7 +51,7 @@ export function KeyManager({ keys, endpoint }: { keys: ApiKey[]; endpoint: strin
     const res = await run(() =>
       postJson<{ key: string }>("/api/keys", {
         name,
-        scopes: trade ? ["read", "trade"] : ["read"],
+        scopes: ["read", ...(trade ? ["trade"] : []), ...(pay ? ["pay"] : [])],
       }),
     );
     if (res) setCreated(res.key);
@@ -60,7 +61,7 @@ export function KeyManager({ keys, endpoint }: { keys: ApiKey[]; endpoint: strin
 
   return (
     <div className="space-y-6">
-      <form onSubmit={create} className="rounded-2xl border border-line bg-surface/80 p-5">
+      <form onSubmit={create} className="rounded-2xl border border-line bg-surface p-5">
         <div className="mb-3 text-sm font-medium text-fg">Create an API key</div>
         <div className="flex flex-wrap items-center gap-3">
           <input
@@ -78,6 +79,15 @@ export function KeyManager({ keys, endpoint }: { keys: ApiKey[]; endpoint: strin
               className="accent-[var(--accent)]"
             />
             Allow trading (proposals, rebalances, rules)
+          </label>
+          <label className="flex items-center gap-2 text-sm text-fg">
+            <input
+              type="checkbox"
+              checked={pay}
+              onChange={() => setPay(!pay)}
+              className="accent-[var(--accent)]"
+            />
+            Allow payments (agent card, within its policy)
           </label>
           <button className={buttonClass("primary")} disabled={pending || !name.trim()}>
             <KeyRound className="h-4 w-4" /> Create key
@@ -140,7 +150,7 @@ export function KeyManager({ keys, endpoint }: { keys: ApiKey[]; endpoint: strin
               <li
                 key={k.id}
                 className={clsx(
-                  "flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface/80 p-4",
+                  "flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-4",
                   k.revokedAt && "opacity-50",
                 )}
               >
@@ -154,8 +164,8 @@ export function KeyManager({ keys, endpoint }: { keys: ApiKey[]; endpoint: strin
                       : "never used"}
                   </div>
                 </div>
-                <Badge tone={k.scopes.includes("trade") ? "warning" : "neutral"}>
-                  {k.scopes.includes("trade") ? "read + trade" : "read only"}
+                <Badge tone={k.scopes.length > 1 ? "warning" : "neutral"}>
+                  {k.scopes.join(" + ")}
                 </Badge>
                 {k.revokedAt ? (
                   <Badge>revoked</Badge>

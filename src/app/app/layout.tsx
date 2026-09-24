@@ -7,6 +7,8 @@ import { listAlerts } from "@/lib/services/alerts";
 import { listProposals } from "@/lib/services/proposals";
 import { getMandate } from "@/lib/services/repo";
 import { ensureMarketCurrent } from "@/lib/services/sim";
+import { getCompanionView } from "@/lib/services/companion";
+import type { Stage } from "@/lib/domain/companion";
 import { MobileNav, Sidebar } from "@/components/app/Sidebar";
 import { SimControls } from "@/components/app/SimControls";
 import { Badge } from "@/components/ui";
@@ -23,6 +25,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ).length;
   const mandate = getMandate(db, investor.id);
   const mode = agentMode();
+  const pet = getCompanionView(db, investor.id);
 
   return (
     <div className="bg-glow min-h-screen">
@@ -32,10 +35,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             pendingCount={pending}
             alertCount={alerts}
             user={{ name: investor.name, email: investor.email, kind: investor.kind }}
+            pet={{
+              name: pet.name,
+              color: pet.color,
+              level: pet.level,
+              stage: pet.stage.id as Stage,
+              mood: pet.vitals.mood,
+            }}
           />
         </aside>
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-20 border-b border-line bg-bg/85 backdrop-blur">
+          <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
             <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-8 sm:py-3">
               <div className="flex min-w-0 items-center gap-2 text-xs">
                 <Link href="/app" className="mr-1 font-semibold text-fg lg:hidden">
@@ -67,12 +77,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             <MobileNav />
           </header>
           {investor.kind === "guest" && (
-            <div className="border-b border-accent/20 bg-accent/10 px-4 py-2 text-xs text-fg sm:px-8">
+            <div className="border-b border-fg/10 bg-accent-2 px-4 py-2 text-xs text-accent-2-ink sm:px-8">
               You&apos;re exploring a private guest account.{" "}
-              <Link
-                href="/signup"
-                className="font-medium text-accent underline-offset-2 hover:underline"
-              >
+              <Link href="/signup" className="font-semibold underline underline-offset-2">
                 Create an account
               </Link>{" "}
               to keep your portfolio and agents.

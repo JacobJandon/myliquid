@@ -21,7 +21,10 @@ export function Card({
 }) {
   return (
     <section
-      className={clsx("rounded-2xl border border-line bg-surface/80 backdrop-blur", className)}
+      className={clsx(
+        "rounded-2xl border border-line bg-surface shadow-[0_1px_0_rgba(17,17,17,0.04)]",
+        className,
+      )}
     >
       {(title || action) && (
         <header className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
@@ -117,7 +120,7 @@ export function Stat({
   return (
     <div
       className={clsx(
-        "min-w-0 rounded-2xl border border-line bg-surface/80 px-4 py-3 sm:px-5 sm:py-4",
+        "min-w-0 rounded-2xl border border-line bg-surface px-4 py-3 sm:px-5 sm:py-4",
         className,
       )}
     >
@@ -147,7 +150,7 @@ export function AgentAvatar({
         : agent === "autopilot"
           ? "Autopilot"
           : agent);
-  const accent = def?.accent ?? (agent === "user" ? "#eef1f7" : "#6b7385");
+  const accent = def?.accent ?? (agent === "user" ? "#111111" : "#86837b");
   const dims =
     size === "sm"
       ? "h-6 w-6 text-[10px]"
@@ -185,16 +188,17 @@ export const SLEEVE_COLORS: Record<Sleeve, string> = {
 };
 
 export function buttonClass(
-  variant: "primary" | "secondary" | "ghost" | "danger" = "secondary",
+  variant: "primary" | "secondary" | "ghost" | "danger" | "accent" = "secondary",
   size: "sm" | "md" = "md",
 ) {
   return clsx(
-    "inline-flex items-center justify-center gap-2 rounded-full font-medium transition disabled:cursor-not-allowed disabled:opacity-50",
+    "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50",
     size === "sm" ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm",
-    variant === "primary" && "bg-accent text-accent-ink hover:brightness-110",
-    variant === "secondary" && "border border-line-strong bg-surface-2 text-fg hover:bg-surface-3",
+    variant === "primary" && "bg-fg text-bg hover:bg-fg/85",
+    variant === "accent" && "bg-accent text-accent-ink hover:brightness-110",
+    variant === "secondary" && "border border-line-strong bg-surface text-fg hover:bg-surface-2",
     variant === "ghost" && "text-fg-2 hover:bg-surface-2 hover:text-fg",
-    variant === "danger" && "border border-critical/60 bg-critical/15 text-fg hover:bg-critical/25",
+    variant === "danger" && "border border-critical/50 bg-critical/10 text-fg hover:bg-critical/20",
   );
 }
 

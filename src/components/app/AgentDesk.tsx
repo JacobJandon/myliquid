@@ -121,7 +121,7 @@ export function AgentDesk({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface/80 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-surface p-4">
         <div>
           <div className="text-sm font-medium text-fg">Run the whole desk</div>
           <div className="text-xs text-muted">
@@ -149,7 +149,7 @@ export function AgentDesk({
           return (
             <article
               key={a.id}
-              className="flex flex-col rounded-2xl border border-line bg-surface/80 p-5"
+              className="flex flex-col rounded-2xl border border-line bg-surface p-5"
             >
               <header className="flex items-start gap-3">
                 <AgentAvatar agent={a.id} size="lg" />

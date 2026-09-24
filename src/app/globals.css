@@ -1,41 +1,48 @@
 @import "tailwindcss";
 
 /*
- * MyLiquid theme. Every color is a token here, so the look can be restyled
- * (e.g. to match a brand guide) without touching components.
+ * MyLiquid brand tokens (v3, "paper & pixels").
+ * Warm paper background, ink-black type, one liquid-blue accent, a lime pop,
+ * and pixel accents for the pet. Every color lives here.
  */
 :root {
-  --bg: #070a11;
-  --surface: #0e131e;
-  --surface-2: #141a27;
-  --surface-3: #1b2232;
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.16);
-  --fg: #eef1f7;
-  --fg-2: #aeb6c7;
-  --muted: #7c869a;
+  --bg: #f5f3ee;
+  --surface: #ffffff;
+  --surface-2: #f3f1eb;
+  --surface-3: #e9e6dd;
+  --line: rgba(17, 17, 17, 0.09);
+  --line-strong: rgba(17, 17, 17, 0.18);
+  --fg: #111111;
+  --fg-2: #4a4843;
+  --muted: #86837b;
 
-  --accent: #2ee6c5; /* "liquid" aqua */
-  --accent-ink: #04201b;
-  --accent-2: #8b7cff; /* agent violet */
+  --accent: #2f5bff; /* liquid blue */
+  --accent-ink: #ffffff;
+  --accent-2: #c8f560; /* lime pop */
+  --accent-2-ink: #1a2400;
 
   /* Status (reserved; always paired with an icon + label) */
   --good: #0ca30c;
-  --warning: #fab219;
+  --warning: #e39a00;
   --serious: #ec835a;
   --critical: #d03b3b;
 
-  /* Sleeve identity (validated categorical order for the dark surface) */
-  --sleeve-index: #3987e5;
-  --sleeve-trading: #d95926;
-  --sleeve-bitcoin: #199e70;
-  --sleeve-business: #c98500;
-  --sleeve-private: #d55181;
-  --sleeve-cash: #6b7385;
+  /* Sleeve identity: validated categorical order for the light surface (labels always shown) */
+  --sleeve-index: #2a78d6;
+  --sleeve-trading: #eb6834;
+  --sleeve-bitcoin: #1baf7a;
+  --sleeve-business: #eda100;
+  --sleeve-private: #e87ba4;
+  --sleeve-cash: #a19e95;
 
-  --grid: rgba(255, 255, 255, 0.06);
-  --axis: rgba(255, 255, 255, 0.18);
-  color-scheme: dark;
+  --grid: rgba(17, 17, 17, 0.06);
+  --axis: rgba(17, 17, 17, 0.2);
+
+  /* The pet's LCD screen */
+  --lcd: #c9d4b1;
+  --lcd-ink: #26301c;
+  --lcd-mid: #8fa177;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -51,12 +58,16 @@
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-accent-2: var(--accent-2);
+  --color-accent-2-ink: var(--accent-2-ink);
   --color-good: var(--good);
   --color-warning: var(--warning);
   --color-serious: var(--serious);
   --color-critical: var(--critical);
+  --color-lcd: var(--lcd);
+  --color-lcd-ink: var(--lcd-ink);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-display: var(--font-display-face), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-pixel: var(--font-pixel-face), ui-monospace, monospace;
 }
 
 html,
@@ -70,22 +81,34 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.font-display {
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+/* Paper with a faint dot grid */
 .bg-glow {
-  background:
-    radial-gradient(60rem 30rem at 15% -10%, rgba(46, 230, 197, 0.12), transparent 60%),
-    radial-gradient(50rem 30rem at 95% 0%, rgba(139, 124, 255, 0.14), transparent 60%),
-    var(--bg);
+  background-color: var(--bg);
+  background-image: radial-gradient(rgba(17, 17, 17, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
 .text-gradient {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
+}
+
+.highlight {
+  background: linear-gradient(transparent 58%, var(--accent-2) 58%, var(--accent-2) 92%, transparent 92%);
+  padding: 0 0.08em;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+  shape-rendering: crispEdges;
 }
 
 /* Markdown rendered from agents */
@@ -118,7 +141,7 @@ body {
   color: var(--fg-2);
 }
 .prose-agent blockquote {
-  border-left: 2px solid var(--accent);
+  border-left: 3px solid var(--accent);
   padding-left: 0.75rem;
   color: var(--fg-2);
   margin: 0.5rem 0;
@@ -146,6 +169,7 @@ body {
   font-size: 0.8em;
 }
 
+/* ── Motion ─────────────────────────────────────────────────────────────── */
 @keyframes pulse-dot {
   0%,
   100% {
@@ -157,4 +181,156 @@ body {
 }
 .animate-pulse-dot {
   animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+@keyframes pet-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6%);
+  }
+}
+@keyframes pet-wiggle {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-9%) rotate(-6deg);
+  }
+  75% {
+    transform: translateY(-9%) rotate(6deg);
+  }
+}
+@keyframes pet-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-4%);
+  }
+  40%,
+  80% {
+    transform: translateX(4%);
+  }
+}
+@keyframes pet-breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.94);
+  }
+}
+@keyframes pet-droop {
+  0%,
+  100% {
+    transform: translateY(2%);
+  }
+  50% {
+    transform: translateY(5%);
+  }
+}
+@keyframes pet-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+@keyframes float-z {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(12%, -40%);
+    opacity: 0;
+  }
+}
+@keyframes float-up {
+  0% {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  15%,
+  80% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+}
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.pet-bounce {
+  animation: pet-bounce 1.6s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+.pet-wiggle {
+  animation: pet-wiggle 0.9s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+.pet-shake {
+  animation: pet-shake 0.5s linear infinite;
+}
+.pet-breathe {
+  animation: pet-breathe 3s ease-in-out infinite;
+  transform-origin: 50% 95%;
+}
+.pet-droop {
+  animation: pet-droop 3s ease-in-out infinite;
+}
+.pet-blink {
+  animation: pet-blink 4.5s infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.float-z {
+  animation: float-z 2.4s ease-out infinite;
+}
+.toast-float {
+  animation: float-up 2.8s ease-out forwards;
+}
+.drift {
+  animation: drift 5s ease-in-out infinite;
+}
+.drift-slow {
+  animation: drift 7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-bounce,
+  .pet-wiggle,
+  .pet-shake,
+  .pet-breathe,
+  .pet-droop,
+  .pet-blink,
+  .float-z,
+  .drift,
+  .drift-slow,
+  .animate-pulse-dot {
+    animation: none;
+  }
 }

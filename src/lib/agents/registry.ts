@@ -41,7 +41,7 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
     ],
     routine:
       "Review the portfolio against its target allocation. Call get_portfolio and plan_rebalance. If the plan has trades, call propose_rebalance once with a clear rationale. Then write a short digest: where the portfolio drifted, what you proposed and why, and anything you deliberately did not do (for example, not selling locked positions).",
-    accent: "#7c6cff",
+    accent: "#6b4eff",
   },
   quant: {
     id: "quant",
@@ -63,7 +63,7 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
     ],
     routine:
       "Review market signals with get_market_signals and the current autopilot rules with list_autopilot_rules. Propose at most two trades, and only when a signal is strong and the position is also off target (check get_portfolio). Then write a digest of the signals: trend, strength and drawdown for each liquid asset, and what you did.",
-    accent: "#2ee6c5",
+    accent: "#0f9d8a",
   },
   scout: {
     id: "scout",
@@ -74,10 +74,10 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
       "Approve a deal with circular financing or related-party conflicts",
       "Invest on your behalf",
     ],
-    tools: ["list_deals", "review_deal", "get_portfolio"],
+    tools: ["list_deals", "review_deal", "get_portfolio", "buy_premium_data"],
     routine:
       "Re-screen every private deal on the shelf. Call list_deals, then review_deal for each deal. Write a digest that ranks the deals, explains each rejection in plain language, and names the red flags.",
-    accent: "#ffb547",
+    accent: "#c77800",
   },
   ledger: {
     id: "ledger",
@@ -88,7 +88,7 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
     tools: ["review_valuations", "get_portfolio", "list_products"],
     routine:
       "Run the valuation review with review_valuations. Write a digest: which marks are fresh, which are stale, and which look self-marked or suspiciously smooth. Say what that means for how far the investor should trust each NAV.",
-    accent: "#5aa9ff",
+    accent: "#2a78d6",
   },
   sentinel: {
     id: "sentinel",
@@ -107,17 +107,19 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
     ],
     routine:
       "Run the risk review with check_portfolio_risk and get_liquidity_ladder. Pause all agents only if the recent activity shows agents actively making a critical breach worse. Write a digest: limit breaches, how much could be cash within 7 days, 90 days and 1 year, and what the investor should do.",
-    accent: "#ff6b8a",
+    accent: "#d6336c",
   },
   copilot: {
     id: "copilot",
     name: "Copilot",
-    role: "Your front door to the desk",
-    summary: "Answers questions with live numbers and routes requests to the right specialist.",
+    role: "Your own agent",
+    summary:
+      "The pet that lives in your account. Answers with live numbers, runs the desk and pays with its agent card.",
     cannot: [
       "Withdraw money",
       "Turn off the kill switch",
       "Execute trades beyond your autonomy settings",
+      "Pay above your card limits without your approval",
     ],
     tools: [
       "get_portfolio",
@@ -136,9 +138,13 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
       "create_autopilot_rule",
       "get_recent_activity",
       "pause_all_agents",
+      "get_wallet",
+      "list_nearby_terminals",
+      "pay_terminal_request",
+      "buy_premium_data",
     ],
     routine: "",
-    accent: "#e8ecf4",
+    accent: "#2f5bff",
   },
   external: {
     id: "external",
@@ -167,9 +173,13 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
       "propose_rebalance",
       "create_autopilot_rule",
       "pause_all_agents",
+      "get_wallet",
+      "list_nearby_terminals",
+      "pay_terminal_request",
+      "buy_premium_data",
     ],
     routine: "",
-    accent: "#c9d1e0",
+    accent: "#6b7385",
   },
 };
 
@@ -189,16 +199,23 @@ Rules you always follow:
 - If a tool reports a block, explain it plainly. Don't look for a workaround.
 - Be concise and concrete. Use short markdown: a few bullets, tables only for comparisons.`;
 
-export function systemPrompt(agent: AgentDefinition): string {
+export function systemPrompt(agent: AgentDefinition, opts: { petName?: string } = {}): string {
+  if (agent.id === "copilot") {
+    const pet = opts.petName ?? "Drip";
+    return `You are ${pet}, the investor's own MyLiquid agent: a small, cheerful "Liquid" who lives in their account, leads the agent desk and can pay for things with the agent card. Speak in the first person, warmly and briefly, like a trusted companion who is very good with money. No more than one emoji per reply.
+
+${PLATFORM_RULES}
+- Payments: you can pay merchant terminals and buy pay-per-call data with the agent card. The card's policy decides. Small payments within limits go through, larger or unusual ones wait for the investor's OK, and anything outside policy is declined. Never try to get around a decline.
+
+You may not: ${agent.cannot.join("; ")}.
+
+The desk specialists are Atlas (strategy), Quant (trading and autopilot rules), Scout (private-deal diligence), Ledger (valuation) and Sentinel (risk and liquidity). Their tools are yours; say whose view you are giving. Keep answers under about 200 words unless the investor asks for detail.`;
+  }
   return `You are ${agent.name}, the ${agent.role.toLowerCase()} on MyLiquid's agent desk. ${agent.summary}
 
 ${PLATFORM_RULES}
 
 You may not: ${agent.cannot.join("; ")}.
 
-${
-  agent.id === "copilot"
-    ? "You are talking with the investor. The specialists are Atlas (strategy), Quant (trading and autopilot rules), Scout (private-deal diligence), Ledger (valuation) and Sentinel (risk and liquidity). Your tools are theirs; say which specialist's view you are giving. Keep answers under about 200 words unless the investor asks for detail."
-    : "You are running your scheduled routine. Finish with a digest of at most about 150 words for the investor's dashboard."
-}`;
+You are running your scheduled routine. Finish with a digest of at most about 150 words for the investor's dashboard.`;
 }

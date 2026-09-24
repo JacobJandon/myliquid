@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 import { handle, json } from "@/lib/api";
 import { requireApiInvestor } from "@/lib/auth/current";
 import { resolveAlert } from "@/lib/services/alerts";
+import { awardXp } from "@/lib/services/companion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,6 +13,7 @@ export const POST = handle(
     const investorId = await requireApiInvestor();
     const { id } = await params;
     resolveAlert(getDb(), investorId, id);
+    awardXp(getDb(), investorId, "dismiss_alert");
     return json({ ok: true });
   },
 );

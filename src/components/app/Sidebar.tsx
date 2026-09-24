@@ -6,8 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Activity,
   Bot,
-  Droplets,
-  LayoutDashboard,
+  CreditCard,
+  Home,
   LogOut,
   MessageSquare,
   Plug,
@@ -15,13 +15,18 @@ import {
   Store,
   Zap,
 } from "lucide-react";
+import type { Stage } from "@/lib/domain/companion";
+import type { CompanionView } from "@/lib/services/companion";
+import { Logo } from "@/components/brand/Logo";
+import { MiniPet } from "@/components/pet/PetRoom";
 import { postJson } from "@/components/client";
 
 const NAV = [
-  { href: "/app", label: "Overview", icon: LayoutDashboard },
+  { href: "/app", label: "Home", icon: Home },
+  { href: "/app/copilot", label: "Talk", icon: MessageSquare },
   { href: "/app/invest", label: "Invest", icon: Store },
+  { href: "/app/pay", label: "Agent Pay", icon: CreditCard },
   { href: "/app/agents", label: "Agent desk", icon: Bot },
-  { href: "/app/copilot", label: "Copilot", icon: MessageSquare },
   { href: "/app/autopilot", label: "Autopilot", icon: Zap },
   { href: "/app/connect", label: "Connect an agent", icon: Plug },
   { href: "/app/activity", label: "Activity", icon: Activity },
@@ -36,21 +41,35 @@ export function Sidebar({
   pendingCount,
   alertCount,
   user,
+  pet,
 }: {
   pendingCount: number;
   alertCount: number;
   user: { name: string; email: string | null; kind: string };
+  pet: Pick<CompanionView, "name" | "color" | "level"> & {
+    stage: Stage;
+    mood: CompanionView["vitals"]["mood"];
+  };
 }) {
   const pathname = usePathname();
   const router = useRouter();
   return (
     <div className="flex h-full flex-col">
       <nav className="flex flex-col gap-1" aria-label="App">
-        <Link href="/" className="mb-6 flex items-center gap-2 px-3 text-fg">
-          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent-2 text-accent-ink">
-            <Droplets className="h-4 w-4" />
-          </span>
-          <span className="text-lg font-semibold tracking-tight">MyLiquid</span>
+        <Link href="/" className="mb-5 px-3">
+          <Logo />
+        </Link>
+        <Link
+          href="/app"
+          className="mb-4 rounded-2xl border border-line bg-surface p-2.5 hover:border-line-strong"
+        >
+          <MiniPet
+            name={pet.name}
+            color={pet.color}
+            stage={pet.stage}
+            mood={pet.mood}
+            level={pet.level}
+          />
         </Link>
         {NAV.map(({ href, label, icon: Icon }) => {
           const active = isActive(pathname, href);
@@ -61,14 +80,19 @@ export function Sidebar({
               href={href}
               className={clsx(
                 "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition",
-                active ? "bg-surface-3 text-fg" : "text-fg-2 hover:bg-surface-2 hover:text-fg",
+                active ? "bg-fg text-bg" : "text-fg-2 hover:bg-surface-3 hover:text-fg",
               )}
               aria-current={active ? "page" : undefined}
             >
               <Icon className="h-4 w-4" />
               <span className="flex-1">{label}</span>
               {count > 0 && (
-                <span className="rounded-full bg-accent/15 px-1.5 text-[10px] font-semibold text-accent">
+                <span
+                  className={clsx(
+                    "rounded-full px-1.5 text-[10px] font-semibold",
+                    active ? "bg-bg text-fg" : "bg-fg text-bg",
+                  )}
+                >
                   {count}
                 </span>
               )}
@@ -77,7 +101,7 @@ export function Sidebar({
         })}
       </nav>
       <div className="mt-auto space-y-3 px-3">
-        <div className="rounded-xl border border-line p-3">
+        <div className="rounded-xl border border-line bg-surface p-3">
           <div className="truncate text-sm text-fg">{user.name}</div>
           <div className="truncate text-[11px] text-muted">
             {user.kind === "guest" ? "Guest account" : (user.email ?? "Demo account")}
@@ -116,7 +140,7 @@ export function MobileNav() {
             href={href}
             className={clsx(
               "shrink-0 rounded-full px-3 py-1.5 text-xs",
-              active ? "bg-surface-3 text-fg" : "text-fg-2",
+              active ? "bg-fg text-bg" : "text-fg-2",
             )}
             aria-current={active ? "page" : undefined}
           >

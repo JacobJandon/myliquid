@@ -2,7 +2,7 @@
 
 MyLiquid is a single Next.js 16 app (App Router, TypeScript, Tailwind v4) with a
 SQLite database. It is multi-user: every portfolio, order, proposal, alert, rule,
-chat and audit event belongs to one investor. The simulated market (prices and
+chat, audit event, pet, wallet, card and payment belongs to one investor. The simulated market (prices and
 Scout's deal reviews) is shared. The code is layered so the rules that matter for money live in
 pure, tested functions, and everything above them (agents, API, UI) goes through
 the same service layer.
@@ -36,6 +36,9 @@ the same service layer.
   hashed, shown once) and a stateless Streamable HTTP MCP server built on the
   official SDK. Tools are the same `AgentTool`s the desk uses, filtered by scope
   and run as the `external` agent. Requests are rate-limited per key.
+- `services/apiKeys.ts` scopes are `read`, `trade` and `pay`. The `pay` scope
+  exposes `pay_terminal_request` and `buy_premium_data`, which spend only from
+  the agent wallet under the card policy.
 - `services/sim.ts`: one market clock for everyone. `ensureMarketCurrent` catches
   the market up to the real date on each app or MCP request. Each simulated day
   settles, gates, records NAV, checks circuit breakers and runs autopilot rules
@@ -59,6 +62,20 @@ the same service layer.
 - `rebalance.ts`: Atlas's plan. It never sells locked sleeves and funds liquid
   sleeves first.
 - `signals.ts`: Quant's momentum signal and the autopilot rule engine.
+- `companion.ts`: the pet.
+  - Vitals come from timestamps, so no background job is needed: fullness decays,
+    energy recovers, joy drifts back to neutral.
+  - Portfolio health comes from open alerts and the 7-day liquid share, and mood
+    comes from health and vitals.
+  - Levels and stages; XP rules with daily caps (habits only, never trading
+    volume); deterministic daily quests; the liquidity quiz; speech.
+- `payments.ts`: fictional merchants and categories, and `evaluatePayment`, the
+  card policy.
+  - *Hard checks* decline: card, category, per-payment, daily, monthly, wallet.
+  - *Soft checks* need the owner: approval threshold, agents paused, velocity,
+    new merchant.
+  - An owner approval re-runs only the hard checks.
+  - Also terminal codes (`LQ-XXXX`).
 
 **`lib/services`: stateful operations on SQLite.**
 - `orders.ts`: `previewOrder` and `executeOrder`, the only way to trade. Blocked
@@ -71,6 +88,19 @@ the same service layer.
   withdrawals, runs quarterly redemption windows with gates (pro-rated, remainder
   rolls over), records NAV, trips the circuit breaker, and lets Quant evaluate
   autopilot rules.
+- `companion.ts`: `getCompanionView` and the care actions (check-in, feed, play,
+  sleep/wake, customize). `awardXp` enforces daily caps, completes quests and
+  logs level-ups. Sleep and wake go through the mandate's kill switch, and wake is
+  human-only.
+- `payments.ts`: Agent Pay.
+  - Wallet: funded from cash by the owner only, capped at $5,000.
+  - Agent card: a token plus the policy.
+  - Terminal payment requests: public, 15-minute TTL.
+  - `payRequest` and `x402Purchase` both go through one private `attemptPayment`
+    (evaluate → approve, hold for the owner, or decline), and `decidePayment`
+    handles the owner's decision.
+  - A settled payment debits the wallet, writes the ledger, tires the pet and
+    awards XP.
 - `alerts.ts`, `audit.ts`, `rules.ts`, `deals.ts`, `portfolio.ts`, `repo.ts`.
 
 **`lib/agents`: the desk.**
@@ -90,6 +120,13 @@ the same service layer.
   the Copilot conversation append-only (full API content blocks) so it can be
   replayed.
 
+**Public payment endpoints.**
+- `/terminal` and `/api/terminal[/code]`: the merchant POS demo. Requests are
+  created without an account (rate-limited per IP) and polled for status.
+- `/api/x402/research/[productId]`: answers `402 Payment Required` with x402-style
+  requirements. With a pay-scoped key and `X-PAYMENT: myliquid-wallet`, it pays
+  and returns the data with an `x-payment-response` header.
+
 **`app/`: UI and API.** Pages are server components that read through the
 services. Interactive pieces are client components that call `/api/*` and then
 `router.refresh()`. Agent runs and chat stream back as NDJSON `DeskEvent`s, so you
@@ -100,7 +137,8 @@ watch tool calls happen live.
 1. Every order goes through `executeOrder`, which runs `runPreTradeChecks`.
 2. Agents trade only through `agentTrade`. Autonomy requires `autonomy = bounded`,
    the order within the auto-execute limit, and every mandate check passing.
-3. No agent tool can withdraw cash, change settings or release the kill switch.
+3. No agent tool can withdraw cash, change settings, release the kill switch
+   (wake the pet), fund the agent wallet or change the card policy.
 4. Rejected deals can never be bought, whether by a person or an agent.
 5. Locked lots can never be sold before `locked_until`.
 6. The audit log (`agent_events`) is append-only.
@@ -108,7 +146,12 @@ watch tool calls happen live.
    proposals, alerts, rules, keys) always also match the investor, so one user can
    never act on another's records.
 8. Session cookies can reach cash, settings and account deletion. API keys can
-   only reach the MCP tool list for their scope.
+   only reach the MCP tool list for their scope, plus the x402 endpoint with the
+   `pay` scope.
+9. Every agent payment goes through `attemptPayment` → `evaluatePayment`. The
+   wallet balance is a hard limit, so an agent can never spend more than its
+   owner put in.
+10. The pet never earns XP for trading volume.
 
 ## Tests
 
@@ -126,5 +169,10 @@ watch tool calls happen live.
 - `services.test.ts` (accounts): investor isolation, passwords, sessions, guest
   upgrade, reset and delete, API keys.
 - `mcp.test.ts`: drives the real `/api/mcp` route with JSON-RPC. It covers auth,
-  origin checks, scope filtering, read tools, and trade proposals from an external
-  agent (including the blocked shipyard bond).
+  origin checks, scope filtering, read tools, trade proposals from an external
+  agent (including the blocked shipyard bond), and pay-scope payments.
+- `companion-payments.test.ts`: vitals decay, levels, streaks, quests, the quiz,
+  and the card policy's approve, needs-approval and decline decisions.
+- `pet-pay.test.ts`: adoption and customization, XP caps, feed, play, sleep and
+  wake, wallet funding, terminal payments, owner approvals, blocked categories,
+  frozen cards, empty wallets, and x402 purchases (402 → 200).

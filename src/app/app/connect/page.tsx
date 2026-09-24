@@ -38,9 +38,11 @@ export default async function ConnectPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title="Tools by scope">
           <div className="space-y-3 text-xs">
-            {(["read", "trade"] as const).map((scope) => (
+            {(["read", "trade", "pay"] as const).map((scope) => (
               <div key={scope}>
-                <div className="mb-1 text-fg-2">{scope === "read" ? "Read" : "Trade (adds)"}</div>
+                <div className="mb-1 text-fg-2">
+                  {scope === "read" ? "Read" : scope === "trade" ? "Trade (adds)" : "Pay (adds)"}
+                </div>
                 <div className="flex flex-wrap gap-1">
                   {SCOPE_TOOLS[scope].map((t) => (
                     <code

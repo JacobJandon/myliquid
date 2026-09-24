@@ -5,11 +5,15 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { PET_COLORS, type PetColor } from "@/lib/domain/companion";
 import { postJson } from "@/components/client";
+import { PixelPet } from "@/components/pet/PixelPet";
 import { buttonClass } from "@/components/ui";
 
 const input =
-  "h-11 w-full rounded-xl border border-line-strong bg-surface-2 px-3 text-sm text-fg outline-none placeholder:text-muted focus:border-accent";
+  "h-11 w-full rounded-xl border border-line-strong bg-surface px-3 text-sm text-fg outline-none placeholder:text-muted focus:border-fg";
+
+const selected = "border-fg bg-surface-2 text-fg shadow-[2px_2px_0_#111]";
 
 export function GuestButton({
   label = "Try the demo",
@@ -127,8 +131,78 @@ export function recommendProfile(answers: number[]): Profile {
         : "aggressive";
 }
 
-export function SignupForm({ isGuest }: { isGuest: boolean }) {
+const PET_NAMES = ["Drip", "Pip", "Mochi", "Bubbles", "Nimbus", "Splash", "Tofu", "Ripple"];
+
+/** Step 0 of sign-up: hatch your own agent. */
+function AdoptPet({
+  name,
+  color,
+  onName,
+  onColor,
+}: {
+  name: string;
+  color: PetColor;
+  onName: (name: string) => void;
+  onColor: (color: PetColor) => void;
+}) {
+  return (
+    <div className="flex items-center gap-4 rounded-2xl border-2 border-fg bg-surface p-3 shadow-[3px_3px_0_#111]">
+      <span className="bg-glow flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl border-2 border-fg">
+        <PixelPet
+          stage="drop"
+          mood="ecstatic"
+          color={color}
+          size={84}
+          title={`${name || "Your agent"}, just hatched`}
+        />
+      </span>
+      <div className="min-w-0 flex-1 space-y-2">
+        <input
+          className={clsx(input, "h-10")}
+          placeholder="Name your agent"
+          maxLength={20}
+          value={name}
+          onChange={(e) => onName(e.target.value)}
+          aria-label="Agent name"
+        />
+        <div className="flex flex-wrap items-center gap-1.5">
+          {(Object.keys(PET_COLORS) as PetColor[]).map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => onColor(c)}
+              className={clsx(
+                "h-7 w-7 rounded-full border-2",
+                color === c ? "border-fg" : "border-transparent",
+              )}
+              style={{ background: PET_COLORS[c] }}
+              aria-label={`${c} shell`}
+              aria-pressed={color === c}
+            />
+          ))}
+          <button
+            type="button"
+            className="ml-auto text-[11px] text-fg-2 underline-offset-2 hover:underline"
+            onClick={() => onName(PET_NAMES[(PET_NAMES.indexOf(name) + 1) % PET_NAMES.length]!)}
+          >
+            Suggest a name
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function SignupForm({
+  isGuest,
+  pet,
+}: {
+  isGuest: boolean;
+  pet?: { name: string; color: PetColor };
+}) {
   const router = useRouter();
+  const [petNameInput, setPetName] = useState(pet?.name ?? "");
+  const [petColor, setPetColor] = useState<PetColor>(pet?.color ?? "blue");
   const [answers, setAnswers] = useState<(number | null)[]>([null, null, null]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [starter, setStarter] = useState<"cash" | "sample">("cash");
@@ -148,7 +222,14 @@ export function SignupForm({ isGuest }: { isGuest: boolean }) {
     setBusy(true);
     setError(null);
     try {
-      await postJson("/api/auth/signup", { name, email, password, riskProfile: chosen, starter });
+      await postJson("/api/auth/signup", {
+        name,
+        email,
+        password,
+        riskProfile: chosen,
+        starter,
+        pet: { name: petNameInput.trim() || undefined, color: petColor },
+      });
       router.push("/app");
       router.refresh();
     } catch (err) {
@@ -159,10 +240,19 @@ export function SignupForm({ isGuest }: { isGuest: boolean }) {
 
   return (
     <form onSubmit={submit} className="space-y-6">
-      <section className="space-y-4">
-        <div className="text-xs font-medium uppercase tracking-wide text-muted">
-          1 · Your risk profile
+      <section className="space-y-3">
+        <div className="font-pixel text-[11px] uppercase text-muted">
+          1 · {isGuest ? "Your agent" : "Hatch your agent"}
         </div>
+        <AdoptPet name={petNameInput} color={petColor} onName={setPetName} onColor={setPetColor} />
+        <p className="text-[11px] text-fg-2">
+          It lives in your account, runs your agent desk and carries a card it can pay with. It
+          grows when you build good habits, never when you trade more.
+        </p>
+      </section>
+
+      <section className="space-y-4">
+        <div className="font-pixel text-[11px] uppercase text-muted">2 · Your risk profile</div>
         {QUESTIONS.map((question, qi) => (
           <fieldset key={qi}>
             <legend className="text-sm text-fg">{question.q}</legend>
@@ -178,7 +268,7 @@ export function SignupForm({ isGuest }: { isGuest: boolean }) {
                   className={clsx(
                     "rounded-xl border px-2 py-2 text-[11px] leading-tight",
                     answers[qi] === oi
-                      ? "border-accent bg-accent/10 text-fg"
+                      ? selected
                       : "border-line text-fg-2 hover:border-line-strong",
                   )}
                   aria-pressed={answers[qi] === oi}
@@ -206,9 +296,7 @@ export function SignupForm({ isGuest }: { isGuest: boolean }) {
                   onClick={() => setProfile(p.id)}
                   className={clsx(
                     "rounded-xl border p-2 text-left",
-                    chosen === p.id
-                      ? "border-accent bg-accent/10"
-                      : "border-line hover:border-line-strong",
+                    chosen === p.id ? selected : "border-line hover:border-line-strong",
                   )}
                   aria-pressed={chosen === p.id}
                 >
@@ -222,9 +310,7 @@ export function SignupForm({ isGuest }: { isGuest: boolean }) {
       </section>
 
       <section className="space-y-3">
-        <div className="text-xs font-medium uppercase tracking-wide text-muted">
-          2 · Your account
-        </div>
+        <div className="font-pixel text-[11px] uppercase text-muted">3 · Your account</div>
         <input
           className={input}
           placeholder="Name"
@@ -266,7 +352,7 @@ export function SignupForm({ isGuest }: { isGuest: boolean }) {
                 {
                   id: "cash",
                   label: "Start fresh",
-                  text: "$100,000 demo cash. Let Atlas build your allocation.",
+                  text: "$100,000 demo cash. Your agent builds your allocation.",
                 },
                 {
                   id: "sample",
@@ -281,9 +367,7 @@ export function SignupForm({ isGuest }: { isGuest: boolean }) {
                 onClick={() => setStarter(o.id)}
                 className={clsx(
                   "rounded-xl border p-2 text-left",
-                  starter === o.id
-                    ? "border-accent bg-accent/10"
-                    : "border-line hover:border-line-strong",
+                  starter === o.id ? selected : "border-line hover:border-line-strong",
                 )}
                 aria-pressed={starter === o.id}
               >
@@ -302,7 +386,7 @@ export function SignupForm({ isGuest }: { isGuest: boolean }) {
           ? "Answer the three questions first"
           : isGuest
             ? "Save my account"
-            : "Create my account"}
+            : `Hatch ${petNameInput.trim() || "my agent"} & create my account`}
       </button>
       <p className="text-center text-xs text-fg-2">
         Already have an account?{" "}

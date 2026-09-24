@@ -35,6 +35,16 @@ import {
   updateMandate,
 } from "@/lib/services/repo";
 import { createRule, listRules, setRuleStatus } from "@/lib/services/rules";
+import { CATEGORY_LABELS } from "@/lib/domain/payments";
+import {
+  getCard,
+  getWalletBalance,
+  listOpenRequests,
+  listPayments,
+  payRequest,
+  spendSummary,
+  x402Purchase,
+} from "@/lib/services/payments";
 
 /**
  * Every capability an agent has is one of these tools. The same functions back
@@ -660,6 +670,85 @@ const pauseAllAgents = defineTool({
   },
 });
 
+// ── Agent Pay ───────────────────────────────────────────────────────────────
+
+const getWalletTool = defineTool({
+  name: "get_wallet",
+  description:
+    "The agent wallet and agent card: balance, card status, spending limits, allowed merchant categories, today's and this month's spending, and payments waiting for the investor's approval.",
+  schema: z.object({}),
+  trades: false,
+  run: (_input, { db, investorId }) => {
+    const card = getCard(db, investorId);
+    const spend = spendSummary(db, investorId);
+    return {
+      walletBalance: formatUsd(getWalletBalance(db, investorId)),
+      card: {
+        last4: card.last4,
+        status: card.status,
+        autoPayUpTo: formatUsd(card.approvalThresholdCents),
+        perPaymentLimit: formatUsd(card.perPaymentLimitCents),
+        dailyLimit: formatUsd(card.dailyLimitCents),
+        monthlyLimit: formatUsd(card.monthlyLimitCents),
+        allowedCategories: card.allowedCategories.map((c) => CATEGORY_LABELS[c]),
+      },
+      spentToday: formatUsd(spend.todayCents),
+      spentThisMonth: formatUsd(spend.monthCents),
+      pendingApprovals: listPayments(db, investorId, { status: "pending_approval" }).map((p) => ({
+        merchant: p.merchantName,
+        amount: formatUsd(p.amountCents),
+      })),
+      recentPayments: listPayments(db, investorId, { limit: 5 }).map((p) => ({
+        merchant: p.merchantName,
+        amount: formatUsd(p.amountCents),
+        status: p.status,
+        channel: p.channel,
+      })),
+    };
+  },
+});
+
+const listNearbyTerminals = defineTool({
+  name: "list_nearby_terminals",
+  description:
+    "Payment terminals near the investor that are waiting for payment (open requests from the last 15 minutes), with their codes.",
+  schema: z.object({}),
+  trades: false,
+  run: (_input, { db }) => ({
+    terminals: listOpenRequests(db).map((r) => ({
+      code: r.code,
+      merchant: r.merchantName,
+      category: CATEGORY_LABELS[r.category],
+      amount: formatUsd(r.amountCents),
+      description: r.description,
+    })),
+  }),
+});
+
+const payTerminalRequest = defineTool({
+  name: "pay_terminal_request",
+  description:
+    "Pays a merchant terminal's payment request (code like LQ-7K2X) with the agent card. The card's policy decides: small payments within limits are paid from the agent wallet, larger or unusual ones wait for the investor's approval, and anything outside policy is declined.",
+  schema: z.object({ code: z.string().min(4).max(12).describe("Terminal code, e.g. LQ-7K2X") }),
+  trades: true,
+  run: ({ code }, { db, investorId, agent }) => {
+    const result = payRequest(db, investorId, code, agent);
+    return { outcome: result.decision, message: result.message, paymentId: result.payment.id };
+  },
+});
+
+const buyPremiumData = defineTool({
+  name: "buy_premium_data",
+  description:
+    "Buys a premium diligence report on a private deal from a pay-per-call data API (x402-style: the API answers 402 Payment Required with a $0.50 price, the agent pays from its wallet and gets the data). Use only when the extra diligence is worth the cost.",
+  schema: z.object({ productId: productIdSchema.describe("A private deal id, e.g. DL-NORDHAVN") }),
+  trades: true,
+  run: ({ productId }, { db, investorId, agent }) => {
+    const result = x402Purchase(db, investorId, productId, agent);
+    return { outcome: result.decision, message: result.message, report: result.data };
+  },
+});
+
 export const TOOLS: AgentTool[] = [
   getPortfolio,
   getLiquidityLadder,
@@ -677,6 +766,10 @@ export const TOOLS: AgentTool[] = [
   createAutopilotRule,
   getRecentActivity,
   pauseAllAgents,
+  getWalletTool,
+  listNearbyTerminals,
+  payTerminalRequest,
+  buyPremiumData,
 ] as AgentTool[];
 
 const TOOL_INDEX = new Map(TOOLS.map((t) => [t.name, t]));

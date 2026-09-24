@@ -4,7 +4,10 @@ import { newId, nowIso } from "@/lib/db/util";
 import { requireProduct } from "@/lib/domain/catalog";
 import { addDays, addMonths } from "@/lib/domain/dates";
 import type { RiskProfileId } from "@/lib/domain/types";
+import type { PetColor } from "@/lib/domain/companion";
 import { logEvent } from "./audit";
+import { createCompanion } from "./companion";
+import { ensureAgentPay } from "./payments";
 import { recordDeposit } from "./orders";
 import { recordNav } from "./portfolio";
 import { currentPrice, insertMandate, type InvestorKind } from "./repo";
@@ -35,6 +38,7 @@ export interface NewInvestor {
   passwordHash?: string | null;
   riskProfile: RiskProfileId;
   starter: Starter;
+  pet?: { name?: string; color?: PetColor };
 }
 
 function marketDates(db: Db): { today: string; historyStart: string } {
@@ -57,6 +61,7 @@ export function createInvestor(db: Db, input: NewInvestor): string {
       input.riskProfile,
       nowIso(),
     );
+    createCompanion(db, id, input.pet ?? {});
     setupPortfolio(db, id, input.starter);
   })();
   return id;
@@ -67,6 +72,7 @@ function setupPortfolio(db: Db, id: string, starter: Starter): void {
   const { today, historyStart } = marketDates(db);
   insertMandate(db, id);
   db.prepare("INSERT INTO accounts (investor_id, cash_cents) VALUES (?, 0)").run(id);
+  ensureAgentPay(db, id);
 
   if (starter === "cash") {
     recordDeposit(db, id, CASH_STARTER_CENTS, today);
@@ -130,6 +136,9 @@ function setupPortfolio(db: Db, id: string, starter: Starter): void {
 /** Wipes an investor's portfolio and activity (keeping their login and API keys) and starts again. */
 export function resetPortfolio(db: Db, investorId: string, starter: Starter): void {
   db.transaction(() => {
+    db.prepare("UPDATE payment_requests SET investor_id = NULL WHERE investor_id = ?").run(
+      investorId,
+    );
     for (const table of PORTFOLIO_TABLES)
       db.prepare(`DELETE FROM ${table} WHERE investor_id = ?`).run(investorId);
     setupPortfolio(db, investorId, starter);
@@ -208,6 +217,10 @@ export function upgradeGuest(
 }
 
 const PORTFOLIO_TABLES = [
+  "payments",
+  "wallet_ledger",
+  "wallets",
+  "agent_cards",
   "chat_messages",
   "nav_history",
   "rules",
@@ -221,10 +234,19 @@ const PORTFOLIO_TABLES = [
   "agent_events",
   "agent_runs",
 ];
-const INVESTOR_TABLES = ["sessions", "api_keys", ...PORTFOLIO_TABLES];
+const INVESTOR_TABLES = [
+  "sessions",
+  "api_keys",
+  "companion_log",
+  "companions",
+  ...PORTFOLIO_TABLES,
+];
 
 export function deleteInvestor(db: Db, investorId: string): void {
   db.transaction(() => {
+    db.prepare("UPDATE payment_requests SET investor_id = NULL WHERE investor_id = ?").run(
+      investorId,
+    );
     for (const table of INVESTOR_TABLES)
       db.prepare(`DELETE FROM ${table} WHERE investor_id = ?`).run(investorId);
     db.prepare("DELETE FROM investors WHERE id = ?").run(investorId);

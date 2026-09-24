@@ -7,7 +7,7 @@ import { logEvent } from "./audit";
  * ("read" or "trade"), stored only as a hash, and shown once at creation.
  */
 
-export type ApiScope = "read" | "trade";
+export type ApiScope = "read" | "trade" | "pay";
 
 export interface ApiKey {
   id: string;

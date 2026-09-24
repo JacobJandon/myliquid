@@ -4,6 +4,7 @@ import type { AgentId } from "@/lib/domain/types";
 import { logEvent } from "@/lib/services/audit";
 import { getSnapshot } from "@/lib/services/portfolio";
 import { getProfile } from "@/lib/services/repo";
+import { petName } from "@/lib/services/companion";
 import type { DeskEvent } from "./events";
 import { compactJson } from "./llm";
 import { TOOLS, invokeTool, type ToolContext, type ToolOutcome } from "./tools";
@@ -265,6 +266,8 @@ const HELP = [
   "- *Review the Nordhavn deal* (Scout's red-flag memo)",
   "- *Are the valuations fresh?* (Ledger)",
   "- *If bitcoin falls 20% from its high, buy $1,000* (Quant autopilot rule)",
+  "- *What's in my wallet?* or *pay LQ-7K2X* (Agent Pay)",
+  "- *Buy the premium report on Nordhavn* (pay-per-call data, x402)",
 ].join("\n");
 
 export function offlineCopilot(
@@ -276,6 +279,49 @@ export function offlineCopilot(
   const t = message.toLowerCase();
   const productId = matchProduct(t);
   const amount = findAmountCents(t);
+
+  const pet = petName(ctx.db, ctx.investorId);
+
+  // Agent Pay: tap to pay a terminal by code ("pay LQ-7K2X")
+  const codeMatch = message.match(/\bLQ[-\s]?[2-9A-Z]{4}\b/i);
+  if (codeMatch && /\b(pay|tap|settle|charge)\b/.test(t)) {
+    const res = call("pay_terminal_request", { code: codeMatch[0] }).result;
+    if (res.error) return `**${pet}**: I couldn't pay that: ${String(res.error)}`;
+    return `**${pet}**: ${String(res.message)}`;
+  }
+  if (/\b(terminal|terminals|nearby)\b/.test(t)) {
+    const terminals = rows(call("list_nearby_terminals").result, "terminals");
+    return terminals.length
+      ? [
+          `**${pet}**: I can see ${terminals.length} terminal${terminals.length === 1 ? "" : "s"} waiting for payment:`,
+          ...terminals.map(
+            (r) => `- **${r.code}** · ${r.merchant}: ${r.amount} (${r.description})`,
+          ),
+          "",
+          "Say *pay LQ-XXXX* and I'll tap to pay, within your card's limits.",
+        ].join("\n")
+      : `**${pet}**: No terminals nearby are waiting for payment. Open the merchant terminal demo at /terminal to create one.`;
+  }
+  if (/\b(premium|x402|court|filings)\b/.test(t) && productId?.startsWith("DL-")) {
+    const res = call("buy_premium_data", { productId }).result;
+    if (res.error) return `**${pet}**: ${String(res.error)}`;
+    if (res.outcome !== "approve") return `**${pet}**: ${String(res.message)}`;
+    const report = res.report as { product: string; findings: string[] };
+    return [
+      `**${pet}** paid $0.50 for a premium report on **${report.product}** (HTTP 402, then paid, then data):`,
+      ...report.findings.map((f) => `- ${f}`),
+    ].join("\n");
+  }
+  if (/\b(wallet|agent card|my card|allowance|spend|spent|spending)\b/.test(t)) {
+    const w = call("get_wallet").result;
+    const card = w.card as Record<string, unknown>;
+    return [
+      `**${pet}'s wallet:** ${String(w.walletBalance)} · card •••• ${String(card.last4)} (${String(card.status)})`,
+      `- Auto-pays up to ${String(card.autoPayUpTo)}; asks you above that (max ${String(card.perPaymentLimit)} per payment)`,
+      `- Spent today ${String(w.spentToday)} of ${String(card.dailyLimit)}, this month ${String(w.spentThisMonth)} of ${String(card.monthlyLimit)}`,
+      `- Allowed: ${(card.allowedCategories as string[]).join(", ")}`,
+    ].join("\n");
+  }
 
   // Withdrawals are human-only.
   if (/\b(withdraw|cash out|send .* bank|transfer out)\b/.test(t)) {
@@ -453,7 +499,7 @@ export function offlineCopilot(
   const p = call("get_portfolio").result;
   const sleeves = rows(p, "sleeves");
   return [
-    `**Your portfolio: ${String(p.total)}** (${(p.riskProfile as Obj).name} profile, ${String(p.availableCash)} cash available)`,
+    `**${pet}**: here's where we stand. **${String(p.total)}** (${(p.riskProfile as Obj).name} profile, ${String(p.availableCash)} cash available)`,
     "",
     "| Sleeve | Weight | Target |",
     "|---|---:|---:|",

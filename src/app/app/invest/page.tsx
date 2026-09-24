@@ -68,7 +68,7 @@ export default async function InvestPage() {
                 <Link
                   key={p.id}
                   href={`/app/invest/${p.id}`}
-                  className="group flex flex-col rounded-2xl border border-line bg-surface/80 p-5 transition hover:border-line-strong hover:bg-surface-2/80"
+                  className="group flex flex-col rounded-2xl border border-line bg-surface p-5 transition hover:border-line-strong hover:bg-surface-2"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>

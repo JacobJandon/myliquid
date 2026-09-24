@@ -37,7 +37,7 @@ export function KillSwitch({ mandate }: { mandate: AgentMandate }) {
     <div
       className={clsx(
         "flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-5",
-        mandate.killSwitch ? "border-critical/60 bg-critical/10" : "border-line bg-surface/80",
+        mandate.killSwitch ? "border-critical/60 bg-critical/10" : "border-line bg-surface",
       )}
     >
       <div className="flex items-start gap-3">
@@ -149,7 +149,7 @@ export function SettingsForm({
 
   return (
     <form onSubmit={save} className="space-y-6">
-      <section className="rounded-2xl border border-line bg-surface/80 p-5">
+      <section className="rounded-2xl border border-line bg-surface p-5">
         <h2 className="text-sm font-semibold text-fg">Risk profile</h2>
         <p className="text-xs text-muted">
           Sets target allocation and the hard limits Sentinel enforces on every trade.
@@ -163,7 +163,7 @@ export function SettingsForm({
               className={clsx(
                 "rounded-xl border p-3 text-left",
                 profile === p.id
-                  ? "border-accent bg-accent/10"
+                  ? "border-fg bg-surface-2 shadow-[2px_2px_0_#111]"
                   : "border-line hover:border-line-strong",
               )}
               aria-pressed={profile === p.id}
@@ -175,7 +175,7 @@ export function SettingsForm({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-line bg-surface/80 p-5">
+      <section className="rounded-2xl border border-line bg-surface p-5">
         <h2 className="text-sm font-semibold text-fg">Agent autonomy</h2>
         <p className="text-xs text-muted">
           Robinhood, Public and Webull all separate what an agent may do alone from what needs you.
@@ -203,7 +203,7 @@ export function SettingsForm({
               className={clsx(
                 "rounded-xl border p-3 text-left",
                 m.autonomy === o.id
-                  ? "border-accent bg-accent/10"
+                  ? "border-fg bg-surface-2 shadow-[2px_2px_0_#111]"
                   : "border-line hover:border-line-strong",
               )}
               aria-pressed={m.autonomy === o.id}

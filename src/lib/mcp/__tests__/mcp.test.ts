@@ -4,6 +4,7 @@ import { POST } from "@/app/api/mcp/route";
 import { createApiKey } from "@/lib/services/apiKeys";
 import { listEvents } from "@/lib/services/audit";
 import { listProposals } from "@/lib/services/proposals";
+import { createPaymentRequest, fundWallet } from "@/lib/services/payments";
 
 /** Drives the real /api/mcp route handler with JSON-RPC requests, as an MCP client would. */
 
@@ -122,5 +123,21 @@ describe("MCP endpoint", () => {
     expect(denied.body.result?.isError ?? !!denied.body.error).toBe(true);
 
     expect(listEvents(db, ID, { agent: "external" }).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("only lets pay-scoped keys pay terminals, under the card policy", async () => {
+    const payKey = createApiKey(db, ID, "payer", ["read", "pay"]).key;
+    fundWallet(db, ID, 20_00);
+    const req = createPaymentRequest(db, { merchantId: "m_brewlab", amountCents: 5_75 });
+    const denied = await rpc(tradeKey, "tools/call", {
+      name: "pay_terminal_request",
+      arguments: { code: req.code },
+    });
+    expect(denied.body.result?.isError ?? !!denied.body.error).toBe(true);
+    const paid = await rpc(payKey, "tools/call", {
+      name: "pay_terminal_request",
+      arguments: { code: req.code },
+    });
+    expect(toolText(paid.body).outcome).toBe("approve");
   });
 });

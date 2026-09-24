@@ -30,8 +30,11 @@ export const SCOPE_TOOLS: Record<ApiScope, string[]> = {
     "preview_trade",
     "list_autopilot_rules",
     "get_recent_activity",
+    "get_wallet",
+    "list_nearby_terminals",
   ],
   trade: ["propose_trade", "propose_rebalance", "create_autopilot_rule", "pause_all_agents"],
+  pay: ["pay_terminal_request", "buy_premium_data"],
 };
 
 export function toolNamesFor(scopes: ApiScope[]): string[] {
@@ -53,7 +56,7 @@ export function buildMcpServer(db: Db, principal: ApiPrincipal): McpServer {
       {
         description: tool.description,
         inputSchema: tool.schema,
-        annotations: { readOnlyHint: !SCOPE_TOOLS.trade.includes(tool.name) },
+        annotations: { readOnlyHint: SCOPE_TOOLS.read.includes(tool.name) },
       },
       async (args: unknown) => {
         const outcome = invokeTool(tool, args, {

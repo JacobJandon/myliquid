@@ -15,6 +15,8 @@ import {
 } from "@/lib/services/portfolio";
 import { listProposals } from "@/lib/services/proposals";
 import { getProfile } from "@/lib/services/repo";
+import { getCompanionView, getQuiz } from "@/lib/services/companion";
+import { PetRoom } from "@/components/pet/PetRoom";
 import { AlertsList } from "@/components/app/AlertsList";
 import { CashPanel } from "@/components/app/CashPanel";
 import { ProposalInbox } from "@/components/app/ProposalInbox";
@@ -56,20 +58,25 @@ export default async function DashboardPage() {
   const contributions = getNetContributions(db, investorId);
   const week = ladder.find((b) => b.id === "week");
 
+  const pet = getCompanionView(db, investorId);
+  const quiz = getQuiz(db, investorId);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm text-muted">Welcome back, {investor.name.split(" ")[0]}</p>
-          <h1 className="font-display text-4xl text-fg">Your portfolio</h1>
+          <h1 className="font-display text-4xl text-fg">Home</h1>
         </div>
         <div className="flex items-center gap-2">
           <Badge tone="accent">{profile.label} profile</Badge>
-          <LinkButton href="/app/agents" variant="secondary" size="sm">
-            Open agent desk
+          <LinkButton href="/app/pay" variant="secondary" size="sm">
+            Agent Pay
           </LinkButton>
         </div>
       </div>
+
+      <PetRoom initial={pet} initialQuiz={quiz} />
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <Stat
@@ -103,11 +110,11 @@ export default async function DashboardPage() {
       </div>
 
       {(snapshot.holdings.length === 0 || runs.size === 0) && (
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/10 to-accent-2/10 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border-2 border-fg bg-accent-2 p-5 shadow-[4px_4px_0_#111]">
           <div>
             <div className="font-medium text-fg">
               {snapshot.holdings.length === 0
-                ? "Your agents are ready to build your first portfolio."
+                ? `${pet.name} and the desk are ready to build your first portfolio.`
                 : "Your agents haven't looked at this portfolio yet."}
             </div>
             <p className="mt-1 max-w-2xl text-sm text-fg-2">
