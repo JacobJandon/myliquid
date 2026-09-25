@@ -5,6 +5,7 @@ import type { AgentId, Severity, Sleeve } from "@/lib/domain/types";
 import { AGENTS } from "@/lib/agents/registry";
 
 export function Card({
+  id,
   title,
   subtitle,
   action,
@@ -12,6 +13,7 @@ export function Card({
   className,
   bodyClassName,
 }: {
+  id?: string;
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   action?: React.ReactNode;
@@ -21,8 +23,9 @@ export function Card({
 }) {
   return (
     <section
+      id={id}
       className={clsx(
-        "rounded-2xl border border-line bg-surface shadow-[0_1px_0_rgba(17,17,17,0.04)]",
+        "scroll-mt-24 rounded-2xl border border-line bg-surface shadow-[0_1px_0_rgba(17,17,17,0.04)]",
         className,
       )}
     >

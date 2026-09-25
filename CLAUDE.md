@@ -17,4 +17,5 @@ Agentic wealth platform demo: Next.js 16 (App Router) + TypeScript + Tailwind v4
 - Offline mode must keep working: when you add a Claude-facing behavior, add the deterministic equivalent in `lib/agents/offline.ts`.
 - Claude calls use the Anthropic TypeScript SDK (`client.beta.messages.stream`), default model `claude-opus-5`, adaptive thinking, `fallbacks: "default"`.
 - UI colors come from CSS tokens in `src/app/globals.css` (light "paper & pixels" theme: ink `fg`, blue `accent`, lime `accent-2`, LCD tokens for the pet). Sleeve colors are a validated categorical palette, so don't reorder them. Fonts: `font-display` for headings, `font-pixel` for pixel labels.
+- The pet is a Tamagotchi (`components/pet`: `PixelPet`, `TamaDevice`, `PetRoom`); keep that look. The brand logo is the separate living orb in `components/brand/LogoMark.tsx`.
 - Avoid `Intl` compact number formatting in anything rendered on both server and client (it causes hydration mismatches). Use `formatUsd(..., { compact: true })`.

@@ -209,7 +209,7 @@ export default async function DashboardPage() {
           <Card title="Approval inbox" subtitle="Agents propose. You decide.">
             <ProposalInbox proposals={proposals} />
           </Card>
-          <Card title="Alerts" subtitle="From Sentinel (risk) and Ledger (valuation)">
+          <Card id="alerts" title="Alerts" subtitle="From Sentinel (risk) and Ledger (valuation)">
             <AlertsList alerts={alerts} />
           </Card>
           <Card title="Cash">

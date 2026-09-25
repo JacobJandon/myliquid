@@ -1,7 +1,7 @@
 import clsx from "clsx";
-import { PixelPet } from "@/components/pet/PixelPet";
+import { LogoMark } from "./LogoMark";
 
-/** Wordmark: a tiny pixel Liquid next to "MyLiquid". */
+/** Wordmark: the living MyLiquid drop next to "MyLiquid". */
 export function Logo({
   className,
   size = "md",
@@ -11,20 +11,8 @@ export function Logo({
 }) {
   const px = size === "lg" ? 34 : size === "sm" ? 22 : 28;
   return (
-    <span className={clsx("inline-flex items-center gap-1.5 text-fg", className)}>
-      <span
-        className="flex items-center justify-center rounded-[10px] border-2 border-fg bg-accent-2"
-        style={{ width: px + 6, height: px + 6 }}
-      >
-        <PixelPet
-          stage="droplet"
-          mood="happy"
-          color="blue"
-          size={px}
-          animate={false}
-          title="MyLiquid"
-        />
-      </span>
+    <span className={clsx("inline-flex items-center gap-2 text-fg", className)}>
+      <LogoMark size={px} />
       <span
         className={clsx(
           "font-display tracking-tight",

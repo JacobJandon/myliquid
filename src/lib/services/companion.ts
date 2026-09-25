@@ -10,7 +10,9 @@ import {
   isPetColor,
   levelForXp,
   ageInDays,
+  attentionReason,
   levelProgress,
+  messCount,
   petThought,
   playQuiz,
   questsForDay,
@@ -330,6 +332,10 @@ export interface CompanionView {
   /** Share of the portfolio that could be cash within 7 days. */
   liquidPct: number;
   presence: Presence | null;
+  /** Why the pet is calling for you (the LCD's "!"), or null. */
+  attention: string | null;
+  /** Open alerts shown as messes on the screen (0–3). */
+  messes: number;
 }
 
 export function getCompanionView(db: Db, investorId: string, now = new Date()): CompanionView {
@@ -376,6 +382,8 @@ export function getCompanionView(db: Db, investorId: string, now = new Date()): 
     ageDays: ageInDays(c.bornAt, now),
     liquidPct: signals.liquidWeekPct,
     presence: latestPresence(db, investorId, now),
+    attention: attentionReason(vitals, signals),
+    messes: messCount(signals),
   };
 }
 

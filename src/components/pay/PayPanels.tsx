@@ -9,6 +9,7 @@ import type { AgentCard, Payment, PaymentRequest } from "@/lib/services/payments
 import { postJson, useAction } from "@/components/client";
 import { formatUsd } from "@/components/format";
 import { Badge, EmptyState, buttonClass } from "@/components/ui";
+import { firePetEvent, petEventForDecision } from "./PayPet";
 
 const input =
   "h-10 w-full rounded-full border border-line-strong bg-surface px-4 text-sm text-fg outline-none placeholder:text-muted focus:border-fg tabular";
@@ -83,8 +84,10 @@ export function TapToPay({ nearby }: { nearby: PaymentRequest[] }) {
       });
       setResult(res);
       setCode("");
+      firePetEvent(petEventForDecision(res.decision));
     } catch (err) {
       setResult({ decision: "error", message: err instanceof Error ? err.message : String(err) });
+      firePetEvent("no");
     } finally {
       setBusy(null);
       router.refresh();
@@ -209,7 +212,15 @@ export function PaymentApprovals({ pending }: { pending: Payment[] }) {
             <button
               className={buttonClass("primary", "sm")}
               disabled={busy}
-              onClick={() => run(() => postJson(`/api/payments/${p.id}`, { action: "approve" }))}
+              onClick={() =>
+                run(async () => {
+                  const r = await postJson<{ decision: string }>(`/api/payments/${p.id}`, {
+                    action: "approve",
+                  });
+                  firePetEvent(petEventForDecision(r.decision));
+                  return r;
+                })
+              }
             >
               <Check className="h-3.5 w-3.5" /> Approve
             </button>
@@ -365,10 +376,15 @@ export function PremiumDataBuyer({ deals }: { deals: { id: string; name: string 
                 accepts?: { maxAmountRequired: string }[];
               };
               // The API answered 402 with a price. The agent pays from its wallet and retries (server side, via the Copilot's tool).
-              const paid = await postJson<{ message: string; findings?: string[] }>(
-                "/api/pay/x402",
-                { productId, quotedPrice: requirements.accepts?.[0]?.maxAmountRequired },
-              );
+              const paid = await postJson<{
+                decision: string;
+                message: string;
+                findings?: string[];
+              }>("/api/pay/x402", {
+                productId,
+                quotedPrice: requirements.accepts?.[0]?.maxAmountRequired,
+              });
+              firePetEvent(petEventForDecision(paid.decision));
               setOut({ message: paid.message, findings: paid.findings ?? [] });
             } catch (err) {
               setOut({ message: err instanceof Error ? err.message : String(err), findings: [] });

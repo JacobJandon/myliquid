@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { Nfc } from "lucide-react";
 import type { PetColor, Stage } from "@/lib/domain/companion";
+import { LogoMark } from "@/components/brand/LogoMark";
 import { PixelPet } from "@/components/pet/PixelPet";
 
 /** The agent card: a tokenized virtual card the pet carries. The agent never sees a card number. */
@@ -30,8 +31,8 @@ export function AgentCardVisual({
     >
       <div className="flex items-start justify-between">
         <div>
-          <div className="font-pixel text-[11px] uppercase tracking-wide text-accent-2">
-            MyLiquid
+          <div className="flex items-center gap-1.5 font-pixel text-[11px] uppercase tracking-wide text-accent-2">
+            <LogoMark size={16} animate={false} /> MyLiquid
           </div>
           <div className="text-xs opacity-80">Agent card</div>
         </div>

@@ -23,6 +23,9 @@ The pet, Agent Pay and the design draw on agentic-token card programs, x402, AI
 companions and YC-era product sites. See
 [`docs/research/agent-pay-and-companions.md`](docs/research/agent-pay-and-companions.md).
 
+The logo is a living drop of liquid with eyes. It slowly morphs, breathes and blinks
+(`components/brand/LogoMark.tsx`, with a static `app/icon.svg` for the browser tab).
+
 > Demo software: simulated markets, fictional products and merchants, demo money. No
 > real cards or payments. Not investment advice.
 
@@ -44,6 +47,11 @@ companions and YC-era product sites. See
 - **It reacts on its screen.** The LCD plays short 1-bit animations: *HI!* with a
   heart on check-in, *YUM!* while it chomps a snack, a bouncing ball when you win at
   Play, and sparkles on a level-up. When it evolves, the screen flashes.
+- **It calls you.** A blinking **!** on the screen means something needs you: a
+  payment or proposal waiting for your OK, a critical alert, or the pet is hungry.
+  Open alerts pile up as little messes on the screen floor until you review them.
+- **An evolution chart** shows the stages it has reached. Stages still to come are
+  mystery silhouettes.
 - **Tap the screen for stats**, like a real Tamagotchi: age, hearts for hunger,
   happiness, energy and portfolio health, and how much of your money could be cash
   within 7 days.
@@ -65,6 +73,9 @@ companions and YC-era product sites. See
   - *Soft rules* ask you first: above your auto-pay line, a new merchant above
     $25, a burst of payments, or the pet is asleep. Approve or decline under
     **Agent Pay → Waiting for your OK**.
+- **Your pet at the till.** On the Agent Pay page, the pet's screen reacts to every
+  payment: **PAID!**, **ASK OWNER** when it needs your OK, or **NO!** when your
+  policy declines.
 - **Terminals.** `/terminal` is a public merchant POS demo. Ring up a sale and it
   shows a short `LQ-XXXX` code (a stand-in for NFC). Pay it from
   **Agent Pay → Tap to pay**, from chat (*"pay LQ-XXXX"*) or over MCP. The terminal

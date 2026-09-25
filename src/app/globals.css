@@ -315,6 +315,75 @@ body {
 .float-z {
   animation: float-z 2.4s ease-out infinite;
 }
+/* The MyLiquid mark: a living drop that morphs, breathes and blinks. */
+@keyframes orb-morph {
+  0%,
+  100% {
+    border-radius: 50% 50% 48% 52% / 52% 48% 52% 48%;
+  }
+  25% {
+    border-radius: 56% 44% 52% 48% / 46% 56% 44% 54%;
+  }
+  50% {
+    border-radius: 47% 53% 44% 56% / 55% 45% 55% 45%;
+  }
+  75% {
+    border-radius: 53% 47% 57% 43% / 47% 53% 47% 53%;
+  }
+}
+@keyframes orb-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+@keyframes orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes orb-aura {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+}
+@keyframes orb-blink {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.12);
+  }
+}
+.orb-morph {
+  animation: orb-morph 8s ease-in-out infinite;
+}
+.orb-breathe {
+  animation: orb-breathe 4s ease-in-out infinite;
+}
+.orb-spin {
+  animation: orb-spin 14s linear infinite;
+}
+.orb-aura {
+  animation: orb-aura 5s ease-in-out infinite;
+}
+.orb-blink {
+  animation: orb-blink 5s infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
 /* LCD event animations: stepped, like a real 1-bit screen */
 @keyframes lcd-banner {
   0%,
@@ -428,6 +497,19 @@ body {
     filter: invert(1) hue-rotate(180deg);
   }
 }
+@keyframes lcd-call {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.lcd-call {
+  animation: lcd-call 1s steps(1, end) infinite;
+}
 .lcd-banner {
   animation: lcd-banner 2.4s steps(1, end) forwards;
 }
@@ -460,7 +542,13 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .orb-morph,
+  .orb-breathe,
+  .orb-spin,
+  .orb-aura,
+  .orb-blink,
   .lcd-ball,
+  .lcd-call,
   .lcd-chomp,
   .lcd-flash,
   .pet-bounce,

@@ -419,6 +419,30 @@ export function ageInDays(bornAt: string, now: Date): number {
   return Math.max(0, Math.floor((now.getTime() - Date.parse(bornAt)) / 86_400_000));
 }
 
+// ── Calls for attention ─────────────────────────────────────────────────────
+
+/**
+ * Like a Tamagotchi's call light: why the pet wants you right now, or null.
+ * Money that needs a human decision comes first, then the pet's own needs.
+ */
+export function attentionReason(v: Vitals, s: PortfolioSignals): string | null {
+  if (s.circuitBreaker) return "The circuit breaker paused every agent";
+  if (s.pendingPayments > 0)
+    return `${s.pendingPayments} payment${s.pendingPayments === 1 ? " needs" : "s need"} your OK`;
+  if (s.criticalAlerts > 0) return "A critical alert needs a look";
+  if (s.pendingProposals > 0)
+    return `${s.pendingProposals} proposal${s.pendingProposals === 1 ? " is" : "s are"} waiting`;
+  if (s.killSwitch) return null; // asleep: it only calls for money matters
+  if (v.fullness < 25) return "Hungry: feed it a research snack";
+  if (v.energy < 15) return "Tired: let it rest";
+  return null;
+}
+
+/** Open alerts pile up on the screen as messes, up to three. Reviewing them tidies up. */
+export function messCount(s: PortfolioSignals): number {
+  return Math.min(3, s.criticalAlerts + s.warnAlerts);
+}
+
 // ── Thoughts ────────────────────────────────────────────────────────────────
 
 export function formatDollars(cents: number): string {

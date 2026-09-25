@@ -3,7 +3,7 @@ import { PET_COLORS, hearts, type Mood, type PetColor, type Stage } from "@/lib/
 import { PixelPet } from "./PixelPet";
 
 /** Something that just happened, played as a short animation on the LCD. */
-export type LcdEventKind = "eat" | "play" | "levelup" | "evolve" | "hello" | "pay";
+export type LcdEventKind = "eat" | "play" | "levelup" | "evolve" | "hello" | "pay" | "ask" | "no";
 
 export interface LcdEvent {
   kind: LcdEventKind;
@@ -29,6 +29,10 @@ const ICONS = {
   heartEmpty: [".XX.XX.", "X..X..X", "X.....X", ".X...X.", "..X.X..", "...X..."],
   star: ["..X..", "..X..", "XXXXX", "..X..", "..X.."],
   coin: [".XXXX.", "X.XX.X", "X.X..X", "X..X.X", "X.XX.X", ".XXXX."],
+  question: [".XXX.", "X...X", "....X", "..XX.", "..X..", ".....", "..X.."],
+  cross: ["X...X", ".X.X.", "..X..", ".X.X.", "X...X"],
+  bang: ["X", "X", "X", ".", "X"],
+  mess: ["..X...", ".XXX..", "XX.XX.", "XXXXXX"],
 } as const;
 
 function LcdIcon({
@@ -72,6 +76,8 @@ const BANNER: Record<LcdEventKind, string> = {
   evolve: "EVOLVED!",
   hello: "HI!",
   pay: "PAID!",
+  ask: "ASK OWNER",
+  no: "NO!",
 };
 
 /** The short animation for an event, drawn over the pet. */
@@ -103,6 +109,16 @@ function EventOverlay({ event, screen }: { event: LcdEvent; screen: number }) {
       )}
       {event.kind === "hello" && (
         <LcdIcon icon="heart" size={icon} className="lcd-pop absolute left-[58%] top-[34%]" />
+      )}
+      {event.kind === "ask" && (
+        <LcdIcon
+          icon="question"
+          size={icon * 0.7}
+          className="lcd-pop absolute left-[62%] top-[34%]"
+        />
+      )}
+      {event.kind === "no" && (
+        <LcdIcon icon="cross" size={icon * 0.7} className="lcd-pop absolute left-[62%] top-[36%]" />
       )}
       {event.kind === "pay" && (
         <LcdIcon icon="coin" size={icon} className="lcd-pop absolute left-[60%] top-[34%]" />
@@ -187,6 +203,8 @@ export function TamaDevice({
   screenMode = "pet",
   stats,
   onScreenClick,
+  attention,
+  messes = 0,
 }: {
   name: string;
   stage: Stage;
@@ -201,6 +219,10 @@ export function TamaDevice({
   screenMode?: "pet" | "stats";
   stats?: LcdStats;
   onScreenClick?: () => void;
+  /** Why the pet is calling for you; shows a blinking "!" on the screen. */
+  attention?: string | null;
+  /** Open alerts, drawn as messes on the screen floor (0–3). */
+  messes?: number;
 }) {
   const showStats = screenMode === "stats" && !!stats;
   const shell = PET_COLORS[color];
@@ -264,7 +286,23 @@ export function TamaDevice({
               className="flex w-full items-center justify-between leading-none"
               style={{ fontSize: screen * 0.075 }}
             >
-              <span>LV{level}</span>
+              <span className="flex items-center gap-[0.35em]">
+                LV{level}
+                {attention && (
+                  <span
+                    className="lcd-call inline-flex items-center justify-center bg-lcd-ink"
+                    style={{ width: screen * 0.075, height: screen * 0.09 }}
+                    title={attention}
+                  >
+                    <LcdIcon
+                      icon="bang"
+                      size={screen * 0.014}
+                      className="[&_rect]:fill-[var(--lcd)]"
+                    />
+                    <span className="sr-only">{attention}</span>
+                  </span>
+                )}
+              </span>
               <span className="uppercase">{showStats ? "STATS" : mood}</span>
             </div>
             {showStats ? (
@@ -289,6 +327,23 @@ export function TamaDevice({
                 />
               </div>
             )}
+            {!showStats &&
+              messes > 0 &&
+              [
+                { left: "8%", bottom: "20%" },
+                { right: "8%", bottom: "20%" },
+                { left: "22%", bottom: "17%" },
+              ]
+                .slice(0, messes)
+                .map((pos, i) => (
+                  <LcdIcon
+                    key={i}
+                    icon="mess"
+                    size={screen * 0.1}
+                    className="absolute"
+                    style={pos}
+                  />
+                ))}
             {event && !showStats && (
               <EventOverlay key={`fx-${event.id}`} event={event} screen={screen} />
             )}

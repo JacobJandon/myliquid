@@ -13,6 +13,7 @@ import {
 } from "@/lib/services/payments";
 import { getCash } from "@/lib/services/repo";
 import { AgentCardVisual } from "@/components/pay/AgentCardVisual";
+import { PayPet } from "@/components/pay/PayPet";
 import {
   CardControls,
   PaymentApprovals,
@@ -80,7 +81,16 @@ export default async function PayPage() {
             title="Tap to pay"
             subtitle="Hold your phone to a terminal, or enter its code. The card's policy decides."
           >
-            <TapToPay nearby={listOpenRequests(db)} />
+            <div className="space-y-4">
+              <PayPet
+                name={pet.name}
+                stage={pet.stage.id as Stage}
+                mood={pet.vitals.mood}
+                color={pet.color}
+                level={pet.level}
+              />
+              <TapToPay nearby={listOpenRequests(db)} />
+            </div>
           </Card>
           <Card title="Waiting for your OK">
             <PaymentApprovals

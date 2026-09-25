@@ -8,6 +8,7 @@ import type { PaymentRequest } from "@/lib/services/payments";
 import { postJson } from "@/components/client";
 import { formatUsd } from "@/components/format";
 import { buttonClass } from "@/components/ui";
+import { LogoMark } from "@/components/brand/LogoMark";
 
 /** Decorative pixel code (not a scannable QR): derived from the request code. */
 function PixelCode({ code, size = 120 }: { code: string; size?: number }) {
@@ -106,7 +107,9 @@ export function PosTerminal({ merchants }: { merchants: Merchant[] }) {
     <div className="mx-auto w-full max-w-[360px]">
       <div className="rounded-[40px] border-[3px] border-fg bg-[#1b1b1b] p-4 shadow-[8px_8px_0_#111]">
         <div className="mb-3 flex items-center justify-between px-2 font-pixel text-[10px] uppercase text-[#9aa0a6]">
-          <span>MyLiquid POS</span>
+          <span className="flex items-center gap-1.5">
+            <LogoMark size={14} animate={false} /> MyLiquid POS
+          </span>
           <span className="flex items-center gap-1">
             <Nfc className="h-3 w-3" /> agent-ready
           </span>

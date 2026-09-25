@@ -4,8 +4,10 @@ import {
   computeVitals,
   levelForXp,
   ageInDays,
+  attentionReason,
   hearts,
   levelProgress,
+  messCount,
   petThought,
   playQuiz,
   questsForDay,
@@ -142,6 +144,21 @@ describe("companion vitals", () => {
     expect(snacks).toContain("2 positions are locked. The next unlock is 2029-09-24.");
     expect([hearts(0), hearts(49), hearts(51), hearts(100)]).toEqual([0, 2, 2, 4]);
     expect(ageInDays("2026-09-20T12:00:00Z", NOW)).toBe(4);
+  });
+
+  it("calls for attention like a Tamagotchi, money first", () => {
+    const v = computeVitals(pet(), signals(), NOW);
+    expect(attentionReason(v, signals())).toBeNull();
+    expect(attentionReason(v, signals({ pendingProposals: 2, pendingPayments: 1 }))).toBe(
+      "1 payment needs your OK",
+    );
+    expect(attentionReason(v, signals({ pendingProposals: 2 }))).toBe("2 proposals are waiting");
+    const hungry = computeVitals(pet({ fullnessAt: "2026-09-23T12:00:00Z" }), signals(), NOW);
+    expect(attentionReason(hungry, signals())).toMatch(/^Hungry/);
+    // Asleep, it only calls for money matters.
+    expect(attentionReason(hungry, signals({ killSwitch: true }))).toBeNull();
+    expect(messCount(signals({ warnAlerts: 2 }))).toBe(2);
+    expect(messCount(signals({ warnAlerts: 4, criticalAlerts: 1 }))).toBe(3);
   });
 
   it("speaks from state", () => {

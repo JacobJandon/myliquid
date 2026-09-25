@@ -178,6 +178,8 @@ export function PetRoom({
               liquidPct: pet.liquidPct,
             }}
             onScreenClick={() => setScreenMode((m) => (m === "pet" ? "stats" : "pet"))}
+            attention={pet.attention}
+            messes={pet.messes}
             buttons={
               <>
                 <DeviceButton
@@ -213,6 +215,17 @@ export function PetRoom({
           <p className="mt-3 font-pixel text-[10px] uppercase text-muted">
             {screenMode === "stats" ? "Tap the screen to go back" : "Tap the screen for stats"}
           </p>
+          {pet.attention && (
+            <p className="mt-2 flex items-center gap-1.5 text-center text-xs text-fg-2">
+              <span className="lcd-call inline-block h-2 w-2 bg-serious" aria-hidden />
+              {pet.attention}
+            </p>
+          )}
+          {pet.messes > 0 && (
+            <a href="#alerts" className="mt-1 text-xs text-fg-2 underline underline-offset-2">
+              Tidy up {pet.messes === 3 ? "3+" : pet.messes} alert{pet.messes === 1 ? "" : "s"}
+            </a>
+          )}
         </div>
 
         {/* Status */}
@@ -344,6 +357,43 @@ export function PetRoom({
                 style={{ width: `${Math.round(pet.levelPct * 100)}%` }}
               />
             </div>
+          </div>
+
+          {/* Evolution chart: stages not reached yet are mystery silhouettes */}
+          <div>
+            <div className="mb-1.5 font-pixel text-[10px] uppercase text-muted">Evolution</div>
+            <ol className="grid grid-cols-5 gap-1.5">
+              {STAGES.map((st) => {
+                const reached = pet.level >= st.fromLevel;
+                const current = st.id === stage;
+                return (
+                  <li
+                    key={st.id}
+                    className={clsx(
+                      "flex flex-col items-center gap-1 rounded-xl border-2 bg-lcd px-1 pb-1 pt-1.5",
+                      current ? "border-fg" : "border-transparent",
+                    )}
+                    aria-label={
+                      reached ? `${st.name}, reached` : `Unknown stage at level ${st.fromLevel}`
+                    }
+                  >
+                    <span className={clsx(!reached && "opacity-25 brightness-0")}>
+                      <PixelPet
+                        stage={st.id}
+                        mood={current ? pet.vitals.mood : "content"}
+                        color={pet.color}
+                        lcd
+                        size={34}
+                        animate={current}
+                      />
+                    </span>
+                    <span className="font-pixel text-[8px] uppercase leading-none text-lcd-ink">
+                      {reached ? st.name : "???"}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
         </div>
 

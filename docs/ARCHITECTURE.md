@@ -74,6 +74,8 @@ the same service layer.
     sends it to the client.
   - `researchSnacks`: the true facts that feeding serves, in rotation.
   - `hearts` and `ageInDays` for the device's stats screen.
+  - `attentionReason` (the LCD's call light, money matters first) and
+    `messCount` (open alerts drawn as messes).
 - `payments.ts`: fictional merchants and categories, and `evaluatePayment`, the
   card policy.
   - *Hard checks* decline: card, category, per-payment, daily, monthly, wallet.
