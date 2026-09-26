@@ -16,10 +16,13 @@ The recommended setup is **Vercel** (hosting) plus **Turso** (the database). Bot
 ### 1. Import the repository
 
 1. Sign in at [vercel.com](https://vercel.com) with GitHub.
-2. Choose **Add New… → Project** and import **`jacobjandon/myliquid`**. Keep the defaults: the framework is
-   detected as Next.js and the build command is `npm run build`.
+2. Choose **Add New… → Project** and import **`jacobjandon/myliquid`**. Keep the defaults.
 3. Click **Deploy**. The first deployment builds `main`, which doesn't have the app yet, so it may fail. That's
    expected.
+
+`vercel.json` tells Vercel this is a Next.js app. The project's own **Framework Preset** setting may still say
+"Other", because it was detected from the empty `main`, but `vercel.json` overrides it. The same file also runs the
+functions in `iad1` (Washington, D.C.), next to the database.
 
 ### 2. Build the app's branch
 
