@@ -190,6 +190,9 @@ npm run dev                  # http://localhost:3000
 The first request creates `.data/myliquid.db` (SQLite) and seeds a year of
 simulated market history.
 
+To put it online privately (Vercel + Turso, or any host with a disk), follow
+[`docs/DEPLOY.md`](docs/DEPLOY.md).
+
 On the landing page, **Try the live demo** opens a private guest account, with a
 year-old sample portfolio and its own pet, in one click. You can save it later by
 creating an account. **Hatch your agent** starts sign-up: name your pet and pick
@@ -225,10 +228,11 @@ Things to try:
 | `npm run dev` | Development server |
 | `npm run build` / `npm start` | Production build and server |
 | `npm test` | Unit and integration tests (Vitest, in-memory SQLite) |
+| `npm run test:libsql` | The same tests against a libSQL server (`LIBSQL_TEST_URL`, e.g. a local `turso dev`; wipes it) |
 | `npm run typecheck` | TypeScript |
 | `npm run lint` | ESLint (Next.js config) |
 | `npm run check` | Typecheck, lint and test |
-| `npm run db:reset` | Wipe and re-seed the local database |
+| `npm run db:reset` | Wipe and re-seed the database (local file, or Turso when configured) |
 
 ## Configuration
 
@@ -239,6 +243,8 @@ Things to try:
 | `MYLIQUID_EFFORT` | `medium` | Reasoning effort (`low` … `max`) |
 | `MYLIQUID_AGENT_MODE` | auto | Force `offline` or `claude` |
 | `MYLIQUID_DB_PATH` | `.data/myliquid.db` | SQLite file location |
+| `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN` | (none) | A hosted libSQL database (Turso) in place of the file. Required on Vercel. `LIBSQL_URL` / `LIBSQL_AUTH_TOKEN` also work |
+| `MYLIQUID_SITE_PASSWORD` | (none) | Makes the whole site private behind one password (HTTP Basic auth; agent API endpoints stay key-authenticated) |
 | `MYLIQUID_SIM_START` | today | Market date to seed from (YYYY-MM-DD) |
 | `MYLIQUID_MARKET_CLOCK` | auto | `manual` stops the market from catching up to today's date |
 | `MYLIQUID_COOKIE_SECURE` | `true` in production | Set `false` to serve over plain HTTP (e.g. Docker on a LAN IP) |
@@ -248,23 +254,29 @@ Things to try:
 Claude requests use adaptive thinking, streaming, prompt caching on the system
 prompt, and server-side refusal fallbacks (`fallbacks: "default"`).
 
-## Docker
+## Deploying
+
+See [`docs/DEPLOY.md`](docs/DEPLOY.md): Vercel with a Turso database (step by step,
+private), or Docker on any host with a disk:
 
 ```bash
 docker build -t myliquid .
 docker run -p 3000:3000 -v myliquid-data:/data -e ANTHROPIC_API_KEY=... myliquid
 ```
 
+`/api/health` reports whether the database and agents are set up.
+
 ## Project layout
 
 ```
 src/
   app/                 Next.js App Router: landing page, /app/* pages, /api/* routes
+  proxy.ts             Optional site password (MYLIQUID_SITE_PASSWORD)
   components/          UI kit, charts, pet (pixel sprite, device, room), pay (card, POS terminal, panels), app components
   lib/
     domain/            Pure logic: catalog, market sim, liquidity, risk, valuation, diligence, rebalance, signals,
                        companion (vitals, XP, quests), payments (merchants, card policy)
-    db/                SQLite schema, seed, connection
+    db/                SQLite schema, seed, connection; hosted libSQL (Turso) wrapper
     services/          Investors, portfolio, orders & settlement, proposals, alerts, audit log, rules, API keys,
                        market clock, companion (the pet), payments (wallet, card, terminals, x402)
     agents/            Agent registry, tools, Claude loop, offline agents, runner
@@ -274,6 +286,7 @@ src/
 docs/
   research/            Agentic-finance landscape; agent payments, AI companions and design; platform review and AINRA (Sept 2026)
   ARCHITECTURE.md      How the pieces fit together
+  DEPLOY.md            Private deployment: Vercel + Turso, or Docker
 ```
 
 More detail in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).

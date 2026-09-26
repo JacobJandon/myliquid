@@ -19,8 +19,36 @@ the same service layer.
                     lib/domain  (pure)       catalog, market, liquidity, risk, valuation,
                         │                    diligence, rebalance, signals
                         ▼
-                    lib/db (better-sqlite3)  schema, seed
+                    lib/db                   schema, seed; a SQLite file (better-sqlite3)
+                                             or hosted libSQL/Turso (libsql, wrapped)
 ```
+
+## Database: a file or hosted
+
+`lib/db` opens a SQLite file (`better-sqlite3`) by default. When `TURSO_DATABASE_URL`
+is set, as on Vercel, it opens a hosted libSQL database instead. There is no persistent
+shared disk on serverless hosts, so the database must be hosted there.
+
+**The wrapper.** `lib/db/remote.ts` puts the `libsql` client behind the same synchronous
+better-sqlite3 API, so services don't know which one they have. It evens out what the
+network client does differently:
+- named parameters, a single `null` parameter and booleans;
+- row metadata and upper-cased keyword column names;
+- integers sent as floats;
+- nested transactions, which become savepoints;
+- a statement prepared outside a transaction running outside it even after `BEGIN`;
+- connections that expire after a few seconds idle, which reconnect and retry when nothing ran.
+
+**Consequences for code:**
+- Every statement is a network round trip there, so large writes use `insertMany` (batched
+  multi-row inserts).
+- Several server instances can run at once. Seeding checks inside its transaction whether
+  the database is already seeded, and the market clock checks that the day hasn't already
+  been advanced.
+- `npm run test:libsql` runs the whole suite against a libSQL server.
+
+An optional site password (`src/proxy.ts`, `MYLIQUID_SITE_PASSWORD`) keeps a test
+deployment private. See [`DEPLOY.md`](DEPLOY.md).
 
 ## Accounts, sessions and connected agents
 
@@ -183,10 +211,13 @@ watch tool calls happen live.
 10. The pet never earns XP for trading volume.
 11. A key pinned to an AINRA identity acts only inside a fresh, valid presentation window, and never with more
     than its tier floor and passport capabilities allow. AINRA verification is local and fails closed.
+12. Services behave the same on a SQLite file and on hosted libSQL: they only use `prepare`/`exec`/`transaction`
+    through `Db`, and multi-step writes are atomic transactions on both.
 
 ## Tests
 
-`npm test` runs Vitest against in-memory SQLite:
+`npm test` runs Vitest against in-memory SQLite (`npm run test:libsql` runs the same suite
+against a libSQL server):
 
 - `domain.test.ts`: dates, market determinism, ladder, checks, diligence,
   valuation, rebalance, rules.

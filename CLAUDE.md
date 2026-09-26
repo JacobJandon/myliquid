@@ -6,10 +6,12 @@ Agentic wealth platform demo: Next.js 16 (App Router) + TypeScript + Tailwind v4
 - `npm run check`: typecheck, lint and tests. Run it before committing.
 - `npm run build`: production build.
 - `npm run dev`: dev server. The DB is created and seeded at `.data/myliquid.db`; `npm run db:reset` re-seeds it.
+- Deploying: `docs/DEPLOY.md` (Vercel + Turso, private with `MYLIQUID_SITE_PASSWORD`).
 
 ## Rules of the codebase
 - Multi-user: every service function takes `(db, investorId, ...)`. Scope every query by `investor_id`, including lookups by id. Pages use `requireInvestor()`; API routes use `requireApiInvestor()` inside `handle(...)`.
 - Money is integer cents everywhere in storage and services. Format only at the edges (`lib/domain/money.ts`).
+- The database is a SQLite file locally and hosted libSQL (Turso) on Vercel (`TURSO_DATABASE_URL`). Use only `db.prepare/exec/transaction`; the wrapper in `lib/db/remote.ts` evens out the differences. Every statement is a round trip there, so batch large writes with `insertMany`. When you touch `lib/db` or SQL patterns, run `npm run test:libsql` against a local libSQL server.
 - Money logic goes in `lib/domain` (pure, unit-tested). State changes go in `lib/services`. Never trade except via `executeOrder`, or `agentTrade` for agents.
 - New agent capabilities are tools in `lib/agents/tools.ts` with a Zod schema. Set `trades: true` if they can move money. Never add a tool that withdraws cash, edits guardrails, releases the kill switch (wakes the pet), funds the agent wallet or edits the card policy. To expose a tool over MCP, add it to a scope in `lib/mcp/server.ts`.
 - Standing orders (recurring investments, limit orders: `lib/services/automation.ts`) are the investor's own; they execute via `executeOrder` as "user" and agents may only read them (`get_standing_orders`).

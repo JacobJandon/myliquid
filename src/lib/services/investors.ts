@@ -1,6 +1,6 @@
 import type { Db } from "@/lib/db";
 import { getMeta } from "@/lib/db";
-import { newId, nowIso } from "@/lib/db/util";
+import { insertMany, newId, nowIso } from "@/lib/db/util";
 import { requireProduct } from "@/lib/domain/catalog";
 import { addDays, addMonths } from "@/lib/domain/dates";
 import type { RiskProfileId } from "@/lib/domain/types";
@@ -167,9 +167,7 @@ function backfillNav(
     );
   }
   const cursor = new Map<string, number>();
-  const insert = db.prepare(
-    "INSERT OR REPLACE INTO nav_history (investor_id, date, total_cents) VALUES (?, ?, ?)",
-  );
+  const rows: [string, string, number][] = [];
   for (let date = from; date <= to; date = addDays(date, 1)) {
     let total = cashCents;
     for (const [productId, u] of units) {
@@ -179,8 +177,9 @@ function backfillNav(
       cursor.set(productId, i);
       total += Math.round(u * (history[i]?.price ?? requireProduct(productId).startPrice) * 100);
     }
-    insert.run(investorId, date, total);
+    rows.push([investorId, date, total]);
   }
+  insertMany(db, "INSERT OR REPLACE INTO nav_history (investor_id, date, total_cents)", rows);
 }
 
 export function findInvestorByEmail(

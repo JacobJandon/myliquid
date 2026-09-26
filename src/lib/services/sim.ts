@@ -24,6 +24,9 @@ import { evaluateLimitOrders, runDuePlans } from "./automation";
  * records NAV, checks the circuit breaker and lets Quant evaluate autopilot rules.
  */
 
+/** Another server advanced the market first (hosted deployments run several). */
+class MarketMovedError extends Error {}
+
 export interface DayReport {
   date: string;
   /** Events for the investor who asked for the report (if any). */
@@ -51,6 +54,7 @@ export function advanceOneDay(db: Db, reportFor?: string): DayReport {
   const note = (investorId: string, e: string) => events.get(investorId)?.push(e);
 
   db.transaction(() => {
+    if (addDays(simDate(db), 1) !== today) throw new MarketMovedError();
     setMeta(db, "sim_date", today);
 
     // 1. Prices and appraisals (shared market)
@@ -203,12 +207,20 @@ export function advanceOneDay(db: Db, reportFor?: string): DayReport {
 export function advanceDays(db: Db, days: number, reportFor?: string): DayReport[] {
   const n = Math.max(1, Math.min(Math.floor(days), 90));
   const reports: DayReport[] = [];
-  for (let i = 0; i < n; i++) reports.push(advanceOneDay(db, reportFor));
-  if (reportFor)
+  for (let i = 0; i < n; i++) {
+    try {
+      reports.push(advanceOneDay(db, reportFor));
+    } catch (err) {
+      if (err instanceof MarketMovedError) break;
+      throw err;
+    }
+  }
+  const done = reports.length;
+  if (reportFor && done > 0)
     logEvent(db, reportFor, {
       agent: "system",
       kind: "system",
-      title: `Market advanced ${n} day${n === 1 ? "" : "s"} to ${simDate(db)}`,
+      title: `Market advanced ${done} day${done === 1 ? "" : "s"} to ${simDate(db)}`,
     });
   return reports;
 }
@@ -222,8 +234,7 @@ export function ensureMarketCurrent(db: Db): number {
   if (process.env.MYLIQUID_MARKET_CLOCK === "manual") return 0;
   const behind = diffDays(simDate(db), toIsoDate(new Date()));
   if (behind <= 0) return 0;
-  advanceDays(db, Math.min(behind, 90));
-  return Math.min(behind, 90);
+  return advanceDays(db, Math.min(behind, 90)).length;
 }
 
 export function historyStart(db: Db): string {

@@ -4,7 +4,7 @@ import { addDays } from "@/lib/domain/dates";
 import { scoreDeal } from "@/lib/domain/diligence";
 import { generateHistory } from "@/lib/domain/market";
 import { createInvestor } from "@/lib/services/investors";
-import { nowIso } from "./util";
+import { insertMany, nowIso } from "./util";
 
 /**
  * Seeds the shared market (a year of price history and Scout's initial deal
@@ -14,13 +14,18 @@ export function seedDatabase(db: Database.Database, today: string): void {
   const historyStart = addDays(today, -365);
 
   db.transaction(() => {
-    const insertPrice = db.prepare(
-      "INSERT INTO prices (product_id, date, price, source) VALUES (?, ?, ?, ?)",
+    insertMany(
+      db,
+      "INSERT INTO prices (product_id, date, price, source)",
+      PRODUCTS.flatMap((product) =>
+        generateHistory(product, historyStart, today).map((p) => [
+          product.id,
+          p.date,
+          p.price,
+          p.source,
+        ]),
+      ),
     );
-    for (const product of PRODUCTS) {
-      for (const p of generateHistory(product, historyStart, today))
-        insertPrice.run(product.id, p.date, p.price, p.source);
-    }
 
     // Initial deal screening, so nothing unreviewed is ever on the shelf.
     const insertReview = db.prepare(
