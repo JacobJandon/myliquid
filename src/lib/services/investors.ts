@@ -217,6 +217,8 @@ export function upgradeGuest(
 }
 
 const PORTFOLIO_TABLES = [
+  "recurring_plans",
+  "limit_orders",
   "payments",
   "wallet_ledger",
   "wallets",

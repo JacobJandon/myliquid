@@ -23,6 +23,8 @@ export function TradeTicket({
   minTicketCents,
   canBuy,
   sellLabel = "Sell",
+  limitSupported = false,
+  price,
 }: {
   productId: string;
   productName: string;
@@ -31,8 +33,15 @@ export function TradeTicket({
   minTicketCents: number;
   canBuy: boolean;
   sellLabel?: string;
+  /** Market-priced, daily-traded products can also take limit orders. */
+  limitSupported?: boolean;
+  price?: number;
 }) {
   const [side, setSide] = useState<"buy" | "sell">(canBuy ? "buy" : "sell");
+  const [orderType, setOrderType] = useState<"market" | "limit">("market");
+  const [limit, setLimit] = useState(price ? price.toFixed(2) : "");
+  const limitPrice = Number(limit);
+  const isLimit = limitSupported && orderType === "limit";
   const [amount, setAmount] = useState("");
   const [lastPreview, setPreview] = useState<Preview | null>(null);
   const [result, setResult] = useState<string | null>(null);
@@ -63,6 +72,24 @@ export function TradeTicket({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (isLimit) {
+      const placed = await run(() =>
+        postJson<{ order: { status: string; expiresOn: string } }>("/api/limit-orders", {
+          productId,
+          side,
+          amountUsd,
+          limitPrice,
+        }),
+      );
+      if (!placed) return;
+      setResult(
+        placed.order.status === "filled"
+          ? `Filled now: today's price already meets your limit of $${limitPrice.toFixed(2)}.`
+          : `Limit ${side} placed at $${limitPrice.toFixed(2)}. It fills on the first market day the price reaches it (until ${placed.order.expiresOn}).`,
+      );
+      setAmount("");
+      return;
+    }
     const res = await run(() =>
       postJson<{ order: { status: string; checks: CheckResult[] } }>("/api/orders", {
         productId,
@@ -115,6 +142,49 @@ export function TradeTicket({
           </button>
         ))}
       </div>
+      {limitSupported && (
+        <div className="flex gap-1 text-xs" role="radiogroup" aria-label="Order type">
+          {(["market", "limit"] as const).map((t) => (
+            <button
+              type="button"
+              key={t}
+              role="radio"
+              aria-checked={orderType === t}
+              onClick={() => setOrderType(t)}
+              className={clsx(
+                "rounded-full border px-3 py-1",
+                orderType === t
+                  ? "border-fg bg-fg text-bg"
+                  : "border-line-strong text-fg-2 hover:text-fg",
+              )}
+            >
+              {t === "market" ? "Market" : "Limit"}
+            </button>
+          ))}
+        </div>
+      )}
+      {isLimit && (
+        <label className="block">
+          <span className="text-xs text-muted">
+            {side === "buy" ? "Buy at or below" : "Sell at or above"} (USD per unit)
+          </span>
+          <div className="mt-1 flex items-center gap-2 rounded-xl border border-line-strong bg-surface-2 px-3 focus-within:border-accent">
+            <span className="text-muted">$</span>
+            <input
+              inputMode="decimal"
+              value={limit}
+              onChange={(e) => setLimit(e.target.value.replace(/[^\d.]/g, ""))}
+              className="h-11 w-full bg-transparent text-lg text-fg outline-none tabular"
+              aria-label="Limit price in US dollars"
+            />
+          </div>
+          {price !== undefined && (
+            <span className="mt-1 block text-[11px] text-muted">
+              Last price ${price.toFixed(2)} · good for 90 days
+            </span>
+          )}
+        </label>
+      )}
       <label className="block">
         <span className="text-xs text-muted">Amount (USD)</span>
         <div className="mt-1 flex items-center gap-2 rounded-xl border border-line-strong bg-surface-2 px-3 focus-within:border-accent">
@@ -172,9 +242,15 @@ export function TradeTicket({
       <button
         type="submit"
         className={clsx(buttonClass("primary"), "w-full")}
-        disabled={pending || !amountUsd || preview?.blocked}
+        disabled={pending || !amountUsd || preview?.blocked || (isLimit && !(limitPrice > 0))}
       >
-        {preview?.blocked ? "Blocked by Sentinel" : side === "buy" ? "Buy" : sellLabel}
+        {preview?.blocked
+          ? "Blocked by Sentinel"
+          : isLimit
+            ? `Place limit ${side}`
+            : side === "buy"
+              ? "Buy"
+              : sellLabel}
       </button>
       {(result || error) && <p className="text-xs text-fg-2">{error ?? result}</p>}
     </form>

@@ -29,6 +29,7 @@ export const SCOPE_TOOLS: Record<ApiScope, string[]> = {
     "plan_rebalance",
     "preview_trade",
     "list_autopilot_rules",
+    "get_standing_orders",
     "get_recent_activity",
     "get_wallet",
     "list_nearby_terminals",

@@ -12,6 +12,7 @@ Agentic wealth platform demo: Next.js 16 (App Router) + TypeScript + Tailwind v4
 - Money is integer cents everywhere in storage and services. Format only at the edges (`lib/domain/money.ts`).
 - Money logic goes in `lib/domain` (pure, unit-tested). State changes go in `lib/services`. Never trade except via `executeOrder`, or `agentTrade` for agents.
 - New agent capabilities are tools in `lib/agents/tools.ts` with a Zod schema. Set `trades: true` if they can move money. Never add a tool that withdraws cash, edits guardrails, releases the kill switch (wakes the pet), funds the agent wallet or edits the card policy. To expose a tool over MCP, add it to a scope in `lib/mcp/server.ts`.
+- Standing orders (recurring investments, limit orders: `lib/services/automation.ts`) are the investor's own; they execute via `executeOrder` as "user" and agents may only read them (`get_standing_orders`).
 - Agent payments go through `payRequest` / `x402Purchase` (which use `attemptPayment` → `evaluatePayment`). Never debit a wallet directly.
 - The pet (`lib/domain/companion.ts`, `lib/services/companion.ts`) earns XP only through `awardXp` for habits. Never award XP for trading volume.
 - Offline mode must keep working: when you add a Claude-facing behavior, add the deterministic equivalent in `lib/agents/offline.ts`.

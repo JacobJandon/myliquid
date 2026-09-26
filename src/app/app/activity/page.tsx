@@ -4,7 +4,8 @@ import { requireProduct } from "@/lib/domain/catalog";
 import { formatUsd } from "@/lib/domain/money";
 import { listEvents } from "@/lib/services/audit";
 import { listCashMovements, listOrders } from "@/lib/services/orders";
-import { AgentAvatar, Badge, Card, agentLabel, type Tone } from "@/components/ui";
+import { Download } from "lucide-react";
+import { AgentAvatar, Badge, Card, agentLabel, buttonClass, type Tone } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Activity" };
@@ -27,12 +28,17 @@ export default async function ActivityPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-4xl text-fg">Activity</h1>
-        <p className="mt-1 text-sm text-fg-2">
-          An append-only record of every order, cash movement and agent action, including the ones
-          Sentinel blocked.
-        </p>
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-4xl text-fg">Activity</h1>
+          <p className="mt-1 text-sm text-fg-2">
+            An append-only record of every order, cash movement and agent action, including the
+            ones Sentinel blocked.
+          </p>
+        </div>
+        <a href="/api/statements" download className={buttonClass("secondary", "sm")}>
+          <Download className="h-3.5 w-3.5" /> Download statement (CSV)
+        </a>
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">

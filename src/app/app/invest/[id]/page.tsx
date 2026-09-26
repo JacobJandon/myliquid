@@ -12,6 +12,9 @@ import { getDealReview } from "@/lib/services/deals";
 import { getSnapshot } from "@/lib/services/portfolio";
 import { getAvailableLots, getLots, priceHistory } from "@/lib/services/repo";
 import { TradeTicket } from "@/components/app/TradeTicket";
+import { LimitOrderList } from "@/components/app/StandingOrders";
+import { supportsStandingOrders } from "@/lib/domain/automation";
+import { listLimitOrders } from "@/lib/services/automation";
 import { LineChart } from "@/components/charts/LineChart";
 import { Markdown } from "@/components/Markdown";
 import { Badge, Card, SeverityIcon } from "@/components/ui";
@@ -163,8 +166,23 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               minTicketCents={product.minTicketCents}
               canBuy={product.status === "open" && review?.verdict !== "reject"}
               sellLabel={product.liquidity.redemption === "quarterly" ? "Redeem" : "Sell"}
+              limitSupported={supportsStandingOrders(product)}
+              price={price}
             />
           </Card>
+
+          {supportsStandingOrders(product) && (
+            <Card
+              title="Your limit orders"
+              subtitle="Open orders fill at the first daily price that meets them."
+            >
+              <LimitOrderList
+                orders={listLimitOrders(db, investorId, { productId: product.id, limit: 10 })}
+                showProduct={false}
+                empty="No limit orders for this product."
+              />
+            </Card>
+          )}
 
           <Card title="Terms">
             <dl className="space-y-3 text-sm">

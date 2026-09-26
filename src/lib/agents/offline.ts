@@ -266,6 +266,7 @@ const HELP = [
   "- *Review the Nordhavn deal* (Scout's red-flag memo)",
   "- *Are the valuations fresh?* (Ledger)",
   "- *If bitcoin falls 20% from its high, buy $1,000* (Quant autopilot rule)",
+  "- *What are my recurring investments and limit orders?*",
   "- *What's in my wallet?* or *pay LQ-7K2X* (Agent Pay)",
   "- *Buy the premium report on Nordhavn* (pay-per-call data, x402)",
 ].join("\n");
@@ -320,6 +321,41 @@ export function offlineCopilot(
       `- Auto-pays up to ${String(card.autoPayUpTo)}; asks you above that (max ${String(card.perPaymentLimit)} per payment)`,
       `- Spent today ${String(w.spentToday)} of ${String(card.dailyLimit)}, this month ${String(w.spentThisMonth)} of ${String(card.monthlyLimit)}`,
       `- Allowed: ${(card.allowedCategories as string[]).join(", ")}`,
+    ].join("\n");
+  }
+
+  // Standing orders: recurring investments and limit orders
+  if (
+    /\b(recurring|auto-?invest|dca|limit orders?|open orders?|standing orders?|scheduled)\b/.test(t)
+  ) {
+    const res = call("get_standing_orders").result;
+    const plans = rows(res, "recurringInvestments");
+    const limits = rows(res, "limitOrders").filter((o) => o.status === "open");
+    if (plans.length === 0 && limits.length === 0) {
+      return `**${pet}**: You have no recurring investments or open limit orders. Set up a recurring buy under **Autopilot**, or place a limit order from any index fund, the momentum strategy or bitcoin's page.`;
+    }
+    return [
+      `**${pet}**: here are your standing orders.`,
+      ...(plans.length
+        ? [
+            "",
+            "**Recurring investments**",
+            ...plans.map(
+              (p) =>
+                `- ${String(p.amount)} of ${String(p.product)}, ${String(p.schedule).toLowerCase()} · ${p.status === "active" ? `next buy ${String(p.nextBuy)}` : "paused"} · ${String(p.buysSoFar)} buys so far`,
+            ),
+          ]
+        : []),
+      ...(limits.length
+        ? [
+            "",
+            "**Open limit orders**",
+            ...limits.map(
+              (o) =>
+                `- ${String(o.side) === "buy" ? "Buy" : "Sell"} ${String(o.amount)} of ${String(o.product)} at ${String(o.limitPrice)} · expires ${String(o.expiresOn)}`,
+            ),
+          ]
+        : []),
     ].join("\n");
   }
 

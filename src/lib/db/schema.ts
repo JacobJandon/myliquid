@@ -245,6 +245,40 @@ CREATE TABLE IF NOT EXISTS companion_log (
 );
 CREATE INDEX IF NOT EXISTS companion_log_investor ON companion_log(investor_id, day);
 
+-- Recurring investments: buy a fixed amount of a product on a schedule.
+CREATE TABLE IF NOT EXISTS recurring_plans (
+  id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  product_id TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  cadence TEXT NOT NULL,
+  status TEXT NOT NULL,
+  next_run_on TEXT NOT NULL,
+  last_run_on TEXT,
+  last_result TEXT,
+  runs INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS recurring_plans_due ON recurring_plans(status, next_run_on);
+
+-- Limit orders: buy or sell once the daily price reaches a level (good till cancelled, 90 days).
+CREATE TABLE IF NOT EXISTS limit_orders (
+  id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  product_id TEXT NOT NULL,
+  side TEXT NOT NULL,
+  amount_cents INTEGER NOT NULL,
+  limit_price REAL NOT NULL,
+  status TEXT NOT NULL,
+  created_on TEXT NOT NULL,
+  expires_on TEXT NOT NULL,
+  closed_on TEXT,
+  order_id TEXT,
+  note TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS limit_orders_open ON limit_orders(status, investor_id);
+
 -- Agent Pay: the agent's own funded wallet (the hard ceiling on agent spending).
 CREATE TABLE IF NOT EXISTS wallets (
   investor_id TEXT PRIMARY KEY REFERENCES investors(id),

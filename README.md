@@ -62,6 +62,25 @@ The logo is a living drop of liquid with eyes. It slowly morphs, breathes and bl
   daily quests, and a little from work the desk does. Each habit has a daily cap.
   Trading more never earns XP.
 
+## Investing: orders, schedules and statements
+
+- **Market orders** on any product, checked live by Sentinel as you type.
+- **Limit orders** on the index funds, the momentum strategy and bitcoin: buy at or
+  below, or sell at or above, a price you set. They are checked when you place
+  them, fill on the first market day the price reaches your limit (or at once if
+  it already has), and expire after 90 days. Cancel them any time.
+- **Recurring investments**: a fixed amount every week, two weeks or month,
+  managed under **Autopilot**. They are your own instructions, so they keep running
+  while agents are paused, but every buy passes the pre-trade checks. A buy that
+  can't go through (not enough cash, a limit that would be broken) is skipped with
+  an alert, and the plan stays on schedule.
+- **Autopilot rules** for strategies such as *"if bitcoin falls 20% from its high,
+  buy $1,000"*.
+- **Statements**: **Activity → Download statement (CSV)** exports every trade,
+  deposit and withdrawal, agent payment and agent-wallet transfer.
+- Your pet and any connected agent can read your recurring investments and limit
+  orders (`get_standing_orders`), but only you can create or change them.
+
 ## Agent Pay
 
 - **Agent card.** The pet carries a tokenized agent card, so it never sees a card
@@ -106,7 +125,8 @@ so the whole platform works out of the box.
 
 Like Robinhood, Webull, Gemini and Coinbase, MyLiquid exposes its tools over the
 **Model Context Protocol**. Create a key under **Connect an agent**. A *read* key
-sees your portfolio, liquidity, deals, signals, risk, wallet and nearby terminals. A
+sees your portfolio, liquidity, deals, signals, risk, standing orders, wallet and
+nearby terminals. A
 *trade* key can also propose trades, rebalances and autopilot rules. A *pay* key
 can pay terminal codes and buy premium data from the agent wallet, under the card
 policy. Then point any MCP client at `/api/mcp`:

@@ -35,6 +35,8 @@ import {
   updateMandate,
 } from "@/lib/services/repo";
 import { createRule, listRules, setRuleStatus } from "@/lib/services/rules";
+import { CADENCE_LABELS } from "@/lib/domain/automation";
+import { listLimitOrders, listPlans } from "@/lib/services/automation";
 import { CATEGORY_LABELS } from "@/lib/domain/payments";
 import {
   getCard,
@@ -749,6 +751,35 @@ const buyPremiumData = defineTool({
   },
 });
 
+const getStandingOrders = defineTool({
+  name: "get_standing_orders",
+  description:
+    "The investor's standing instructions: recurring investments (amount, product, schedule, next buy, last result) and limit orders (side, amount, limit price, status, expiry). Read-only; the investor sets these up in the app.",
+  schema: z.object({}),
+  trades: false,
+  run: (_input, { db, investorId }) => ({
+    recurringInvestments: listPlans(db, investorId).map((p) => ({
+      product: p.productName,
+      productId: p.productId,
+      amount: formatUsd(p.amountCents),
+      schedule: CADENCE_LABELS[p.cadence],
+      status: p.status,
+      nextBuy: p.status === "active" ? p.nextRunOn : null,
+      buysSoFar: p.runs,
+      lastResult: p.lastResult,
+    })),
+    limitOrders: listLimitOrders(db, investorId, { limit: 20 }).map((o) => ({
+      product: o.productName,
+      productId: o.productId,
+      side: o.side,
+      amount: formatUsd(o.amountCents),
+      limitPrice: formatPrice(o.limitPrice),
+      status: o.status,
+      expiresOn: o.status === "open" ? o.expiresOn : null,
+    })),
+  }),
+});
+
 export const TOOLS: AgentTool[] = [
   getPortfolio,
   getLiquidityLadder,
@@ -763,6 +794,7 @@ export const TOOLS: AgentTool[] = [
   proposeTrade,
   proposeRebalance,
   listAutopilotRules,
+  getStandingOrders,
   createAutopilotRule,
   getRecentActivity,
   pauseAllAgents,

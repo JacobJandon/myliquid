@@ -62,6 +62,9 @@ the same service layer.
 - `rebalance.ts`: Atlas's plan. It never sells locked sleeves and funds liquid
   sleeves first.
 - `signals.ts`: Quant's momentum signal and the autopilot rule engine.
+- `automation.ts`: standing orders. Recurring cadences (`nextRunOn`,
+  `catchUpRunOn`), the limit trigger, which products support them
+  (market-priced, daily liquidity), amount bounds, and RFC 4180 CSV helpers.
 - `companion.ts`: the pet.
   - Vitals come from timestamps, so no background job is needed: fullness decays,
     energy recovers, joy drifts back to neutral.
@@ -93,8 +96,18 @@ the same service layer.
   a block. `approveProposal` re-checks every order at approval time.
 - `sim.ts`: the market clock. Each day it moves prices, settles sales and
   withdrawals, runs quarterly redemption windows with gates (pro-rated, remainder
-  rolls over), records NAV, trips the circuit breaker, and lets Quant evaluate
-  autopilot rules.
+  rolls over), records NAV, trips the circuit breaker, fills limit orders and
+  recurring investments, and lets Quant evaluate autopilot rules.
+- `automation.ts`: recurring investments and limit orders.
+  - Both execute through `executeOrder` as the investor ("user"), so every fill
+    passes the pre-trade checks.
+  - Blocked fills are recorded as rejected orders and raise an alert.
+  - A limit order is also checked when placed, and fills at once if it is
+    already marketable.
+  - Standing orders run while the kill switch is on, because they are the
+    investor's instructions, not an agent's.
+- `statements.ts`: the CSV statement: trades, cash movements, agent payments and
+  agent-wallet transfers.
 - `companion.ts`: `getCompanionView` (vitals, XP, quests, age, 7-day liquidity,
   and `presence`, the desk's latest work) and the care actions (check-in, feed,
   play, sleep/wake, customize). `awardXp` enforces daily caps, completes quests and
@@ -176,6 +189,10 @@ watch tool calls happen live.
   eager tool streaming), the tool-result round trip and transcript storage.
 - `services.test.ts` (accounts): investor isolation, passwords, sessions, guest
   upgrade, reset and delete, API keys.
+- `automation.test.ts`: cadences and limit triggers; recurring buys through the
+  market clock (including while agents are paused, when paused by the investor,
+  and when skipped for lack of cash); limit orders that fill at once, wait, get
+  cancelled or expire; the CSV statement; the read-only agent tool.
 - `mcp.test.ts`: drives the real `/api/mcp` route with JSON-RPC. It covers auth,
   origin checks, scope filtering, read tools, trade proposals from an external
   agent (including the blocked shipyard bond), and pay-scope payments.

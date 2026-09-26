@@ -201,6 +201,7 @@ export type XpAction =
   | "agent_run"
   | "dismiss_alert"
   | "agent_payment"
+  | "savings_plan"
   | "quest";
 
 /** XP per action and how many times a day it counts. Trading volume earns nothing. */
@@ -213,6 +214,8 @@ export const XP_RULES: Record<XpAction, { xp: number; dailyCap: number }> = {
   agent_run: { xp: 2, dailyCap: 5 },
   dismiss_alert: { xp: 2, dailyCap: 5 },
   agent_payment: { xp: 3, dailyCap: 5 },
+  // Setting up a recurring investment is a saving habit, rewarded once a day at most.
+  savings_plan: { xp: 12, dailyCap: 1 },
   quest: { xp: 15, dailyCap: 3 },
 };
 

@@ -16,6 +16,7 @@ import { removeUnitsFifo } from "./orders";
 import { getSnapshot, recordNav } from "./portfolio";
 import { adjustCash, getMandate, listInvestorIds, updateMandate } from "./repo";
 import { evaluateRules } from "./rules";
+import { evaluateLimitOrders, runDuePlans } from "./automation";
 
 /**
  * The market clock. It is shared by every investor. Advancing a day moves prices,
@@ -180,7 +181,13 @@ export function advanceOneDay(db: Db, reportFor?: string): DayReport {
       note(investorId, "Circuit breaker tripped: all agents paused");
     }
 
-    // 6. Autopilot rules (skipped while agents are paused)
+    // 6. The investor's standing orders: limit orders, then recurring investments.
+    // They are the investor's own instructions, so they run even while agents are
+    // paused, and every fill still passes the pre-trade checks.
+    for (const e of evaluateLimitOrders(db, investorId)) note(investorId, e);
+    for (const e of runDuePlans(db, investorId)) note(investorId, e);
+
+    // 7. Autopilot rules (skipped while agents are paused)
     if (!getMandate(db, investorId).killSwitch) {
       for (const { rule, result } of evaluateRules(db, investorId))
         note(investorId, `Autopilot "${rule.name}": ${result.outcome}`);
