@@ -238,6 +238,7 @@ const PORTFOLIO_TABLES = [
 ];
 const INVESTOR_TABLES = [
   "sessions",
+  "api_key_identities",
   "api_keys",
   "companion_log",
   "companions",

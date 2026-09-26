@@ -45,7 +45,10 @@ export function toolNamesFor(scopes: ApiScope[]): string[] {
 const INSTRUCTIONS = `MyLiquid is an agentic wealth platform with simulated markets and demo money. You are acting for one investor.
 Numbers must come from tool results. Trades go through propose_trade or propose_rebalance: they run pre-trade risk checks and usually create a proposal the investor approves in the MyLiquid app. You cannot withdraw money or change the investor's guardrails. Private deals that the platform's diligence rejected can never be bought, and locked positions cannot be sold before their lock-up ends.`;
 
-export function buildMcpServer(db: Db, principal: ApiPrincipal): McpServer {
+export function buildMcpServer(
+  db: Db,
+  principal: ApiPrincipal & { ainraNumber?: string | null },
+): McpServer {
   const server = new McpServer(
     { name: "myliquid", version: MCP_SERVER_VERSION },
     { instructions: INSTRUCTIONS },
@@ -69,8 +72,12 @@ export function buildMcpServer(db: Db, principal: ApiPrincipal): McpServer {
         logEvent(db, principal.investorId, {
           agent: "external",
           kind: "tool_call",
-          title: `${principal.keyName}: ${tool.name}(${compactJson(args)})`,
-          payload: { keyId: principal.keyId, ok: outcome.ok },
+          title: `${principal.keyName}${principal.ainraNumber ? ` (${principal.ainraNumber})` : ""}: ${tool.name}(${compactJson(args)})`,
+          payload: {
+            keyId: principal.keyId,
+            ainraNumber: principal.ainraNumber ?? null,
+            ok: outcome.ok,
+          },
         });
         return {
           content: [{ type: "text" as const, text: JSON.stringify(outcome.result, null, 2) }],
@@ -86,7 +93,7 @@ export function buildMcpServer(db: Db, principal: ApiPrincipal): McpServer {
 export async function handleMcpRequest(
   req: Request,
   db: Db,
-  principal: ApiPrincipal,
+  principal: ApiPrincipal & { ainraNumber?: string | null },
 ): Promise<Response> {
   const server = buildMcpServer(db, principal);
   const transport = new WebStandardStreamableHTTPServerTransport({

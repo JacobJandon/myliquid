@@ -140,6 +140,25 @@ Connected agents get the same guardrails as the desk: Sentinel's checks, your
 autonomy setting, the mandate and the kill switch. They are rate-limited, and
 every call is recorded in your audit log.
 
+### Agent identity (AINRA)
+
+MyLiquid verifies [AINRA](https://github.com/JacobJandon/ainra) passports, the neutral root of AI-agent identity,
+with the published `@ainra/sdk`, locally and fail-closed.
+
+1. **Pin a key.** Under **Connect**, verify a connected agent's passport and pin the API key to its permanent
+   AINRA Number.
+2. **The agent presents.** It sends its passport with its key (`POST /api/agent-identity`,
+   `{"ainra_passport": …}`), and may act for the next 5 minutes.
+3. **The gate enforces.**
+   - The key's scopes narrow to the agent's tier (L0–L1 read, L2 trade, L3+ pay) and to any `myliquid:*`
+     capabilities its passport declares.
+   - A revoked passport cuts the key off, even though the key itself is still valid, and raises a critical alert.
+   - Every call is logged with the agent's AINRA Number.
+
+Without configured trust anchors it runs in **testbed** mode on AINRA's TEST-ROOT samples, and says so. See
+[`docs/research/platform-review-and-ainra.md`](docs/research/platform-review-and-ainra.md) for the design, its
+limits, and the next step: passports for every pet.
+
 ### Guardrails
 
 - **Propose-only by default.** Agent trades become proposals in your approval
@@ -223,6 +242,8 @@ Things to try:
 | `MYLIQUID_SIM_START` | today | Market date to seed from (YYYY-MM-DD) |
 | `MYLIQUID_MARKET_CLOCK` | auto | `manual` stops the market from catching up to today's date |
 | `MYLIQUID_COOKIE_SECURE` | `true` in production | Set `false` to serve over plain HTTP (e.g. Docker on a LAN IP) |
+| `AINRA_ROOTS_FILE` / `AINRA_DIRECTORY_FILE` | testbed | AINRA root keys and root-signed registrar directory (JSON). Unset = the bundled TEST-ROOT samples |
+| `AINRA_AUDIENCE` | empty | This service's audience for AINRA instance credentials. Empty accepts none (fail-closed) |
 
 Claude requests use adaptive thinking, streaming, prompt caching on the system
 prompt, and server-side refusal fallbacks (`fallbacks: "default"`).
@@ -249,8 +270,9 @@ src/
     agents/            Agent registry, tools, Claude loop, offline agents, runner
     auth/              Password hashing (scrypt), sessions, cookies
     mcp/               MCP server (official SDK, stateless Streamable HTTP)
+    ainra/             AINRA passport verification (@ainra/sdk), trust anchors, TEST-ROOT testbed samples
 docs/
-  research/            Agentic-finance landscape; agent payments, AI companions and design (Sept 2026)
+  research/            Agentic-finance landscape; agent payments, AI companions and design; platform review and AINRA (Sept 2026)
   ARCHITECTURE.md      How the pieces fit together
 ```
 

@@ -328,7 +328,8 @@ export default function LandingPage() {
               <Kicker className="text-muted">Bring your own AI</Kicker>
               <p className="mt-3 text-sm text-fg-2">
                 Connect Claude or any MCP client with a scoped key: read, trade or pay. Same checks,
-                same approvals.
+                same approvals. Pin the key to the agent&apos;s AINRA passport to know who is behind
+                it, and cut it off the moment its passport is revoked.
               </p>
               <pre className="mt-4 overflow-x-auto rounded-xl bg-surface-2 p-3 text-[11px] leading-relaxed text-fg-2">
                 <code>{`claude mcp add --transport http \\

@@ -32,6 +32,14 @@ the same service layer.
 - `services/investors.ts`: creates accounts with a starter (sample portfolio
   backfilled from market history, or $100k of cash). It also upgrades guests to
   users, resets or deletes accounts, and prunes guests older than 7 days.
+- `lib/ainra` and `services/agentIdentity.ts`: AINRA agent identity.
+  - `checkPassport` verifies a passport with `@ainra/sdk` against the configured trust anchors, or the TEST-ROOT
+    testbed at the samples' clock.
+  - A key can be pinned to an agent's AINRA Number. `presentPassport` opens a 5-minute window for a valid passport
+    of that Number.
+  - `identityGate`, in front of `/api/mcp` and the x402 API, refuses pinned keys outside the window. It narrows
+    scopes to the tier floor and to `myliquid:*` capabilities.
+  - A revoked presentation closes the window and raises a critical alert.
 - `services/apiKeys.ts` and `lib/mcp/server.ts`: scoped keys (`mlk_…`, stored
   hashed, shown once) and a stateless Streamable HTTP MCP server built on the
   official SDK. Tools are the same `AgentTool`s the desk uses, filtered by scope
@@ -173,6 +181,8 @@ watch tool calls happen live.
    wallet balance is a hard limit, so an agent can never spend more than its
    owner put in.
 10. The pet never earns XP for trading volume.
+11. A key pinned to an AINRA identity acts only inside a fresh, valid presentation window, and never with more
+    than its tier floor and passport capabilities allow. AINRA verification is local and fails closed.
 
 ## Tests
 
@@ -189,6 +199,9 @@ watch tool calls happen live.
   eager tool streaming), the tool-result round trip and transcript storage.
 - `services.test.ts` (accounts): investor isolation, passwords, sessions, guest
   upgrade, reset and delete, API keys.
+- `ainra.test.ts`: TEST-ROOT passports (valid, revoked, stale at real time, tampered, unreadable, base64url),
+  capability and tier-floor scopes, pinning, the 5-minute window, revocation alerts, identity mismatch, and the
+  whole HTTP flow (MCP refuses → agent presents → MCP answers, attributed to the AINRA Number).
 - `automation.test.ts`: cadences and limit triggers; recurring buys through the
   market clock (including while agents are paused, when paused by the investor,
   and when skipped for lack of cash); limit orders that fill at once, wait, get

@@ -4,7 +4,10 @@ import { requireInvestor } from "@/lib/auth/current";
 import { SCOPE_TOOLS } from "@/lib/mcp/server";
 import { listApiKeys } from "@/lib/services/apiKeys";
 import { listEvents } from "@/lib/services/audit";
-import { KeyManager } from "@/components/app/KeyManager";
+import { KeyManager, Snippet } from "@/components/app/KeyManager";
+import { PassportVerifier, type IdentitySummary } from "@/components/app/AgentIdentity";
+import { ainraMode, ainraModeLabel } from "@/lib/ainra";
+import { listKeyIdentities, wallNow } from "@/lib/services/agentIdentity";
 import { Card, EmptyState } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +23,24 @@ export default async function ConnectPage() {
     (host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https");
   const endpoint = `${proto}://${host}/api/mcp`;
   const activity = listEvents(db, investorId, { agent: "external", limit: 12 });
+  const keys = listApiKeys(db, investorId);
+  const identities: Record<string, IdentitySummary> = Object.fromEntries(
+    listKeyIdentities(db, investorId).map((i) => [
+      i.keyId,
+      {
+        keyId: i.keyId,
+        ainraNumber: i.ainraNumber,
+        tier: i.tier,
+        capabilities: i.capabilities,
+        requirePassport: i.requirePassport,
+        verifiedUntil: i.verifiedUntil,
+        lastStatus: i.lastPresentedAt ? (i.lastVerdict?.status ?? null) : null,
+        lastReason: i.lastPresentedAt ? (i.lastVerdict?.reason ?? null) : null,
+      },
+    ]),
+  );
+  const now = wallNow();
+  const origin = endpoint.replace(/\/api\/mcp$/, "");
 
   return (
     <div className="max-w-6xl space-y-6">
@@ -33,7 +54,44 @@ export default async function ConnectPage() {
         </p>
       </div>
 
-      <KeyManager keys={listApiKeys(db, investorId)} endpoint={endpoint} />
+      <KeyManager keys={keys} endpoint={endpoint} identities={identities} now={now} />
+
+      <Card
+        title="Agent identity (AINRA)"
+        subtitle="Know who is behind a connected agent, what it may do, and whether it is still trusted right now."
+      >
+        <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+          <PassportVerifier
+            keys={keys.filter((k) => !k.revokedAt).map((k) => ({ id: k.id, name: k.name }))}
+            trust={ainraModeLabel()}
+            testbed={ainraMode() === "testbed"}
+          />
+          <div className="space-y-3 text-sm text-fg-2">
+            <p>
+              <a
+                href="https://github.com/JacobJandon/ainra"
+                className="font-medium text-fg underline underline-offset-2"
+              >
+                AINRA
+              </a>{" "}
+              gives AI agents signed passports that anyone can check offline. Pin a key to an
+              agent&apos;s permanent AINRA Number and that key only works while the agent presents a
+              valid, fresh passport: if its registrar revokes it, MyLiquid cuts it off within five
+              minutes, even though the key is still valid.
+            </p>
+            <p>
+              The key can do no more than the agent&apos;s AINRA tier allows (L0–L1 read, L2 trade,
+              L3 and up pay) and, if the passport declares them, its <code>myliquid:read</code>,{" "}
+              <code>myliquid:trade</code> or <code>myliquid:pay</code> capabilities. Every call is
+              logged with the agent&apos;s AINRA Number.
+            </p>
+            <Snippet
+              label="The agent presents its passport (valid for 5 minutes)"
+              code={`curl -s ${origin}/api/agent-identity \\\n  -H "Authorization: Bearer mlk_YOUR_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"ainra_passport": <bundle JSON or base64url>}'`}
+            />
+          </div>
+        </div>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title="Tools by scope">

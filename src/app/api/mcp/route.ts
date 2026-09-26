@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db";
 import { HttpError, assertSameOrigin } from "@/lib/api";
 import { authenticateApiKey } from "@/lib/services/apiKeys";
+import { identityGate } from "@/lib/services/agentIdentity";
 import { ensureMarketCurrent } from "@/lib/services/sim";
 import { handleMcpRequest, rateLimited } from "@/lib/mcp/server";
 
@@ -42,8 +43,11 @@ export async function POST(req: Request): Promise<Response> {
   }
   if (rateLimited(principal.keyId))
     return jsonRpcError(429, "Rate limit exceeded (120 requests per minute).");
+  // Keys pinned to an AINRA identity need a live passport presentation, and are narrowed to its capabilities.
+  const gate = identityGate(db, principal);
+  if (!gate.allow) return jsonRpcError(403, gate.message);
   ensureMarketCurrent(db);
-  return handleMcpRequest(req, db, principal);
+  return handleMcpRequest(req, db, gate.principal);
 }
 
 function methodNotAllowed(): Response {

@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { ApiKey } from "@/lib/services/apiKeys";
 import { postJson, useAction } from "@/components/client";
 import { Badge, EmptyState, buttonClass } from "@/components/ui";
+import { KeyIdentityLine, type IdentitySummary } from "./AgentIdentity";
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -39,7 +40,18 @@ export function Snippet({ label, code }: { label: string; code: string }) {
   );
 }
 
-export function KeyManager({ keys, endpoint }: { keys: ApiKey[]; endpoint: string }) {
+export function KeyManager({
+  keys,
+  endpoint,
+  identities = {},
+  now = 0,
+}: {
+  keys: ApiKey[];
+  endpoint: string;
+  identities?: Record<string, IdentitySummary>;
+  /** Server time (unix seconds), so the passport status renders the same on server and client. */
+  now?: number;
+}) {
   const { run, pending, error } = useAction();
   const [name, setName] = useState("Claude");
   const [trade, setTrade] = useState(false);
@@ -177,6 +189,9 @@ export function KeyManager({ keys, endpoint }: { keys: ApiKey[]; endpoint: strin
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Revoke
                   </button>
+                )}
+                {identities[k.id] && !k.revokedAt && (
+                  <KeyIdentityLine identity={identities[k.id]!} now={now} />
                 )}
               </li>
             ))}

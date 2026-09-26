@@ -245,6 +245,22 @@ CREATE TABLE IF NOT EXISTS companion_log (
 );
 CREATE INDEX IF NOT EXISTS companion_log_investor ON companion_log(investor_id, day);
 
+-- AINRA agent identity pinned to an API key: the connected agent's permanent AINRA Number, what its last
+-- verified passport said, and until when its last presentation lets it act (unix seconds).
+CREATE TABLE IF NOT EXISTS api_key_identities (
+  key_id TEXT PRIMARY KEY REFERENCES api_keys(id),
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  ainra_number TEXT NOT NULL,
+  ainra_name TEXT NOT NULL,
+  tier TEXT,
+  capabilities TEXT NOT NULL,
+  require_passport INTEGER NOT NULL DEFAULT 1,
+  verified_until INTEGER,
+  last_verdict TEXT,
+  last_presented_at TEXT,
+  bound_at TEXT NOT NULL
+);
+
 -- Recurring investments: buy a fixed amount of a product on a schedule.
 CREATE TABLE IF NOT EXISTS recurring_plans (
   id TEXT PRIMARY KEY,

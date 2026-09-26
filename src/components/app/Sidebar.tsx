@@ -21,17 +21,35 @@ import { Logo } from "@/components/brand/Logo";
 import { MiniPet } from "@/components/pet/PetRoom";
 import { postJson } from "@/components/client";
 
-const NAV = [
-  { href: "/app", label: "Home", icon: Home },
-  { href: "/app/copilot", label: "Talk", icon: MessageSquare },
-  { href: "/app/invest", label: "Invest", icon: Store },
-  { href: "/app/pay", label: "Agent Pay", icon: CreditCard },
-  { href: "/app/agents", label: "Agent desk", icon: Bot },
-  { href: "/app/autopilot", label: "Autopilot", icon: Zap },
-  { href: "/app/connect", label: "Connect an agent", icon: Plug },
-  { href: "/app/activity", label: "Activity", icon: Activity },
-  { href: "/app/settings", label: "Guardrails", icon: Settings },
+/** Grouped by what you came to do: your money, your agents, your account. Short labels fit the mobile tab row. */
+const NAV_GROUPS = [
+  {
+    title: "Money",
+    items: [
+      { href: "/app", label: "Home", icon: Home },
+      { href: "/app/invest", label: "Invest", icon: Store },
+      { href: "/app/autopilot", label: "Autopilot", icon: Zap },
+      { href: "/app/pay", label: "Agent Pay", icon: CreditCard },
+    ],
+  },
+  {
+    title: "Agents",
+    items: [
+      { href: "/app/copilot", label: "Talk", icon: MessageSquare },
+      { href: "/app/agents", label: "Desk", icon: Bot },
+      { href: "/app/connect", label: "Connect", icon: Plug },
+    ],
+  },
+  {
+    title: "Account",
+    items: [
+      { href: "/app/activity", label: "Activity", icon: Activity },
+      { href: "/app/settings", label: "Guardrails", icon: Settings },
+    ],
+  },
 ];
+
+const NAV = NAV_GROUPS.flatMap((g) => g.items);
 
 function isActive(pathname: string, href: string) {
   return href === "/app" ? pathname === "/app" : pathname.startsWith(href);
@@ -73,35 +91,46 @@ export function Sidebar({
             level={pet.level}
           />
         </Link>
-        {NAV.map(({ href, label, icon: Icon }) => {
-          const active = isActive(pathname, href);
-          const count =
-            href === "/app" ? pendingCount + alertCount : href === "/app/pay" ? paymentCount : 0;
-          return (
-            <Link
-              key={href}
-              href={href}
-              className={clsx(
-                "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition",
-                active ? "bg-fg text-bg" : "text-fg-2 hover:bg-surface-3 hover:text-fg",
-              )}
-              aria-current={active ? "page" : undefined}
-            >
-              <Icon className="h-4 w-4" />
-              <span className="flex-1">{label}</span>
-              {count > 0 && (
-                <span
+        {NAV_GROUPS.map((group) => (
+          <div key={group.title} className="mb-2 flex flex-col gap-0.5">
+            <div className="px-3 pb-1 pt-2 font-pixel text-[9px] uppercase text-muted">
+              {group.title}
+            </div>
+            {group.items.map(({ href, label, icon: Icon }) => {
+              const active = isActive(pathname, href);
+              const count =
+                href === "/app"
+                  ? pendingCount + alertCount
+                  : href === "/app/pay"
+                    ? paymentCount
+                    : 0;
+              return (
+                <Link
+                  key={href}
+                  href={href}
                   className={clsx(
-                    "rounded-full px-1.5 text-[10px] font-semibold",
-                    active ? "bg-bg text-fg" : "bg-fg text-bg",
+                    "flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition",
+                    active ? "bg-fg text-bg" : "text-fg-2 hover:bg-surface-3 hover:text-fg",
                   )}
+                  aria-current={active ? "page" : undefined}
                 >
-                  {count}
-                </span>
-              )}
-            </Link>
-          );
-        })}
+                  <Icon className="h-4 w-4" />
+                  <span className="flex-1">{label}</span>
+                  {count > 0 && (
+                    <span
+                      className={clsx(
+                        "rounded-full px-1.5 text-[10px] font-semibold",
+                        active ? "bg-bg text-fg" : "bg-fg text-bg",
+                      )}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
       <div className="mt-auto space-y-3 px-3">
         <div className="rounded-xl border border-line bg-surface p-3">

@@ -1,5 +1,6 @@
 import { getDb } from "@/lib/db";
 import { authenticateApiKey } from "@/lib/services/apiKeys";
+import { identityGate } from "@/lib/services/agentIdentity";
 import { getDealFacts } from "@/lib/domain/catalog";
 import { x402Purchase, x402Requirements } from "@/lib/services/payments";
 
@@ -28,7 +29,11 @@ export async function GET(
     ?.trim();
   const db = getDb();
   const principal = authenticateApiKey(db, token);
-  if (!principal || !principal.scopes.includes("pay")) {
+  const gate = principal ? identityGate(db, principal) : null;
+  if (gate && !gate.allow) {
+    return Response.json({ ...x402Requirements(resource), error: gate.message }, { status: 402 });
+  }
+  if (!principal || !gate?.allow || !gate.principal.scopes.includes("pay")) {
     return Response.json(
       { ...x402Requirements(resource), error: "A MyLiquid API key with the pay scope is required" },
       { status: 402 },

@@ -5,7 +5,7 @@ import { CalendarClock, Pause, Play, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { CADENCE_LABELS, type Cadence } from "@/lib/domain/automation";
 import { postJson, useAction } from "@/components/client";
-import { formatUsd } from "@/components/format";
+import { formatPrice, formatUsd } from "@/components/format";
 import { Badge, EmptyState, buttonClass, type Tone } from "@/components/ui";
 
 export interface PlanRow {
@@ -184,10 +184,6 @@ const LIMIT_TONE: Record<LimitRow["status"], Tone> = {
   rejected: "critical",
 };
 
-function price(v: number): string {
-  return `$${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
 /** Limit orders with their status; open ones can be cancelled. */
 export function LimitOrderList({
   orders,
@@ -208,7 +204,7 @@ export function LimitOrderList({
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm text-fg">
                 Limit {o.side} {formatUsd(o.amountCents)}
-                {showProduct && ` of ${o.productName}`} at {price(o.limitPrice)}
+                {showProduct && ` of ${o.productName}`} at {formatPrice(o.limitPrice)}
               </div>
               <div className="truncate text-[11px] text-muted">
                 Placed {o.createdOn} ·{" "}

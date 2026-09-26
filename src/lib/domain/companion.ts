@@ -6,6 +6,8 @@
  * never for trading volume. Pure functions only.
  */
 
+import { formatUsd } from "./money";
+
 export const PET_COLORS = {
   blue: "#3b6bff",
   lime: "#7cc414",
@@ -370,7 +372,7 @@ export interface SnackFacts {
 
 /** Whole dollars for big sums, where cents are noise. */
 function roundDollars(cents: number): string {
-  return formatDollars(Math.round(cents / 100) * 100);
+  return formatUsd(Math.round(cents / 100) * 100);
 }
 
 /** True, useful facts about the portfolio. Feeding serves one of them. */
@@ -406,7 +408,7 @@ export function researchSnacks(f: SnackFacts): string[] {
       `${parts.join(" and ")} ${parts.length > 1 || f.pendingProposals > 1 || f.pendingPayments > 1 ? "are" : "is"} waiting for your OK.`,
     );
   }
-  if (f.walletCents > 0) snacks.push(`The agent wallet holds ${formatDollars(f.walletCents)}.`);
+  if (f.walletCents > 0) snacks.push(`The agent wallet holds ${formatUsd(f.walletCents)}.`);
   return snacks;
 }
 
@@ -448,10 +450,6 @@ export function messCount(s: PortfolioSignals): number {
 
 // ── Thoughts ────────────────────────────────────────────────────────────────
 
-export function formatDollars(cents: number): string {
-  return `$${(cents / 100).toLocaleString("en-US", { maximumFractionDigits: cents % 100 === 0 ? 0 : 2, minimumFractionDigits: cents % 100 === 0 ? 0 : 2 })}`;
-}
-
 /** What the pet says right now. Deterministic, driven by state. */
 export function petThought(opts: {
   name: string;
@@ -482,7 +480,7 @@ export function petThought(opts: {
   if (s.holdings === 0)
     return "We haven't invested anything yet. Run the desk and I'll draft a first allocation for you.";
   if (s.lastPayment && s.lastPayment.hoursAgo < 12) {
-    return `Paid ${s.lastPayment.merchant} ${formatDollars(s.lastPayment.amountCents)}. The wallet has ${formatDollars(s.walletCents)} left.`;
+    return `Paid ${s.lastPayment.merchant} ${formatUsd(s.lastPayment.amountCents)}. The wallet has ${formatUsd(s.walletCents)} left.`;
   }
   const options = [
     `${Math.round(s.liquidWeekPct * 100)}% of your money could be cash within a week. I like knowing that.`,
