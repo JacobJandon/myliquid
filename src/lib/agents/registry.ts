@@ -153,10 +153,11 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
     name: "Your agent",
     role: "Connected over MCP",
     summary:
-      "An AI you connect with an API key, such as Claude or another MCP client. It uses the desk's tools under the same guardrails.",
+      "An AI you connect over MCP, such as Claude or an outside trading agent. It uses the desk's tools under the same guardrails, and its AINRA identity decides whether it may trade on its own.",
     cannot: [
       "Withdraw money or change guardrails",
       "Trade without a trade-scoped key",
+      "Trade on its own without a fresh AINRA passport, an L2+ tier and your limits",
       "Skip Sentinel's checks or your approval settings",
     ],
     tools: [
@@ -172,6 +173,7 @@ export const AGENTS: Record<AgentId, AgentDefinition> = {
       "list_autopilot_rules",
       "get_standing_orders",
       "get_recent_activity",
+      "get_my_permissions",
       "propose_trade",
       "propose_rebalance",
       "create_autopilot_rule",

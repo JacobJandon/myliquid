@@ -18,8 +18,8 @@ import testbedRoots from "./testbed/roots.json";
  * permanent AINRA Number. Verification is local and fails closed; nothing is sent to AINRA.
  *
  * Trust anchors come from `AINRA_ROOTS_FILE` and `AINRA_DIRECTORY_FILE` (JSON, as AINRA publishes them). Without
- * them MyLiquid runs in **testbed** mode on the TEST-ROOT sample artifacts in `./testbed`, verifying at the
- * samples' issue time, and labels every result that way.
+ * them MyLiquid runs in **testbed** mode on TEST-ROOT artifacts in `./testbed` (minted with AINRA's registrar),
+ * verifying at their pinned issue time, and labels every result that way.
  */
 
 export type AinraMode = "testbed" | "configured";
@@ -83,7 +83,7 @@ export function ainraMode(): AinraMode {
   return anchors().mode;
 }
 
-/** The clock passports are verified against: real time, or the samples' issue time in testbed mode. */
+/** The clock passports are verified against: real time, or the testbed's pinned issue time. */
 export function ainraNow(): number {
   return anchors().mode === "testbed" ? testbedMeta.now : Math.floor(Date.now() / 1000);
 }
@@ -92,12 +92,57 @@ export function ainraModeLabel(): string {
   return anchors().mode === "testbed" ? "TESTBED · TEST-ROOT" : "AINRA trust anchors configured";
 }
 
-/** The two TEST-ROOT sample presentations, for demos and tests (testbed mode only). */
-export async function sampleBundle(kind: "valid" | "revoked"): Promise<PresentationBundle> {
+/**
+ * The testbed's sample agents: passports minted with AINRA's own registrar under the TEST-ROOT (see
+ * `testbed/README.md`). Outside agent companies, so a demo shows what identity decides.
+ */
+export const TESTBED_AGENTS = [
+  {
+    id: "momentum-trader",
+    label: "Northwind Momentum Trader",
+    summary: "L2 · declares myliquid:read and myliquid:trade",
+  },
+  {
+    id: "research-analyst",
+    label: "Northwind Research Analyst",
+    summary: "L1 · declares myliquid:read only",
+  },
+  {
+    id: "treasury-agent",
+    label: "Harbor Treasury Agent",
+    summary: "L3 · declares myliquid:read, trade and pay",
+  },
+  {
+    id: "yield-hunter",
+    label: "QuickFox Yield Hunter",
+    summary: "L2 trader whose registrar then revokes it",
+  },
+] as const;
+
+export type TestbedAgentId = (typeof TESTBED_AGENTS)[number]["id"];
+export const TESTBED_AGENT_IDS = TESTBED_AGENTS.map((a) => a.id) as [
+  TestbedAgentId,
+  ...TestbedAgentId[],
+];
+
+/**
+ * A testbed agent's presentation. `revoked: true` is the yield hunter's presentation after its registrar revoked
+ * it (the others have none).
+ */
+export async function testbedBundle(
+  id: TestbedAgentId,
+  opts: { revoked?: boolean } = {},
+): Promise<PresentationBundle> {
   const mod =
-    kind === "valid"
-      ? await import("./testbed/bundle-valid.json")
-      : await import("./testbed/bundle-revoked.json");
+    id === "momentum-trader"
+      ? await import("./testbed/agent-momentum-trader.json")
+      : id === "research-analyst"
+        ? await import("./testbed/agent-research-analyst.json")
+        : id === "treasury-agent"
+          ? await import("./testbed/agent-treasury-agent.json")
+          : opts.revoked
+            ? await import("./testbed/agent-yield-hunter-revoked.json")
+            : await import("./testbed/agent-yield-hunter.json");
   return (mod.default ?? mod) as PresentationBundle;
 }
 

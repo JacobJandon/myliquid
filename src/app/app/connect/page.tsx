@@ -6,12 +6,38 @@ import { listApiKeys } from "@/lib/services/apiKeys";
 import { listEvents } from "@/lib/services/audit";
 import { KeyManager, Snippet } from "@/components/app/KeyManager";
 import { PassportVerifier, type IdentitySummary } from "@/components/app/AgentIdentity";
-import { ainraMode, ainraModeLabel } from "@/lib/ainra";
-import { listKeyIdentities, wallNow } from "@/lib/services/agentIdentity";
-import { Card, EmptyState } from "@/components/ui";
+import {
+  ConnectedAgents,
+  InviteAgent,
+  TraderTestDrive,
+  type ConnectionView,
+} from "@/components/app/AgentTraders";
+import { TESTBED_AGENTS, ainraMode, ainraModeLabel } from "@/lib/ainra";
+import { TIER_AUTO_CEILING_CENTS } from "@/lib/domain/agentTrading";
+import { formatUsd } from "@/lib/domain/money";
+import { listConnections, listKeyIdentities, wallNow } from "@/lib/services/agentIdentity";
+import { listInvites } from "@/lib/services/agentInvites";
+import { Badge, Card, EmptyState } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Connect an agent" };
+export const metadata = { title: "Agent traders" };
+
+const TIERS: { tier: string; may: string }[] = [
+  { tier: "Not identified", may: "Reads and proposes; you approve every trade" },
+  { tier: "AINRA L0–L1", may: "Reads only" },
+  {
+    tier: "AINRA L2",
+    may: `Trades; on its own up to ${formatUsd(TIER_AUTO_CEILING_CENTS.L2!)} a trade within your limits`,
+  },
+  {
+    tier: "AINRA L3",
+    may: `Trades and pays; on its own up to ${formatUsd(TIER_AUTO_CEILING_CENTS.L3!)} a trade`,
+  },
+  {
+    tier: "AINRA L4",
+    may: `Trades and pays; on its own up to ${formatUsd(TIER_AUTO_CEILING_CENTS.L4!)} a trade`,
+  },
+];
 
 export default async function ConnectPage() {
   const { id: investorId } = await requireInvestor();
@@ -21,9 +47,37 @@ export default async function ConnectPage() {
   const proto =
     h.get("x-forwarded-proto") ??
     (host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https");
-  const endpoint = `${proto}://${host}/api/mcp`;
+  const origin = `${proto}://${host}`;
+  const endpoint = `${origin}/api/mcp`;
+  const now = wallNow();
+  const testbed = ainraMode() === "testbed";
+
   const activity = listEvents(db, investorId, { agent: "external", limit: 12 });
   const keys = listApiKeys(db, investorId);
+  const connections: ConnectionView[] = listConnections(db, investorId, now).map((c) => ({
+    keyId: c.keyId,
+    name: c.name,
+    prefix: c.prefix,
+    lastUsedAt: c.lastUsedAt,
+    scopes: c.scopes,
+    identified: c.identified,
+    identity: c.identity && {
+      ainraNumber: c.identity.ainraNumber,
+      tier: c.identity.tier,
+      capabilities: c.identity.capabilities,
+      requirePassport: c.identity.requirePassport,
+      verifiedUntil: c.identity.verifiedUntil,
+      lastStatus: c.identity.lastPresentedAt ? (c.identity.lastVerdict?.status ?? null) : null,
+      lastReason: c.identity.lastPresentedAt ? (c.identity.lastVerdict?.reason ?? null) : null,
+      tradeMode: c.identity.tradeMode,
+      perTradeLimitCents: c.identity.perTradeLimitCents,
+      dailyLimitCents: c.identity.dailyLimitCents,
+    },
+    tierCeilingCents: c.tierCeilingCents,
+    effectivePerTradeLimitCents: c.effectivePerTradeLimitCents,
+    usedTodayCents: c.usedTodayCents,
+    autonomyBlockedBy: c.autonomyBlockedBy,
+  }));
   const identities: Record<string, IdentitySummary> = Object.fromEntries(
     listKeyIdentities(db, investorId).map((i) => [
       i.keyId,
@@ -39,59 +93,126 @@ export default async function ConnectPage() {
       },
     ]),
   );
-  const now = wallNow();
-  const origin = endpoint.replace(/\/api\/mcp$/, "");
+  const openInvites = listInvites(db, investorId, now)
+    .filter((i) => i.status === "open")
+    .map((i) => ({
+      id: i.id,
+      label: i.label,
+      scopes: i.scopes,
+      tradeMode: i.tradeMode,
+      perTradeLimitCents: i.perTradeLimitCents,
+      dailyLimitCents: i.dailyLimitCents,
+      expiresAt: i.expiresAt,
+    }));
 
   return (
     <div className="max-w-6xl space-y-6">
       <div>
-        <h1 className="font-display text-4xl text-fg">Connect your own agent</h1>
+        <h1 className="font-display text-4xl text-fg">Agent traders</h1>
         <p className="mt-1 max-w-3xl text-sm text-fg-2">
-          Robinhood, Webull, Gemini and Coinbase now let people connect their own AI over the Model
-          Context Protocol. MyLiquid does too: connect Claude or any other MCP client to{" "}
-          <code className="rounded bg-surface-3 px-1 text-xs">{endpoint}</code>. It gets the same
-          tools as the desk agents and the same guardrails.
+          Let outside AI agents trade for you, and know who they are. An agent identifies itself
+          with its{" "}
+          <a
+            href="https://github.com/JacobJandon/ainra"
+            className="font-medium text-fg underline underline-offset-2"
+          >
+            AINRA
+          </a>{" "}
+          passport: who runs it, its tier, what it declares it may do, and whether its registrar
+          still vouches for it. That identity decides what it can do here, on top of your guardrails
+          and Sentinel&apos;s checks.
         </p>
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+          <Badge tone={testbed ? "warning" : "good"}>{ainraModeLabel()}</Badge>
+          <span className="text-muted">
+            Passports are verified here, offline, with the published <code>@ainra/sdk</code>.
+          </span>
+        </div>
       </div>
 
-      <KeyManager keys={keys} endpoint={endpoint} identities={identities} now={now} />
+      <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] [&>*]:min-w-0">
+        <Card
+          title="Invite an agent trader"
+          subtitle="It connects itself with its passport; you never copy keys around."
+        >
+          <InviteAgent origin={origin} open={openInvites} />
+        </Card>
+        <Card
+          title="What identity decides"
+          subtitle="Least privilege: the lower of these and your settings."
+        >
+          <table className="w-full text-left text-xs">
+            <tbody>
+              {TIERS.map((t) => (
+                <tr key={t.tier} className="border-t border-line first:border-t-0">
+                  <th className="py-2 pr-3 font-medium text-fg">{t.tier}</th>
+                  <td className="py-2 text-fg-2">{t.may}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <ul className="mt-3 space-y-1.5 text-xs text-fg-2">
+            <li>
+              To trade on its own it must also declare <code>myliquid:trade</code> and present a
+              fresh passport at least every 5 minutes.
+            </li>
+            <li>
+              If its registrar revokes it, MyLiquid cuts it off at its next presentation, withdraws
+              its pending proposals and alerts you.
+            </li>
+            <li>Every order and proposal it makes carries its AINRA Number.</li>
+          </ul>
+        </Card>
+      </div>
 
       <Card
-        title="Agent identity (AINRA)"
-        subtitle="Know who is behind a connected agent, what it may do, and whether it is still trusted right now."
+        id="connected"
+        title="Connected agents"
+        subtitle="Who each one is, whether it's identified right now, and what it may do."
       >
-        <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
-          <PassportVerifier
-            keys={keys.filter((k) => !k.revokedAt).map((k) => ({ id: k.id, name: k.name }))}
-            trust={ainraModeLabel()}
-            testbed={ainraMode() === "testbed"}
+        <ConnectedAgents connections={connections} />
+      </Card>
+
+      {testbed && (
+        <Card
+          title="Test drive an AINRA trader"
+          subtitle="A testbed agent connects to this app through the real endpoints, from your browser, step by step."
+        >
+          <TraderTestDrive
+            agents={TESTBED_AGENTS.map((a) => ({ id: a.id, label: a.label, summary: a.summary }))}
+            previous={connections.map((c) => ({ keyId: c.keyId, name: c.name }))}
           />
-          <div className="space-y-3 text-sm text-fg-2">
-            <p>
-              <a
-                href="https://github.com/JacobJandon/ainra"
-                className="font-medium text-fg underline underline-offset-2"
-              >
-                AINRA
-              </a>{" "}
-              gives AI agents signed passports that anyone can check offline. Pin a key to an
-              agent&apos;s permanent AINRA Number and that key only works while the agent presents a
-              valid, fresh passport: if its registrar revokes it, MyLiquid cuts it off within five
-              minutes, even though the key is still valid.
-            </p>
-            <p>
-              The key can do no more than the agent&apos;s AINRA tier allows (L0–L1 read, L2 trade,
-              L3 and up pay) and, if the passport declares them, its <code>myliquid:read</code>,{" "}
-              <code>myliquid:trade</code> or <code>myliquid:pay</code> capabilities. Every call is
-              logged with the agent&apos;s AINRA Number.
-            </p>
+        </Card>
+      )}
+
+      <details className="group rounded-2xl border border-line bg-surface">
+        <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-fg">
+          Manual setup: API keys for MCP clients, and pinning a passport by hand
+          <span className="ml-2 text-xs font-normal text-muted">
+            For Claude and other MCP clients without an invite flow
+          </span>
+        </summary>
+        <div className="space-y-6 border-t border-line p-5">
+          <KeyManager
+            keys={keys}
+            endpoint={endpoint}
+            identities={identities}
+            now={now}
+            showList={false}
+          />
+          <div className="grid gap-6 lg:grid-cols-[1.3fr_1fr] [&>*]:min-w-0">
+            <PassportVerifier
+              keys={keys.filter((k) => !k.revokedAt).map((k) => ({ id: k.id, name: k.name }))}
+              trust={ainraModeLabel()}
+              testbed={testbed}
+            />
             <Snippet
               label="The agent presents its passport (valid for 5 minutes)"
               code={`curl -s ${origin}/api/agent-identity \\\n  -H "Authorization: Bearer mlk_YOUR_KEY" \\\n  -H "Content-Type: application/json" \\\n  -d '{"ainra_passport": <bundle JSON or base64url>}'`}
             />
           </div>
         </div>
-      </Card>
+      </details>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title="Tools by scope">

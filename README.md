@@ -121,43 +121,84 @@ Agents run on **Claude** (Anthropic API) when `ANTHROPIC_API_KEY` is set. Withou
 key they run in a deterministic **offline mode** that calls exactly the same tools,
 so the whole platform works out of the box.
 
+### Agent traders, identified with AINRA
+
+Outside AI agents can trade for you, and MyLiquid knows who they are. An agent identifies itself with its
+[AINRA](https://github.com/JacobJandon/ainra) passport: who runs it, its tier, what it declares it may do, and
+whether its registrar still vouches for it. MyLiquid verifies passports itself, offline and fail-closed, with the
+published `@ainra/sdk`. **Identity decides autonomy.**
+
+| The agent | What it may do |
+|---|---|
+| Not identified | Read and propose; you approve every trade |
+| AINRA L0–L1 | Read only |
+| AINRA L2 | Trade; on its own up to $2,500 a trade, within your limits |
+| AINRA L3 / L4 | Trade and pay; on its own up to $10,000 / $25,000 a trade |
+
+To trade on its own, an agent must also:
+- declare `myliquid:trade` in its passport;
+- present a fresh passport at least every 5 minutes;
+- stay within the per-trade and daily limits you set.
+
+Every order it places still passes the mandate, Sentinel's checks and the kill switch. Its orders and proposals
+carry its AINRA Number. If its registrar revokes it, its next presentation is refused, its key stops working, its
+pending proposals are withdrawn and Sentinel alerts you.
+
+1. **Invite.** Under **Traders**, create a one-time invite: what the agent may do, and its limits.
+2. **The agent connects itself.** It redeems the invite with its passport:
+
+   ```bash
+   curl -s https://<your-host>/api/agent-identity/enroll -H "Content-Type: application/json" \
+     -d '{"invite": "mli_...", "ainra_passport": <bundle JSON or base64url>}'
+   ```
+
+   It gets back an API key already pinned to its AINRA Number, the MCP endpoint and a 5-minute presentation window.
+   It re-presents with `POST /api/agent-identity` (`{"ainra_passport": …}`, authenticated with its key).
+3. **It trades over MCP.** `propose_trade` either executes on its own or becomes a proposal, with the reason.
+   `get_my_permissions` tells the agent who MyLiquid thinks it is and what it may do right now.
+4. **You stay in charge.** Under **Traders** you see each agent's identity, whether it is identified right now,
+   its limits (editable) and what it traded today, and you can disconnect it.
+
+**Test drive.** In testbed mode, **Traders → Test drive** runs a sample agent through all of this from your browser,
+against the real endpoints: invite, enroll, read, a trade it may make on its own, one over its limit, and (for the
+yield hunter) revocation.
+
+The testbed agents were minted with AINRA's own registrar under its TEST-ROOT (`scripts/mint-ainra-testbed.sh`,
+`src/lib/ainra/testbed/`):
+
+| Agent | Tier | Capabilities |
+|---|---|---|
+| Northwind Momentum Trader | L2 | `myliquid:read`, `myliquid:trade` |
+| Northwind Research Analyst | L1 | `myliquid:read` |
+| Harbor Treasury Agent | L3 | `myliquid:read`, `myliquid:trade`, `myliquid:pay` |
+| QuickFox Yield Hunter | L2 | `myliquid:read`, `myliquid:trade`, then revoked by its registrar |
+
+Everything verified against them is labelled `TESTBED · TEST-ROOT`. With real trust anchors (`AINRA_ROOTS_FILE`,
+`AINRA_DIRECTORY_FILE`) MyLiquid verifies real passports at real time. See
+[`docs/research/platform-review-and-ainra.md`](docs/research/platform-review-and-ainra.md) for the design and its
+limits.
+
 ### Bring your own agent (MCP)
 
-Like Robinhood, Webull, Gemini and Coinbase, MyLiquid exposes its tools over the
-**Model Context Protocol**. Create a key under **Connect an agent**. A *read* key
-sees your portfolio, liquidity, deals, signals, risk, standing orders, wallet and
-nearby terminals. A
-*trade* key can also propose trades, rebalances and autopilot rules. A *pay* key
-can pay terminal codes and buy premium data from the agent wallet, under the card
-policy. Then point any MCP client at `/api/mcp`:
+Like Robinhood, Webull, Gemini and Coinbase, MyLiquid exposes its tools over the **Model Context Protocol**.
+
+| Key scope | What it can do |
+|---|---|
+| *read* | See your portfolio, liquidity, deals, signals, risk, standing orders, wallet and nearby terminals |
+| *trade* | Also propose trades, rebalances and autopilot rules |
+| *pay* | Also pay terminal codes and buy premium data from the agent wallet, under the card policy |
+
+Agent traders get keys through invites (above). For other MCP clients, create a key under
+**Traders → Manual setup** and point the client at `/api/mcp`:
 
 ```bash
 claude mcp add --transport http myliquid https://<your-host>/api/mcp \
   --header "Authorization: Bearer mlk_..."
 ```
 
-Connected agents get the same guardrails as the desk: Sentinel's checks, your
-autonomy setting, the mandate and the kill switch. They are rate-limited, and
-every call is recorded in your audit log.
-
-### Agent identity (AINRA)
-
-MyLiquid verifies [AINRA](https://github.com/JacobJandon/ainra) passports, the neutral root of AI-agent identity,
-with the published `@ainra/sdk`, locally and fail-closed.
-
-1. **Pin a key.** Under **Connect**, verify a connected agent's passport and pin the API key to its permanent
-   AINRA Number.
-2. **The agent presents.** It sends its passport with its key (`POST /api/agent-identity`,
-   `{"ainra_passport": …}`), and may act for the next 5 minutes.
-3. **The gate enforces.**
-   - The key's scopes narrow to the agent's tier (L0–L1 read, L2 trade, L3+ pay) and to any `myliquid:*`
-     capabilities its passport declares.
-   - A revoked passport cuts the key off, even though the key itself is still valid, and raises a critical alert.
-   - Every call is logged with the agent's AINRA Number.
-
-Without configured trust anchors it runs in **testbed** mode on AINRA's TEST-ROOT samples, and says so. See
-[`docs/research/platform-review-and-ainra.md`](docs/research/platform-review-and-ainra.md) for the design, its
-limits, and the next step: passports for every pet.
+A key that isn't pinned to an AINRA identity only proposes. Connected agents get the same guardrails as the
+desk: Sentinel's checks, the mandate and the kill switch. They are rate-limited, and every call is recorded in
+your audit log.
 
 ### Guardrails
 
@@ -217,9 +258,10 @@ Things to try:
    redemption gates and autopilot rules fire.
 8. **Guardrails.** Change the risk profile, switch to bounded autonomy, or pull
    the kill switch (or just put your pet to sleep).
-9. **Connect an agent.** Create a trade or pay key, connect Claude (or run the
-   curl snippet), and watch its proposal land in your inbox or its payment reach
-   the terminal.
+9. **Traders → Test drive.** Pick a testbed agent: watch it enroll with its AINRA
+   passport, trade on its own within its limits, and (the yield hunter) get cut
+   off when its registrar revokes it. Or invite your own agent, or connect Claude
+   with a key under *Manual setup*.
 
 ## Scripts
 
@@ -233,6 +275,7 @@ Things to try:
 | `npm run lint` | ESLint (Next.js config) |
 | `npm run check` | Typecheck, lint and test |
 | `npm run db:reset` | Wipe and re-seed the database (local file, or Turso when configured) |
+| `scripts/mint-ainra-testbed.sh` | Re-mint the AINRA testbed agents with AINRA's registrar (needs an AINRA checkout and Rust) |
 
 ## Configuration
 
@@ -275,14 +318,16 @@ src/
   components/          UI kit, charts, pet (pixel sprite, device, room), pay (card, POS terminal, panels), app components
   lib/
     domain/            Pure logic: catalog, market sim, liquidity, risk, valuation, diligence, rebalance, signals,
-                       companion (vitals, XP, quests), payments (merchants, card policy)
+                       companion (vitals, XP, quests), payments (merchants, card policy),
+                       agent trading (what an outside agent's AINRA identity lets it do)
     db/                SQLite schema, seed, connection; hosted libSQL (Turso) wrapper
     services/          Investors, portfolio, orders & settlement, proposals, alerts, audit log, rules, API keys,
-                       market clock, companion (the pet), payments (wallet, card, terminals, x402)
+                       market clock, companion (the pet), payments (wallet, card, terminals, x402),
+                       agent identity and invites (AINRA-identified outside traders)
     agents/            Agent registry, tools, Claude loop, offline agents, runner
     auth/              Password hashing (scrypt), sessions, cookies
     mcp/               MCP server (official SDK, stateless Streamable HTTP)
-    ainra/             AINRA passport verification (@ainra/sdk), trust anchors, TEST-ROOT testbed samples
+    ainra/             AINRA passport verification (@ainra/sdk), trust anchors, TEST-ROOT testbed agents
 docs/
   research/            Agentic-finance landscape; agent payments, AI companions and design; platform review and AINRA (Sept 2026)
   ARCHITECTURE.md      How the pieces fit together

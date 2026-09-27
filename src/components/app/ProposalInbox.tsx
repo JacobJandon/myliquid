@@ -36,6 +36,11 @@ export function ProposalInbox({ proposals }: { proposals: Proposal[] }) {
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="text-sm font-medium text-fg">{p.title}</h3>
                   <Badge tone="violet">{agentLabel(p.agent)}</Badge>
+                  {p.ainraNumber && (
+                    <Badge tone="accent" className="font-mono">
+                      AINRA {p.ainraNumber.replace(/^did:ainra:/, "")}
+                    </Badge>
+                  )}
                   {warnings.length > 0 && (
                     <Badge tone="warning">
                       {warnings.length} warning{warnings.length > 1 ? "s" : ""}

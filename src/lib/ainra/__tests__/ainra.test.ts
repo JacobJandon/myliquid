@@ -7,8 +7,8 @@ import {
   ainraNow,
   checkPassport,
   parsePassport,
-  sampleBundle,
   scopesFromCapabilities,
+  testbedBundle,
 } from "@/lib/ainra";
 import { listAlerts } from "@/lib/services/alerts";
 import { createApiKey, type ApiPrincipal } from "@/lib/services/apiKeys";
@@ -22,37 +22,49 @@ import {
   unbindKeyIdentity,
 } from "@/lib/services/agentIdentity";
 
-const NUMBER = "did:ainra:registrar-07:acme:invoicing";
+const NUMBER = "did:ainra:registrar-07:northwind:momentum-trader";
+const valid = () => testbedBundle("momentum-trader");
 
 describe("AINRA passports (TEST-ROOT testbed)", () => {
-  it("runs in testbed mode on the sample clock without configured anchors", () => {
+  it("runs in testbed mode on the testbed's pinned clock without configured anchors", () => {
     expect(ainraMode()).toBe("testbed");
     expect(ainraNow()).toBe(1776729600);
   });
 
-  it("verifies a valid passport and names the agent", async () => {
-    const check = checkPassport(await sampleBundle("valid"));
+  it("verifies each testbed agent and reads its tier and capabilities", async () => {
+    const check = checkPassport(await valid());
     expect(check).toMatchObject({
       status: "valid",
       reason: null,
-      name: "ainra:registrar-07:acme:invoicing@1.0.0",
+      name: "ainra:registrar-07:northwind:momentum-trader@1.0.0",
       number: NUMBER,
-      tier: "L3",
-      capabilities: ["read:invoices"],
+      tier: "L2",
+      capabilities: ["myliquid:read", "myliquid:trade"],
     });
-    expect(check.event?.freshness_age_s).toBe(1);
+    expect(check.event?.freshness_age_s).toBeLessThanOrEqual(300);
+    expect(checkPassport(await testbedBundle("research-analyst"))).toMatchObject({
+      status: "valid",
+      tier: "L1",
+      capabilities: ["myliquid:read"],
+    });
+    expect(checkPassport(await testbedBundle("treasury-agent"))).toMatchObject({
+      status: "valid",
+      tier: "L3",
+      capabilities: ["myliquid:read", "myliquid:trade", "myliquid:pay"],
+    });
+    expect(checkPassport(await testbedBundle("yield-hunter")).status).toBe("valid");
   });
 
   it("fails closed: revoked, stale, tampered and unreadable passports are invalid", async () => {
-    expect(checkPassport(await sampleBundle("revoked"))).toMatchObject({
+    expect(checkPassport(await testbedBundle("yield-hunter", { revoked: true }))).toMatchObject({
       status: "invalid",
       reason: "revoked",
     });
     // At real time the stapled status is months old: never "probably fine".
-    expect(
-      checkPassport(await sampleBundle("valid"), { now: Math.floor(Date.now() / 1000) }).reason,
-    ).toBe("stale_status");
-    const tampered = structuredClone(await sampleBundle("valid")) as Record<string, unknown>;
+    expect(checkPassport(await valid(), { now: Math.floor(Date.now() / 1000) }).reason).toBe(
+      "stale_status",
+    );
+    const tampered = structuredClone(await valid()) as Record<string, unknown>;
     const claims = tampered.claims as string;
     tampered.claims = claims.slice(0, 40) + (claims[40] === "A" ? "B" : "A") + claims.slice(41);
     expect(checkPassport(tampered).status).toBe("invalid");
@@ -61,13 +73,14 @@ describe("AINRA passports (TEST-ROOT testbed)", () => {
   });
 
   it("accepts the base64url header form", async () => {
-    const encoded = Buffer.from(JSON.stringify(await sampleBundle("valid"))).toString("base64url");
+    const encoded = Buffer.from(JSON.stringify(await valid())).toString("base64url");
     expect(parsePassport(encoded)).not.toBeNull();
     expect(checkPassport(encoded).status).toBe("valid");
   });
 
   it("maps myliquid:* capabilities to scopes, and nothing else", () => {
     expect(scopesFromCapabilities(["read:invoices"])).toBeNull();
+    expect(scopesFromCapabilities(["myliquid:read", "myliquid:trade"])).toEqual(["read", "trade"]);
     expect(scopesFromCapabilities(["myliquid:read"])).toEqual(["read"]);
     expect(scopesFromCapabilities(["myliquid:trade"])).toEqual(["read", "trade"]);
     expect(scopesFromCapabilities(["myliquid:*"])).toEqual(["read", "trade", "pay"]);
@@ -82,19 +95,19 @@ describe("pinning an API key to an agent's AINRA identity", () => {
   beforeEach(() => {
     db = openDatabase(":memory:", { today: "2026-09-24" });
     setDb(db);
-    const created = createApiKey(db, ID, "billing agent", ["read", "trade"]);
+    const created = createApiKey(db, ID, "trading agent", ["read", "trade"]);
     key = created.key;
     principal = {
       investorId: ID,
       keyId: created.apiKey.id,
-      keyName: "billing agent",
+      keyName: "trading agent",
       scopes: ["read", "trade"],
     };
   });
 
   it("binds only a valid passport", async () => {
     expect(() => bindKeyIdentity(db, ID, principal.keyId, "garbage")).toThrow(/can't be bound/);
-    const { identity } = bindKeyIdentity(db, ID, principal.keyId, await sampleBundle("valid"));
+    const { identity } = bindKeyIdentity(db, ID, principal.keyId, await valid());
     expect(identity).toMatchObject({
       ainraNumber: NUMBER,
       requirePassport: true,
@@ -104,17 +117,24 @@ describe("pinning an API key to an agent's AINRA identity", () => {
 
   it("gates the key until the agent presents, for five minutes, and a revoked passport cuts it off", async () => {
     expect(identityGate(db, principal).allow).toBe(true); // unbound keys are unaffected
-    bindKeyIdentity(db, ID, principal.keyId, await sampleBundle("valid"));
+    bindKeyIdentity(db, ID, principal.keyId, await testbedBundle("yield-hunter"));
     expect(identityGate(db, principal).allow).toBe(false);
 
     const wallNow = 2_000_000_000;
-    const ok = presentPassport(db, principal, await sampleBundle("valid"), { wallNow });
+    const ok = presentPassport(db, principal, await testbedBundle("yield-hunter"), { wallNow });
     expect(ok).toMatchObject({ ok: true, verifiedUntil: wallNow + 300 });
     const gate = identityGate(db, principal, wallNow + 10);
-    expect(gate.allow && gate.principal.ainraNumber).toBe(NUMBER);
+    expect(gate.allow && gate.principal.ainraNumber).toBe(
+      "did:ainra:registrar-07:quickfox:yield-hunter",
+    );
     expect(identityGate(db, principal, wallNow + 301).allow).toBe(false);
 
-    const revoked = presentPassport(db, principal, await sampleBundle("revoked"), { wallNow });
+    const revoked = presentPassport(
+      db,
+      principal,
+      await testbedBundle("yield-hunter", { revoked: true }),
+      { wallNow },
+    );
     expect(revoked).toMatchObject({ ok: false, reason: "revoked" });
     expect(identityGate(db, principal, wallNow + 10).allow).toBe(false);
     expect(
@@ -128,7 +148,7 @@ describe("pinning an API key to an agent's AINRA identity", () => {
   });
 
   it("narrows scopes to myliquid:* capabilities when the passport declares them", async () => {
-    bindKeyIdentity(db, ID, principal.keyId, await sampleBundle("valid"));
+    bindKeyIdentity(db, ID, principal.keyId, await valid());
     db.prepare("UPDATE api_key_identities SET capabilities = ?, require_passport = 0").run(
       JSON.stringify(["myliquid:read"]),
     );
@@ -137,8 +157,11 @@ describe("pinning an API key to an agent's AINRA identity", () => {
   });
 
   it("applies MyLiquid's tier floor: L1 reads, L2 trades, L3 pays", async () => {
-    bindKeyIdentity(db, ID, principal.keyId, await sampleBundle("valid"));
-    db.prepare("UPDATE api_key_identities SET require_passport = 0, tier = ?").run("L1");
+    bindKeyIdentity(db, ID, principal.keyId, await valid());
+    // Declare every MyLiquid capability, so only the tier limits the scopes.
+    db.prepare(
+      "UPDATE api_key_identities SET require_passport = 0, tier = ?, capabilities = ?",
+    ).run("L1", JSON.stringify(["myliquid:*"]));
     const payer = { ...principal, scopes: ["read", "trade", "pay"] as ApiPrincipal["scopes"] };
     const l1 = identityGate(db, payer);
     expect(l1.allow && l1.principal.scopes).toEqual(["read"]);
@@ -151,18 +174,18 @@ describe("pinning an API key to an agent's AINRA identity", () => {
   });
 
   it("refuses presentations for an unbound key or another identity", async () => {
-    expect(presentPassport(db, principal, await sampleBundle("valid")).reason).toBe("not_bound");
-    bindKeyIdentity(db, ID, principal.keyId, await sampleBundle("valid"));
+    expect(presentPassport(db, principal, await valid()).reason).toBe("not_bound");
+    bindKeyIdentity(db, ID, principal.keyId, await valid());
     db.prepare("UPDATE api_key_identities SET ainra_number = ?").run(
-      "did:ainra:registrar-07:acme:other",
+      "did:ainra:registrar-07:northwind:other",
     );
-    expect(presentPassport(db, principal, await sampleBundle("valid")).reason).toBe(
+    expect(presentPassport(db, principal, await valid()).reason).toBe(
       "identity_mismatch",
     );
   });
 
   it("works end to end over HTTP: MCP refuses until the passport is presented", async () => {
-    bindKeyIdentity(db, ID, principal.keyId, await sampleBundle("valid"));
+    bindKeyIdentity(db, ID, principal.keyId, await valid());
     const call = () =>
       mcpPost(
         new Request("http://localhost:3000/api/mcp", {
@@ -196,7 +219,7 @@ describe("pinning an API key to an agent's AINRA identity", () => {
           "content-type": "application/json",
           authorization: `Bearer ${key}`,
         },
-        body: JSON.stringify({ ainra_passport: await sampleBundle("valid") }),
+        body: JSON.stringify({ ainra_passport: await valid() }),
       }),
     );
     expect(presented.status).toBe(200);

@@ -39,6 +39,9 @@ network client does differently:
 - a statement prepared outside a transaction running outside it even after `BEGIN`;
 - connections that expire after a few seconds idle, which reconnect and retry when nothing ran.
 
+**Schema upgrades.** Columns added since schema version 3 are listed in `ADDED_COLUMNS` and added in place
+(`ALTER TABLE`) when an older database opens, so a hosted database keeps its data.
+
 **Consequences for code:**
 - Every statement is a network round trip there, so large writes use `insertMany` (batched
   multi-row inserts).
@@ -62,12 +65,23 @@ deployment private. See [`DEPLOY.md`](DEPLOY.md).
   users, resets or deletes accounts, and prunes guests older than 7 days.
 - `lib/ainra` and `services/agentIdentity.ts`: AINRA agent identity.
   - `checkPassport` verifies a passport with `@ainra/sdk` against the configured trust anchors, or the TEST-ROOT
-    testbed at the samples' clock.
+    testbed at its pinned clock. The testbed agents were minted with AINRA's own registrar
+    (`scripts/mint-ainra-testbed.sh`).
   - A key can be pinned to an agent's AINRA Number. `presentPassport` opens a 5-minute window for a valid passport
     of that Number.
   - `identityGate`, in front of `/api/mcp` and the x402 API, refuses pinned keys outside the window. It narrows
     scopes to the tier floor and to `myliquid:*` capabilities.
-  - A revoked presentation closes the window and raises a critical alert.
+  - A revoked presentation closes the window, withdraws the key's pending proposals and raises a critical alert.
+  - `listConnections` is the investor's view: identity, freshness, effective scopes, limits and today's volume.
+- `domain/agentTrading.ts`: what an outside agent may do on its own. `autonomyDecision` requires a pinned,
+  freshly presented identity, the investor's "trade on its own" setting, tier L2+ (per-trade ceilings: L2 $2,500,
+  L3 $10,000, L4 $25,000), a declared `myliquid:trade`, and the per-trade and daily limits. `agentTrade` applies it
+  for the `external` agent (the MCP tools pass the gate's `OutsideTrader`), then the mandate's autonomous checks;
+  anything else becomes a proposal with the reason. Orders and proposals are stamped with the key and AINRA Number.
+- `services/agentInvites.ts`: one-time invites (`mli_…`, stored hashed, 15 minutes). `enrollAgent` verifies the
+  agent's passport (fail closed; a revoked one raises an alert and leaves the invite open), then in one
+  transaction spends the invite, creates the key, pins it to the passport's AINRA Number and applies the invite's
+  limits, and opens a presentation window. `POST /api/agent-identity/enroll` is the public endpoint.
 - `services/apiKeys.ts` and `lib/mcp/server.ts`: scoped keys (`mlk_…`, stored
   hashed, shown once) and a stateless Streamable HTTP MCP server built on the
   official SDK. Tools are the same `AgentTool`s the desk uses, filtered by scope
@@ -192,8 +206,10 @@ watch tool calls happen live.
 ## Invariants
 
 1. Every order goes through `executeOrder`, which runs `runPreTradeChecks`.
-2. Agents trade only through `agentTrade`. Autonomy requires `autonomy = bounded`,
-   the order within the auto-execute limit, and every mandate check passing.
+2. Agents trade only through `agentTrade`. For MyLiquid's own agents, autonomy requires `autonomy = bounded`,
+   the order within the auto-execute limit, and every mandate check passing. An outside agent acts on its own
+   only when `autonomyDecision` allows it (AINRA-identified and fresh, L2+, `myliquid:trade`, within its limits)
+   and every mandate check passes; an unidentified key only ever proposes.
 3. No agent tool can withdraw cash, change settings, release the kill switch
    (wake the pet), fund the agent wallet or change the card policy.
 4. Rejected deals can never be bought, whether by a person or an agent.
@@ -210,7 +226,8 @@ watch tool calls happen live.
    owner put in.
 10. The pet never earns XP for trading volume.
 11. A key pinned to an AINRA identity acts only inside a fresh, valid presentation window, and never with more
-    than its tier floor and passport capabilities allow. AINRA verification is local and fails closed.
+    than its tier floor and passport capabilities allow. AINRA verification is local and fails closed. A revoked
+    agent's pending proposals are withdrawn.
 12. Services behave the same on a SQLite file and on hosted libSQL: they only use `prepare`/`exec`/`transaction`
     through `Db`, and multi-step writes are atomic transactions on both.
 
@@ -233,6 +250,11 @@ against a libSQL server):
 - `ainra.test.ts`: TEST-ROOT passports (valid, revoked, stale at real time, tampered, unreadable, base64url),
   capability and tier-floor scopes, pinning, the 5-minute window, revocation alerts, identity mismatch, and the
   whole HTTP flow (MCP refuses → agent presents → MCP answers, attributed to the AINRA Number).
+- `agent-traders.test.ts`: the autonomy rule (identity, freshness, mode, tier, capability, per-trade and daily
+  limits, tier ceilings); enrollment over HTTP (one-time invites, L1 read-only, revoked agents refused with the
+  invite kept open, expired invites); an L2 trader executing within its limits and proposing beyond them, with
+  orders and proposals stamped; revocation withdrawing proposals; unidentified keys proposing even in bounded
+  autonomy; and the in-place schema upgrade.
 - `automation.test.ts`: cadences and limit triggers; recurring buys through the
   market clock (including while agents are paused, when paused by the investor,
   and when skipped for lack of cash); limit orders that fill at once, wait, get

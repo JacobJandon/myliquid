@@ -28,7 +28,7 @@ function CopyButton({ text }: { text: string }) {
 
 export function Snippet({ label, code }: { label: string; code: string }) {
   return (
-    <div>
+    <div className="min-w-0">
       <div className="mb-1 flex items-center justify-between">
         <span className="text-xs text-fg-2">{label}</span>
         <CopyButton text={code} />
@@ -45,12 +45,15 @@ export function KeyManager({
   endpoint,
   identities = {},
   now = 0,
+  showList = true,
 }: {
   keys: ApiKey[];
   endpoint: string;
   identities?: Record<string, IdentitySummary>;
   /** Server time (unix seconds), so the passport status renders the same on server and client. */
   now?: number;
+  /** The Connect page lists keys as connected agents instead. */
+  showList?: boolean;
 }) {
   const { run, pending, error } = useAction();
   const [name, setName] = useState("Claude");
@@ -107,9 +110,9 @@ export function KeyManager({
         </div>
         <p className="mt-2 text-xs text-muted">
           Read keys can see your portfolio, liquidity, deals, signals and risk. Trade keys can also
-          propose trades and rules. Those still pass Sentinel&apos;s checks and wait for your
-          approval unless your autonomy settings allow otherwise. No key can withdraw money or
-          change guardrails.
+          propose trades and rules; they pass Sentinel&apos;s checks and wait for your approval. A
+          key only trades on its own once it is pinned to an AINRA identity that allows it. No key
+          can withdraw money or change guardrails.
         </p>
         {error && <p className="mt-2 text-xs text-critical">{error}</p>}
         {created && (
@@ -125,7 +128,7 @@ export function KeyManager({
         )}
       </form>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
         <Snippet
           label="Claude Code"
           code={`claude mcp add --transport http myliquid ${endpoint} \\\n  --header "Authorization: Bearer ${shownKey}"`}
@@ -152,52 +155,54 @@ export function KeyManager({
         />
       </div>
 
-      <div>
-        <div className="mb-2 text-sm font-medium text-fg">Your keys</div>
-        {keys.length === 0 ? (
-          <EmptyState>No keys yet.</EmptyState>
-        ) : (
-          <ul className="space-y-2">
-            {keys.map((k) => (
-              <li
-                key={k.id}
-                className={clsx(
-                  "flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-4",
-                  k.revokedAt && "opacity-50",
-                )}
-              >
-                <KeyRound className="h-4 w-4 text-muted" />
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm text-fg">{k.name}</div>
-                  <div className="font-mono text-[11px] text-muted">
-                    {k.prefix}… · created {k.createdAt.slice(0, 10)} ·{" "}
-                    {k.lastUsedAt
-                      ? `last used ${k.lastUsedAt.slice(0, 16).replace("T", " ")}`
-                      : "never used"}
+      {showList && (
+        <div>
+          <div className="mb-2 text-sm font-medium text-fg">Your keys</div>
+          {keys.length === 0 ? (
+            <EmptyState>No keys yet.</EmptyState>
+          ) : (
+            <ul className="space-y-2">
+              {keys.map((k) => (
+                <li
+                  key={k.id}
+                  className={clsx(
+                    "flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-4",
+                    k.revokedAt && "opacity-50",
+                  )}
+                >
+                  <KeyRound className="h-4 w-4 text-muted" />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm text-fg">{k.name}</div>
+                    <div className="font-mono text-[11px] text-muted">
+                      {k.prefix}… · created {k.createdAt.slice(0, 10)} ·{" "}
+                      {k.lastUsedAt
+                        ? `last used ${k.lastUsedAt.slice(0, 16).replace("T", " ")}`
+                        : "never used"}
+                    </div>
                   </div>
-                </div>
-                <Badge tone={k.scopes.length > 1 ? "warning" : "neutral"}>
-                  {k.scopes.join(" + ")}
-                </Badge>
-                {k.revokedAt ? (
-                  <Badge>revoked</Badge>
-                ) : (
-                  <button
-                    className={buttonClass("ghost", "sm")}
-                    disabled={pending}
-                    onClick={() => run(() => postJson(`/api/keys/${k.id}`, undefined, "DELETE"))}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" /> Revoke
-                  </button>
-                )}
-                {identities[k.id] && !k.revokedAt && (
-                  <KeyIdentityLine identity={identities[k.id]!} now={now} />
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                  <Badge tone={k.scopes.length > 1 ? "warning" : "neutral"}>
+                    {k.scopes.join(" + ")}
+                  </Badge>
+                  {k.revokedAt ? (
+                    <Badge>revoked</Badge>
+                  ) : (
+                    <button
+                      className={buttonClass("ghost", "sm")}
+                      disabled={pending}
+                      onClick={() => run(() => postJson(`/api/keys/${k.id}`, undefined, "DELETE"))}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Revoke
+                    </button>
+                  )}
+                  {identities[k.id] && !k.revokedAt && (
+                    <KeyIdentityLine identity={identities[k.id]!} now={now} />
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 }

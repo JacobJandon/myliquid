@@ -34,6 +34,8 @@ export interface IdentitySummary {
   lastReason: string | null;
 }
 
+type Source = { sample?: string; revoked?: boolean; passport?: string };
+
 const utc = (unix: number) => new Date(unix * 1000).toISOString().slice(0, 16).replace("T", " ");
 
 /** Verify an agent's AINRA passport locally, then pin an API key to that agent's identity. */
@@ -48,16 +50,14 @@ export function PassportVerifier({
 }) {
   const [text, setText] = useState("");
   const [result, setResult] = useState<VerifyResponse | null>(null);
-  const [source, setSource] = useState<{ sample?: "valid" | "revoked"; passport?: string } | null>(
-    null,
-  );
+  const [source, setSource] = useState<Source | null>(null);
   const [picked, setKeyId] = useState("");
   // Keys can be created after this panel mounts, so fall back to the first one rather than to nothing.
   const keyId = keys.some((k) => k.id === picked) ? picked : (keys[0]?.id ?? "");
   const [bound, setBound] = useState<string | null>(null);
   const { run, pending, error } = useAction();
 
-  async function verify(body: { sample?: "valid" | "revoked"; passport?: string }) {
+  async function verify(body: Source) {
     setBound(null);
     const res = await run(() => postJson<VerifyResponse>("/api/ainra/verify", body));
     if (res) {
@@ -97,14 +97,14 @@ export function PassportVerifier({
             <button
               className={buttonClass("secondary", "sm")}
               disabled={pending}
-              onClick={() => verify({ sample: "valid" })}
+              onClick={() => verify({ sample: "momentum-trader" })}
             >
-              Try the sample passport
+              Try a testbed trader
             </button>
             <button
               className={buttonClass("ghost", "sm")}
               disabled={pending}
-              onClick={() => verify({ sample: "revoked" })}
+              onClick={() => verify({ sample: "yield-hunter", revoked: true })}
             >
               Try a revoked one
             </button>
@@ -152,7 +152,7 @@ export function PassportVerifier({
             <div>
               <dt className="text-muted">Checked at</dt>
               <dd className="text-fg">
-                {utc(check.checkedAt)} UTC{testbed && " (the samples' issue time)"}
+                {utc(check.checkedAt)} UTC{testbed && " (the testbed's pinned time)"}
               </dd>
             </div>
           </dl>

@@ -103,7 +103,9 @@ CREATE TABLE IF NOT EXISTS orders (
   window_on TEXT,
   note TEXT,
   checks TEXT NOT NULL DEFAULT '[]',
-  created_at TEXT NOT NULL
+  created_at TEXT NOT NULL,
+  agent_key_id TEXT,
+  ainra_number TEXT
 );
 CREATE INDEX IF NOT EXISTS orders_investor ON orders(investor_id, created_on);
 
@@ -130,7 +132,9 @@ CREATE TABLE IF NOT EXISTS proposals (
   created_on TEXT NOT NULL,
   created_at TEXT NOT NULL,
   decided_at TEXT,
-  result TEXT
+  result TEXT,
+  agent_key_id TEXT,
+  ainra_number TEXT
 );
 
 CREATE TABLE IF NOT EXISTS alerts (
@@ -258,8 +262,28 @@ CREATE TABLE IF NOT EXISTS api_key_identities (
   verified_until INTEGER,
   last_verdict TEXT,
   last_presented_at TEXT,
-  bound_at TEXT NOT NULL
+  bound_at TEXT NOT NULL,
+  trade_mode TEXT NOT NULL DEFAULT 'propose',
+  per_trade_limit_cents INTEGER NOT NULL DEFAULT 0,
+  daily_limit_cents INTEGER NOT NULL DEFAULT 0
 );
+
+-- One-time invitations: an outside agent redeems one with its AINRA passport to get a key pinned to its identity.
+CREATE TABLE IF NOT EXISTS agent_invites (
+  id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  code_hash TEXT NOT NULL UNIQUE,
+  label TEXT NOT NULL,
+  scopes TEXT NOT NULL,
+  trade_mode TEXT NOT NULL,
+  per_trade_limit_cents INTEGER NOT NULL,
+  daily_limit_cents INTEGER NOT NULL,
+  created_at TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,
+  used_at TEXT,
+  key_id TEXT
+);
+CREATE INDEX IF NOT EXISTS agent_invites_investor ON agent_invites(investor_id);
 
 -- Recurring investments: buy a fixed amount of a product on a schedule.
 CREATE TABLE IF NOT EXISTS recurring_plans (
@@ -357,4 +381,24 @@ CREATE TABLE IF NOT EXISTS payments (
   decided_at TEXT
 );
 CREATE INDEX IF NOT EXISTS payments_investor ON payments(investor_id, created_at);
+`;
+
+/**
+ * Columns added since schema version 3, so an existing database (a Turso one in production) is upgraded in
+ * place instead of rebuilt. Fresh databases get them from SCHEMA_SQL.
+ */
+export const ADDED_COLUMNS: [table: string, column: string, definition: string][] = [
+  ["orders", "agent_key_id", "TEXT"],
+  ["orders", "ainra_number", "TEXT"],
+  ["proposals", "agent_key_id", "TEXT"],
+  ["proposals", "ainra_number", "TEXT"],
+  ["api_key_identities", "trade_mode", "TEXT NOT NULL DEFAULT 'propose'"],
+  ["api_key_identities", "per_trade_limit_cents", "INTEGER NOT NULL DEFAULT 0"],
+  ["api_key_identities", "daily_limit_cents", "INTEGER NOT NULL DEFAULT 0"],
+];
+
+/** Indexes on added columns, created after the columns exist. */
+export const ADDED_INDEXES = `
+CREATE INDEX IF NOT EXISTS orders_agent_key ON orders(agent_key_id, created_on);
+CREATE INDEX IF NOT EXISTS proposals_agent_key ON proposals(agent_key_id, status);
 `;

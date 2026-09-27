@@ -37,6 +37,9 @@ export interface OrderRecord {
   note: string | null;
   checks: CheckResult[];
   createdAt: string;
+  /** The outside agent's API key and AINRA Number, when one placed it. */
+  agentKeyId: string | null;
+  ainraNumber: string | null;
 }
 
 function mapOrder(r: Record<string, unknown>): OrderRecord {
@@ -58,6 +61,8 @@ function mapOrder(r: Record<string, unknown>): OrderRecord {
     note: (r.note as string | null) ?? null,
     checks: JSON.parse((r.checks as string) || "[]") as CheckResult[],
     createdAt: r.created_at as string,
+    agentKeyId: (r.agent_key_id as string | null) ?? null,
+    ainraNumber: (r.ainra_number as string | null) ?? null,
   };
 }
 
@@ -147,7 +152,14 @@ export function executeOrder(
   investorId: string,
   intent: OrderIntent,
   actor: Actor,
-  opts: { autonomous?: boolean; proposalId?: string; note?: string; runId?: string | null } = {},
+  opts: {
+    autonomous?: boolean;
+    proposalId?: string;
+    note?: string;
+    runId?: string | null;
+    agentKeyId?: string | null;
+    ainraNumber?: string | null;
+  } = {},
 ): OrderRecord {
   const run = db.transaction((): OrderRecord => {
     const today = simDate(db);
@@ -167,12 +179,15 @@ export function executeOrder(
       note: opts.note ?? null,
       checks: JSON.stringify(preview.checks),
       created_at: nowIso(),
+      agent_key_id: opts.agentKeyId ?? null,
+      ainra_number: opts.ainraNumber ?? null,
     };
     const insert = db.prepare(
       `INSERT INTO orders (id, investor_id, product_id, side, amount_cents, filled_cents, units, price, status, placed_by,
-        autonomous, proposal_id, created_on, settle_on, window_on, note, checks, created_at)
+        autonomous, proposal_id, created_on, settle_on, window_on, note, checks, created_at, agent_key_id, ainra_number)
        VALUES (@id, @investor_id, @product_id, @side, @amount_cents, @filled_cents, @units, @price, @status, @placed_by,
-        @autonomous, @proposal_id, @created_on, @settle_on, @window_on, @note, @checks, @created_at)`,
+        @autonomous, @proposal_id, @created_on, @settle_on, @window_on, @note, @checks, @created_at, @agent_key_id,
+        @ainra_number)`,
     );
 
     if (preview.blocked) {

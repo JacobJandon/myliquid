@@ -27,7 +27,7 @@ Each finding records why it matters and whether this change already acts on it.
 | 5 | The pet is the agent id `copilot` in code, logs and the MCP registry, but is called by its pet name in the UI. | Two names for one thing confuse contributors. | Proposed: rename the id to `pet`. Stored audit events need a data migration. |
 | 6 | The Agent desk page mostly shows the same run as the pet's "Run the desk" button, plus logs. | Most investors never need the per-agent view. | Proposed: make Desk an advanced view reached from Home, and drop it from the main nav. |
 | 7 | The landing page has seven sections (556 lines). "The desk" and "shadow banking" both explain *why it's safe*. | Shorter pages convert better. | Proposed: merge them into one "Why it's safe" section, and add an "Agent identity (AINRA)" tile to the bento. |
-| 8 | The Connect page stacks six blocks: key form, three setup snippets, keys, AINRA, tools by scope, activity. | Long page for a one-time task. | Proposed: collapse the snippets behind "Show setup" once a key exists. |
+| 8 | The Connect page stacks six blocks: key form, three setup snippets, keys, AINRA, tools by scope, activity. | Long page for a one-time task. | **Done**: the page is now **Traders** (invite, connected agents, test drive); manual key setup is folded away. |
 | 9 | `lib/agents/tools.ts` is 854 lines with 21 tools in one file. | Hard to review, and merge conflicts. | Proposed: split by area (portfolio, trading, pay, standing orders), keeping `TOOLS` as the index. |
 | 10 | `lib/services/payments.ts` is 679 lines. | Wallet/card and terminal/x402 change for different reasons. | Proposed: split into `wallet.ts` and `terminals.ts`. |
 | 11 | The offline copilot is a 546-line chain of regex intents. | Order-dependent bugs (one happened before: "bond" matched the wrong product). | Proposed: a table of `{ pattern, tool, render }` intents, tested as data. |
@@ -75,12 +75,12 @@ genesis ceremony that has not happened yet, and it needs three external real-wor
 three independent verifiers, a revocation soak) before its prototype ships. So today every AINRA verdict, in
 MyLiquid too, is labelled `TESTBED · TEST-ROOT`.
 
-### Role 1: MyLiquid checks connected agents' passports (built in this change)
+### Role 1: MyLiquid checks connected agents' passports (built)
 
 MyLiquid is an AINRA **verifier**. When an investor connects their own AI over MCP, they can pin the API key to that
 agent's AINRA identity:
 
-1. **Verify and pin.** On **Connect**, paste the agent's passport, or try the TEST-ROOT samples. MyLiquid verifies
+1. **Verify and pin.** Under **Traders → Manual setup**, paste the agent's passport, or try a testbed agent. MyLiquid verifies
    it locally with `@ainra/sdk` and shows the agent, its AINRA Number, tier and capabilities. **Pin to key** records
    the Number against the key. Only a valid passport can be pinned.
 2. **Present.** The agent sends its passport with its key: `POST /api/agent-identity` with body
@@ -97,6 +97,36 @@ agent's AINRA identity:
    is refused as `identity_mismatch`.
 5. **Attribute.** Every MCP call from a pinned key is logged with the agent's AINRA Number.
 
+### Role 1b: identity decides autonomy (built, Sept 27)
+
+The verifier role became an **agentic trading** feature: an outside agent's AINRA identity decides whether it may
+trade on its own.
+
+- **Agents connect themselves.** The investor creates a one-time invite (scopes, "propose" or "trade on its own",
+  per-trade and daily limits). The agent redeems it at `POST /api/agent-identity/enroll` with its passport and
+  gets a key already pinned to its AINRA Number, with a fresh presentation window. A revoked or invalid passport is
+  refused and the invite stays open; a revoked one raises an alert.
+- **Autonomy needs identity.**
+  - Unidentified keys only propose.
+  - An identified agent trades on its own only while all of these hold:
+    - its presentation is fresh;
+    - its tier is L2 or higher, which also caps its per-trade limit (L2 $2,500, L3 $10,000, L4 $25,000);
+    - its passport declares `myliquid:trade`;
+    - the investor allowed it;
+    - the trade fits the per-trade and daily limits.
+  - Its orders still pass the mandate, Sentinel and the kill switch.
+- **Identity is on the record.** Its orders and proposals carry its AINRA Number, and `get_my_permissions` tells the
+  agent what MyLiquid thinks of it.
+- **Revocation.** Revocation withdraws its pending proposals.
+- **Testbed agents.** The testbed now holds four agents minted with AINRA's own `registrar-box` and `accredit`
+  (`scripts/mint-ainra-testbed.sh`):
+  - an L2 momentum trader;
+  - an L1 research analyst;
+  - an L3 treasury agent;
+  - an L2 yield hunter, presented both before and after revocation.
+
+  **Traders → Test drive** runs any of them against the real endpoints from the browser.
+
 **Why it's useful for a money app.** API keys prove *possession*. AINRA adds *who is behind the agent*, a tier that
 says how much consequence it has earned, and revocation that its operator or registrar controls. That is exactly
 what you want before an outside agent can trade or pay.
@@ -105,7 +135,7 @@ what you want before an outside agent can trade or pay.
 
 - A presentation is a bearer credential for its 5-minute window, bound to the API key (itself a secret) but not
   to each request. AINRA's RFC 9421 request signatures close this, and aren't in the published SDK yet.
-- In testbed mode the samples are verified at their own issue time. At real time they correctly come back
+- In testbed mode the testbed agents are verified at their pinned issue time. At real time they correctly come back
   `stale_status`, because nobody is refreshing their revocation status.
 - Instance credentials (ADR-019, a running copy's short-lived credential) are accepted only when `AINRA_AUDIENCE` is
   set. The default refuses them, as AINRA recommends.

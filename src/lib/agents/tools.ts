@@ -11,6 +11,13 @@ import {
 import { addDays } from "@/lib/domain/dates";
 import { scoreDeal } from "@/lib/domain/diligence";
 import { formatPct, formatPrice, formatUsd } from "@/lib/domain/money";
+import {
+  declaresTrading,
+  effectivePerTradeLimitCents,
+  tierAutoCeilingCents,
+  type OutsideTrader,
+} from "@/lib/domain/agentTrading";
+import { autonomousVolumeToday } from "@/lib/services/agentIdentity";
 import { planRebalance } from "@/lib/domain/rebalance";
 import { reviewPortfolioRisk } from "@/lib/domain/risk";
 import { describeRule, momentumSignal } from "@/lib/domain/signals";
@@ -59,6 +66,8 @@ export interface ToolContext {
   investorId: string;
   agent: AgentId;
   runId: string | null;
+  /** For an outside agent over MCP: its key and AINRA identity, which decide its autonomy. */
+  outside?: OutsideTrader;
 }
 
 export interface AgentTool<S extends z.ZodType = z.ZodType> {
@@ -450,7 +459,7 @@ const previewTrade = defineTool({
 const proposeTrade = defineTool({
   name: "propose_trade",
   description:
-    "Proposes one trade for the investor. It runs Sentinel's checks. In propose-only mode it creates a proposal for the investor to approve. In bounded autonomy, small trades within the mandate execute immediately. Returns what happened.",
+    "Proposes one trade for the investor. It runs Sentinel's checks. In propose-only mode it creates a proposal for the investor to approve. In bounded autonomy, small trades within the mandate execute immediately. An outside agent executes on its own only when its AINRA identity and the investor's limits allow it (see get_my_permissions). Returns what happened.",
   schema: tradeInput.extend({
     rationale: z
       .string()
@@ -459,7 +468,7 @@ const proposeTrade = defineTool({
       .describe("Why, in one or two sentences, for the investor"),
   }),
   trades: true,
-  run: ({ productId, side, amountUsd, rationale }, { db, investorId, agent, runId }) => {
+  run: ({ productId, side, amountUsd, rationale }, { db, investorId, agent, runId, outside }) => {
     const result = agentTrade(
       db,
       investorId,
@@ -467,6 +476,7 @@ const proposeTrade = defineTool({
       { productId, side, amountCents: Math.round(amountUsd * 100) },
       rationale,
       runId,
+      { outside },
     );
     if (result.outcome === "executed") {
       return {
@@ -613,6 +623,60 @@ const createAutopilotRule = defineTool({
     } catch (err) {
       return { error: err instanceof Error ? err.message : String(err) };
     }
+  },
+});
+
+const getMyPermissions = defineTool({
+  name: "get_my_permissions",
+  description:
+    "For an outside agent: who MyLiquid thinks you are (your AINRA identity, if your key is pinned to one), whether your passport presentation is fresh, and whether you may trade on your own, within what limits, and how much of today's limit is left.",
+  schema: z.object({}),
+  trades: false,
+  run: (_input, { db, investorId, outside }) => {
+    if (!outside) return { error: "Only outside agents connected over MCP have permissions to report." };
+    const ceiling = tierAutoCeilingCents(outside.tier);
+    const autoAllowed =
+      !!outside.ainraNumber &&
+      outside.mode === "auto" &&
+      ceiling > 0 &&
+      declaresTrading(outside.capabilities);
+    const used = autonomousVolumeToday(db, investorId, outside.keyId);
+    const mandate = getMandate(db, investorId);
+    return {
+      key: outside.keyName,
+      ainra: outside.ainraNumber
+        ? {
+            number: outside.ainraNumber,
+            name: outside.ainraName,
+            tier: outside.tier,
+            capabilities: outside.capabilities,
+            presentationFresh: outside.identified,
+            present:
+              "POST your passport as {\"ainra_passport\": …} to /api/agent-identity at least every 5 minutes.",
+          }
+        : null,
+      trading: autoAllowed
+        ? {
+            mode: "trades on its own within limits",
+            perTradeLimit: formatUsd(effectivePerTradeLimitCents(outside)),
+            tierCeiling: formatUsd(ceiling),
+            dailyLimit: formatUsd(outside.dailyLimitCents),
+            usedToday: formatUsd(used),
+            leftToday: formatUsd(Math.max(0, outside.dailyLimitCents - used)),
+            needsFreshPassport: !outside.identified,
+          }
+        : {
+            mode: "proposes; the investor approves each trade",
+            why: !outside.ainraNumber
+              ? "Not pinned to an AINRA identity."
+              : outside.mode !== "auto"
+                ? "The investor set you to propose only."
+                : ceiling === 0
+                  ? `AINRA tier ${outside.tier ?? "(none)"} can't trade on its own.`
+                  : "Your passport doesn't declare myliquid:trade.",
+          },
+      killSwitch: mandate.killSwitch,
+    };
   },
 });
 
@@ -797,6 +861,7 @@ export const TOOLS: AgentTool[] = [
   getStandingOrders,
   createAutopilotRule,
   getRecentActivity,
+  getMyPermissions,
   pauseAllAgents,
   getWalletTool,
   listNearbyTerminals,

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
-import { SCHEMA_SQL, SCHEMA_VERSION } from "./schema";
+import { ADDED_COLUMNS, ADDED_INDEXES, SCHEMA_SQL, SCHEMA_VERSION } from "./schema";
 import { seedDatabase } from "./seed";
 import { isRemoteUrl, openRemoteDatabase } from "./remote";
 import { toIsoDate } from "@/lib/domain/dates";
@@ -64,6 +64,20 @@ function dropAllTables(db: Db): void {
   if (left.length > 0) throw new Error(`Could not drop tables: ${left.join(", ")}`);
 }
 
+/** Upgrades an older database in place with the columns added since its schema version. */
+function addMissingColumns(db: Db): void {
+  const columns = new Map<string, Set<string>>();
+  for (const [table, column, definition] of ADDED_COLUMNS) {
+    if (!columns.has(table)) {
+      const rows = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+      columns.set(table, new Set(rows.map((r) => r.name)));
+    }
+    if (!columns.get(table)!.has(column))
+      db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+  db.exec(ADDED_INDEXES);
+}
+
 function connect(target: string): Db {
   if (isRemoteUrl(target)) return openRemoteDatabase(target, remoteAuthToken());
   if (target !== ":memory:") fs.mkdirSync(path.dirname(target), { recursive: true });
@@ -81,6 +95,7 @@ function initialise(db: Db, opts: { today?: string }): Db {
     dropAllTables(db);
   }
   db.exec(SCHEMA_SQL);
+  addMissingColumns(db);
   // Checked inside the transaction so two servers starting together seed only once.
   db.transaction(() => {
     if (db.prepare("SELECT value FROM meta WHERE key = 'seeded_at'").get()) return;

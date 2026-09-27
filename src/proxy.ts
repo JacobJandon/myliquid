@@ -4,12 +4,18 @@ import { NextResponse, type NextRequest } from "next/server";
 /**
  * Optional site password for private test deployments. With MYLIQUID_SITE_PASSWORD
  * set, every page and API asks for it (HTTP Basic auth, any user name) before the
- * app's own sign-in. Endpoints that connected agents call with an API key are left
- * open, since the key is the credential there and only a signed-in investor can
- * create one.
+ * app's own sign-in. Endpoints that connected agents call are left open: they
+ * authenticate with an API key or a one-time invite, which only a signed-in
+ * investor can create.
  */
 
-const AGENT_ENDPOINTS = ["/api/mcp", "/api/agent-identity", "/api/x402/", "/api/health"];
+const AGENT_ENDPOINTS = [
+  "/api/mcp",
+  "/api/agent-identity",
+  "/api/agent-identity/",
+  "/api/x402/",
+  "/api/health",
+];
 
 function digest(value: string): Buffer {
   return createHash("sha256").update(value).digest();

@@ -4,7 +4,8 @@ import type { Db } from "@/lib/db";
 import { compactJson } from "@/lib/agents/llm";
 import { TOOLS, invokeTool } from "@/lib/agents/tools";
 import { logEvent } from "@/lib/services/audit";
-import type { ApiPrincipal, ApiScope } from "@/lib/services/apiKeys";
+import type { GatedPrincipal } from "@/lib/services/agentIdentity";
+import type { ApiScope } from "@/lib/services/apiKeys";
 
 /**
  * "Bring your own agent": MyLiquid's tools over the Model Context Protocol,
@@ -31,6 +32,7 @@ export const SCOPE_TOOLS: Record<ApiScope, string[]> = {
     "list_autopilot_rules",
     "get_standing_orders",
     "get_recent_activity",
+    "get_my_permissions",
     "get_wallet",
     "list_nearby_terminals",
   ],
@@ -43,12 +45,10 @@ export function toolNamesFor(scopes: ApiScope[]): string[] {
 }
 
 const INSTRUCTIONS = `MyLiquid is an agentic wealth platform with simulated markets and demo money. You are acting for one investor.
-Numbers must come from tool results. Trades go through propose_trade or propose_rebalance: they run pre-trade risk checks and usually create a proposal the investor approves in the MyLiquid app. You cannot withdraw money or change the investor's guardrails. Private deals that the platform's diligence rejected can never be bought, and locked positions cannot be sold before their lock-up ends.`;
+Numbers must come from tool results. Trades go through propose_trade or propose_rebalance: they run pre-trade risk checks and usually create a proposal the investor approves in the MyLiquid app. You cannot withdraw money or change the investor's guardrails. Private deals that the platform's diligence rejected can never be bought, and locked positions cannot be sold before their lock-up ends.
+Identity decides autonomy. If your key is pinned to your AINRA identity, present your passport ({"ainra_passport": …} to /api/agent-identity) at least every 5 minutes. An identified agent at AINRA tier L2 or above whose passport declares myliquid:trade, and whom the investor allowed to trade on its own, executes propose_trade within its limits; otherwise trades become proposals. Call get_my_permissions to see yours.`;
 
-export function buildMcpServer(
-  db: Db,
-  principal: ApiPrincipal & { ainraNumber?: string | null },
-): McpServer {
+export function buildMcpServer(db: Db, principal: GatedPrincipal): McpServer {
   const server = new McpServer(
     { name: "myliquid", version: MCP_SERVER_VERSION },
     { instructions: INSTRUCTIONS },
@@ -68,6 +68,7 @@ export function buildMcpServer(
           investorId: principal.investorId,
           agent: "external",
           runId: null,
+          outside: principal.trader,
         });
         logEvent(db, principal.investorId, {
           agent: "external",
@@ -93,7 +94,7 @@ export function buildMcpServer(
 export async function handleMcpRequest(
   req: Request,
   db: Db,
-  principal: ApiPrincipal & { ainraNumber?: string | null },
+  principal: GatedPrincipal,
 ): Promise<Response> {
   const server = buildMcpServer(db, principal);
   const transport = new WebStandardStreamableHTTPServerTransport({

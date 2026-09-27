@@ -32,8 +32,8 @@ export default async function ActivityPage() {
         <div>
           <h1 className="font-display text-4xl text-fg">Activity</h1>
           <p className="mt-1 text-sm text-fg-2">
-            An append-only record of every order, cash movement and agent action, including the
-            ones Sentinel blocked.
+            An append-only record of every order, cash movement and agent action, including the ones
+            Sentinel blocked.
           </p>
         </div>
         <a href="/api/statements" download className={buttonClass("secondary", "sm")}>
@@ -81,6 +81,14 @@ export default async function ActivityPage() {
                       <td className="px-3 py-3 text-xs text-fg-2">
                         {agentLabel(o.placedBy)}
                         {o.autonomous ? " (auto)" : o.proposalId ? " (approved)" : ""}
+                        {o.ainraNumber && (
+                          <div
+                            className="mt-0.5 break-all font-mono text-[10px] text-accent"
+                            title="The outside agent's AINRA Number"
+                          >
+                            {o.ainraNumber.replace(/^did:ainra:/, "")}
+                          </div>
+                        )}
                       </td>
                       <td className="px-5 py-3">
                         <Badge tone={STATUS_TONE[o.status] ?? "neutral"}>{o.status}</Badge>

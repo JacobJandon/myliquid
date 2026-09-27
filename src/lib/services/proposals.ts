@@ -1,18 +1,27 @@
 import { newId, nowIso, simDate, type Db } from "@/lib/db";
 import { requireProduct } from "@/lib/domain/catalog";
+import { autonomyDecision, type OutsideTrader } from "@/lib/domain/agentTrading";
 import { formatUsd } from "@/lib/domain/money";
 import type { AgentId, CheckResult, OrderIntent } from "@/lib/domain/types";
+import { autonomousVolumeToday } from "./agentIdentity";
 import { logEvent } from "./audit";
 import { executeOrder, previewOrder, type OrderRecord } from "./orders";
 import { getMandate } from "./repo";
 
 /**
  * Proposals are how agents act by default: they suggest, a human approves.
- * Agents only skip the approval step in "bounded" autonomy, for small orders
- * that pass every mandate limit.
+ * MyLiquid's own agents only skip the approval step in "bounded" autonomy, for
+ * small orders that pass every mandate limit. Outside agents skip it only when
+ * their AINRA identity allows (see `lib/domain/agentTrading.ts`).
  */
 
-export type ProposalStatus = "pending" | "executed" | "partially_executed" | "failed" | "rejected";
+export type ProposalStatus =
+  | "pending"
+  | "executed"
+  | "partially_executed"
+  | "failed"
+  | "rejected"
+  | "withdrawn";
 
 export interface ProposedOrder extends OrderIntent {
   reason?: string;
@@ -30,6 +39,9 @@ export interface Proposal {
   createdAt: string;
   decidedAt: string | null;
   result: { orderIds: string[]; messages: string[] } | null;
+  /** The outside agent's API key and AINRA Number, when one proposed it. */
+  agentKeyId: string | null;
+  ainraNumber: string | null;
 }
 
 function mapProposal(r: Record<string, unknown>): Proposal {
@@ -45,6 +57,8 @@ function mapProposal(r: Record<string, unknown>): Proposal {
     createdAt: r.created_at as string,
     decidedAt: (r.decided_at as string | null) ?? null,
     result: r.result ? (JSON.parse(r.result as string) as Proposal["result"]) : null,
+    agentKeyId: (r.agent_key_id as string | null) ?? null,
+    ainraNumber: (r.ainra_number as string | null) ?? null,
   };
 }
 
@@ -85,6 +99,8 @@ export function createProposal(
     rationale: string;
     orders: ProposedOrder[];
     runId?: string | null;
+    agentKeyId?: string | null;
+    ainraNumber?: string | null;
   },
 ): CreateProposalResult {
   const kept: ProposedOrder[] = [];
@@ -107,8 +123,9 @@ export function createProposal(
   }
   const id = newId("prp");
   db.prepare(
-    `INSERT INTO proposals (id, investor_id, agent, title, rationale, orders, checks, status, created_on, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
+    `INSERT INTO proposals (id, investor_id, agent, title, rationale, orders, checks, status, created_on, created_at,
+       agent_key_id, ainra_number)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)`,
   ).run(
     id,
     investorId,
@@ -119,6 +136,8 @@ export function createProposal(
     JSON.stringify(keptChecks),
     simDate(db),
     nowIso(),
+    input.agentKeyId ?? null,
+    input.ainraNumber ?? null,
   );
   logEvent(db, investorId, {
     runId: input.runId,
@@ -138,6 +157,8 @@ export type AgentTradeResult =
 /**
  * The single entry point for an agent that wants to trade. It either executes
  * within the mandate, turns the trade into a proposal, or reports why it is blocked.
+ * An outside agent (`agent === "external"`) passes what MyLiquid knows about it as
+ * `outside`; without it, it can only propose.
  */
 export function agentTrade(
   db: Db,
@@ -146,6 +167,7 @@ export function agentTrade(
   intent: ProposedOrder,
   rationale: string,
   runId?: string | null,
+  opts: { outside?: OutsideTrader } = {},
 ): AgentTradeResult {
   const mandate = getMandate(db, investorId);
   const humanPath = previewOrder(db, investorId, intent, agent);
@@ -160,9 +182,38 @@ export function agentTrade(
     return { outcome: "blocked", checks: humanPath.checks };
   }
 
+  const outside = agent === "external" ? opts.outside : undefined;
+  const stamp = { agentKeyId: outside?.keyId ?? null, ainraNumber: outside?.ainraNumber ?? null };
+
   let whyNotAuto =
     "Your autonomy setting is propose-only, so every agent trade needs your approval.";
-  if (mandate.autonomy === "bounded") {
+  if (agent === "external") {
+    const decision = outside
+      ? autonomyDecision(
+          outside,
+          intent.amountCents,
+          autonomousVolumeToday(db, investorId, outside.keyId),
+        )
+      : ({ auto: false, reason: "Outside agents without a known key only propose." } as const);
+    if (decision.auto) {
+      const autoPath = previewOrder(db, investorId, intent, agent, { autonomous: true });
+      if (!autoPath.blocked) {
+        const order = executeOrder(db, investorId, intent, agent, {
+          autonomous: true,
+          note: rationale,
+          runId,
+          ...stamp,
+        });
+        return { outcome: "executed", order, checks: autoPath.checks };
+      }
+      whyNotAuto = `Outside the agent mandate: ${autoPath.checks
+        .filter((c) => c.status === "block")
+        .map((c) => c.label)
+        .join(", ")}.`;
+    } else {
+      whyNotAuto = decision.reason;
+    }
+  } else if (mandate.autonomy === "bounded") {
     const autoPath = previewOrder(db, investorId, intent, agent, { autonomous: true });
     const overLimit = intent.amountCents > mandate.autoExecuteLimitCents;
     if (!autoPath.blocked && !overLimit) {
@@ -188,6 +239,7 @@ export function agentTrade(
     rationale,
     orders: [intent],
     runId,
+    ...stamp,
   });
   if (!created.ok) return { outcome: "blocked", checks: humanPath.checks };
   return { outcome: "proposed", proposal: created.proposal, checks: humanPath.checks, whyNotAuto };
@@ -209,6 +261,8 @@ export function approveProposal(db: Db, investorId: string, id: string): Proposa
     const order = executeOrder(db, investorId, intent, proposal.agent, {
       proposalId: id,
       note: `Approved proposal: ${proposal.title}`,
+      agentKeyId: proposal.agentKeyId,
+      ainraNumber: proposal.ainraNumber,
     });
     orderIds.push(order.id);
     if (order.status === "rejected") {

@@ -58,9 +58,9 @@ Under **Settings → Environment Variables**, add these:
 | `ANTHROPIC_API_KEY` | Optional. Without it the agents run in their deterministic offline mode. |
 
 - **What the password protects.** It covers the whole site, including the public production URL.
-- **What stays open.** The agent endpoints stay open for connected agents: `/api/mcp`, `/api/agent-identity`,
-  `/api/x402/*` and `/api/health`. Each needs an API key that only a signed-in user can create (`/api/health`
-  doesn't need a key).
+- **What stays open.** The agent endpoints stay open for connected agents: `/api/mcp`, `/api/agent-identity`
+  (including `/enroll`), `/api/x402/*` and `/api/health`. Each needs an API key or a one-time invite, which only a
+  signed-in user can create (`/api/health` needs neither).
 - **Preview deployments.** Vercel also protects preview deployments on its own (Deployment Protection → Vercel
   Authentication).
 
@@ -83,7 +83,8 @@ Under **Settings → Environment Variables**, add these:
   buys and limit orders run then as well.
 - **Resetting the data.** To wipe everything, run `npm run db:reset` on your machine with the same
   `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` in `.env.local`.
-- **Schema changes.** Demo data is disposable before launch: a schema version change rebuilds the database.
+- **Schema changes.** New columns are added in place when the app starts, so your data stays. Only a schema
+  version change (none planned) would rebuild the demo database.
 
 ## How it works
 

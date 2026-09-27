@@ -7,10 +7,10 @@ import {
   Activity,
   Bot,
   CreditCard,
+  Fingerprint,
   Home,
   LogOut,
   MessageSquare,
-  Plug,
   Settings,
   Store,
   Zap,
@@ -37,7 +37,7 @@ const NAV_GROUPS = [
     items: [
       { href: "/app/copilot", label: "Talk", icon: MessageSquare },
       { href: "/app/agents", label: "Desk", icon: Bot },
-      { href: "/app/connect", label: "Connect", icon: Plug },
+      { href: "/app/connect", label: "Traders", icon: Fingerprint },
     ],
   },
   {
