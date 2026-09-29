@@ -17,6 +17,7 @@ Agentic wealth platform demo: Next.js 16 (App Router) + TypeScript + Tailwind v4
 - Standing orders (recurring investments, limit orders: `lib/services/automation.ts`) are the investor's own; they execute via `executeOrder` as "user" and agents may only read them (`get_standing_orders`).
 - AINRA passports are verified only through `lib/ainra` (`checkPassport`, fail-closed). Every route that authenticates an API key must also call `identityGate` (see `/api/mcp`, x402).
 - Identity decides autonomy for outside agents: they trade on their own only through `agentTrade`'s outside path (`autonomyDecision` in `lib/domain/agentTrading.ts`, fed by the gate's `OutsideTrader`); unidentified keys only propose. Stamp their orders and proposals with `agentKeyId`/`ainraNumber`. New columns go in `ADDED_COLUMNS` (in-place upgrade), not a schema version bump.
+- Hosted traders (`lib/services/hostedTraders.ts`) act only like an outside agent: present the passport, pass `identityGate`, call MCP tools with `callMcpTool`, trade with `propose_trade`. Never let them call trading services directly. Strategies stay pure in `lib/domain/traderStrategies.ts`.
 - Agent payments go through `payRequest` / `x402Purchase` (which use `attemptPayment` → `evaluatePayment`). Never debit a wallet directly.
 - The pet (`lib/domain/companion.ts`, `lib/services/companion.ts`) earns XP only through `awardXp` for habits. Never award XP for trading volume.
 - Offline mode must keep working: when you add a Claude-facing behavior, add the deterministic equivalent in `lib/agents/offline.ts`.

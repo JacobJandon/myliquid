@@ -159,6 +159,30 @@ pending proposals are withdrawn and Sentinel alerts you.
 4. **You stay in charge.** Under **Traders** you see each agent's identity, whether it is identified right now,
    its limits (editable) and what it traded today, and you can disconnect it.
 
+**Your AI traders.** Hire a testbed agent under **Traders → Your AI traders** and it works for you once every
+market day:
+1. It presents its AINRA passport.
+2. It reads your portfolio and the signals through the MCP tools.
+3. It decides with its strategy and trades with `propose_trade`, on its own within its limits.
+
+| Trader | Tier | What it does |
+|---|---|---|
+| Northwind Momentum Trader | L2 | Buys the strongest uptrend among MLUS, MLWX and MLQM; trims a held downtrend |
+| Harbor Treasury Agent | L3 | Keeps cash near 8% (± 2%) by parking the excess in the bond index, or raising cash from it |
+| Northwind Research Analyst | L1 | Writes a daily market note; can't trade |
+
+- **When they work:**
+  - when you advance the market (+1d);
+  - when you open MyLiquid on a new market day;
+  - daily on Vercel (a cron job);
+  - on **Run now**.
+- **What you see:** each trader's decisions, what it traded on its own, its proposals and the P&L of its trades,
+  on the Traders page and on Home.
+- **What stops them:** pause, let go, or the kill switch.
+
+They are hosted by MyLiquid for the demo, but they go through the same identity gate, MCP tools, limits, mandate
+and Sentinel checks as an agent running anywhere else.
+
 **Test drive.** In testbed mode, **Traders → Test drive** runs a sample agent through all of this from your browser,
 against the real endpoints: invite, enroll, read, a trade it may make on its own, one over its limit, and (for the
 yield hunter) revocation.
@@ -287,6 +311,7 @@ Things to try:
 | `MYLIQUID_AGENT_MODE` | auto | Force `offline` or `claude` |
 | `MYLIQUID_DB_PATH` | `.data/myliquid.db` | SQLite file location |
 | `TURSO_DATABASE_URL` / `TURSO_AUTH_TOKEN` | (none) | A hosted libSQL database (Turso) in place of the file. Required on Vercel. `LIBSQL_URL` / `LIBSQL_AUTH_TOKEN` also work |
+| `CRON_SECRET` | (none) | Vercel sends it to the daily hosted-traders job; when set, nothing else can call it |
 | `MYLIQUID_SITE_PASSWORD` | (none) | Makes the whole site private behind one password (HTTP Basic auth; agent API endpoints stay key-authenticated) |
 | `MYLIQUID_SIM_START` | today | Market date to seed from (YYYY-MM-DD) |
 | `MYLIQUID_MARKET_CLOCK` | auto | `manual` stops the market from catching up to today's date |
@@ -319,11 +344,11 @@ src/
   lib/
     domain/            Pure logic: catalog, market sim, liquidity, risk, valuation, diligence, rebalance, signals,
                        companion (vitals, XP, quests), payments (merchants, card policy),
-                       agent trading (what an outside agent's AINRA identity lets it do)
+                       agent trading (what an outside agent's AINRA identity lets it do), trader strategies
     db/                SQLite schema, seed, connection; hosted libSQL (Turso) wrapper
     services/          Investors, portfolio, orders & settlement, proposals, alerts, audit log, rules, API keys,
                        market clock, companion (the pet), payments (wallet, card, terminals, x402),
-                       agent identity and invites (AINRA-identified outside traders)
+                       agent identity and invites (AINRA-identified outside traders), hosted traders
     agents/            Agent registry, tools, Claude loop, offline agents, runner
     auth/              Password hashing (scrypt), sessions, cookies
     mcp/               MCP server (official SDK, stateless Streamable HTTP)

@@ -237,6 +237,7 @@ const PORTFOLIO_TABLES = [
 ];
 const INVESTOR_TABLES = [
   "sessions",
+  "hosted_traders",
   "agent_invites",
   "api_key_identities",
   "api_keys",

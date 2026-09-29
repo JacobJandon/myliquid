@@ -109,6 +109,50 @@ export async function handleMcpRequest(
   }
 }
 
+export interface McpToolResult {
+  ok: boolean;
+  data: Record<string, unknown>;
+}
+
+/**
+ * Calls one tool through the MCP server in-process, as JSON-RPC, exactly as an outside agent's HTTP request
+ * would after authentication and the identity gate. Used by the traders MyLiquid hosts.
+ */
+export async function callMcpTool(
+  db: Db,
+  principal: GatedPrincipal,
+  name: string,
+  args: Record<string, unknown> = {},
+): Promise<McpToolResult> {
+  const req = new Request("http://myliquid.internal/api/mcp", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      accept: "application/json, text/event-stream",
+      "mcp-protocol-version": "2025-06-18",
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "tools/call",
+      params: { name, arguments: args },
+    }),
+  });
+  const res = await handleMcpRequest(req, db, principal);
+  const body = (await res.json().catch(() => ({}))) as {
+    result?: { content?: { text?: string }[]; isError?: boolean };
+    error?: { message?: string };
+  };
+  if (!body.result)
+    return { ok: false, data: { error: body.error?.message ?? `HTTP ${res.status}` } };
+  const text = body.result.content?.[0]?.text ?? "";
+  try {
+    return { ok: !body.result.isError, data: JSON.parse(text) as Record<string, unknown> };
+  } catch {
+    return { ok: false, data: { error: text } };
+  }
+}
+
 // Simple per-key rate limit: 120 requests per minute.
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 120;

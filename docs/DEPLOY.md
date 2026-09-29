@@ -56,6 +56,7 @@ Under **Settings → Environment Variables**, add these:
 |---|---|
 | `MYLIQUID_SITE_PASSWORD` | Any password. Every page then asks for it before anything else (any user name works). |
 | `ANTHROPIC_API_KEY` | Optional. Without it the agents run in their deterministic offline mode. |
+| `CRON_SECRET` | Optional but recommended: any long random string. It protects the daily job that lets your hosted AI traders work (Vercel sends it automatically). |
 
 - **What the password protects.** It covers the whole site, including the public production URL.
 - **What stays open.** The agent endpoints stay open for connected agents: `/api/mcp`, `/api/agent-identity`

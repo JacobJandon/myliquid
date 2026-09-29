@@ -17,6 +17,12 @@ import { TIER_AUTO_CEILING_CENTS } from "@/lib/domain/agentTrading";
 import { formatUsd } from "@/lib/domain/money";
 import { listConnections, listKeyIdentities, wallNow } from "@/lib/services/agentIdentity";
 import { listInvites } from "@/lib/services/agentInvites";
+import { HOSTED_STRATEGIES, listHostedTraders, traderRecord } from "@/lib/services/hostedTraders";
+import {
+  HostedTraders,
+  type HireableAgent,
+  type HostedTraderView,
+} from "@/components/app/HostedTraders";
 import { Badge, Card, EmptyState } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -93,6 +99,38 @@ export default async function ConnectPage() {
       },
     ]),
   );
+  const hosted: HostedTraderView[] = listHostedTraders(db, investorId).map((t) => {
+    const c = connections.find((x) => x.keyId === t.keyId);
+    const id = c?.identity;
+    return {
+      id: t.id,
+      agent: t.agent,
+      label: t.label,
+      description: t.description,
+      status: t.status,
+      tier: id?.tier ?? null,
+      ainraNumber: id?.ainraNumber ?? null,
+      identifiedUntil: id?.verifiedUntil ?? null,
+      runs: t.runs,
+      lastRunOn: t.lastRunOn,
+      limits: {
+        auto: id?.tradeMode === "auto" && !c?.autonomyBlockedBy,
+        perTradeCents: c?.effectivePerTradeLimitCents ?? 0,
+        dailyCents: id?.dailyLimitCents ?? 0,
+      },
+      record: traderRecord(db, investorId, t.keyId),
+      last: t.lastSummary,
+    };
+  });
+  const hireable: HireableAgent[] = TESTBED_AGENTS.filter((a) => HOSTED_STRATEGIES[a.id]).map(
+    (a) => ({
+      id: a.id,
+      label: a.label,
+      tier: a.summary.split(" · ")[0]!,
+      description: HOSTED_STRATEGIES[a.id]!.description,
+      trades: HOSTED_STRATEGIES[a.id]!.strategy !== "research",
+    }),
+  );
   const openInvites = listInvites(db, investorId, now)
     .filter((i) => i.status === "open")
     .map((i) => ({
@@ -129,6 +167,21 @@ export default async function ConnectPage() {
           </span>
         </div>
       </div>
+
+      {testbed && (
+        <Card
+          id="hosted"
+          title="Your AI traders"
+          subtitle="Testbed AINRA agents MyLiquid runs for you. Each works once every market day through the same MCP tools and identity gate as any outside agent."
+        >
+          <HostedTraders traders={hosted} agents={hireable} now={now} />
+          <p className="mt-3 text-xs text-muted">
+            They work when you advance the market (+1d), when you open MyLiquid on a new market day,
+            and daily at 13:45 UTC on Vercel. Every trade passes their AINRA limits, your mandate
+            and Sentinel&apos;s checks; pull the kill switch and they stop.
+          </p>
+        </Card>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] [&>*]:min-w-0">
         <Card

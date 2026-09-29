@@ -285,6 +285,22 @@ CREATE TABLE IF NOT EXISTS agent_invites (
 );
 CREATE INDEX IF NOT EXISTS agent_invites_investor ON agent_invites(investor_id);
 
+-- Reference traders MyLiquid hosts for an investor: testbed AINRA agents that trade through the MCP tools once a
+-- market day, like any outside agent (the key is pinned to their identity).
+CREATE TABLE IF NOT EXISTS hosted_traders (
+  id TEXT PRIMARY KEY,
+  investor_id TEXT NOT NULL REFERENCES investors(id),
+  agent TEXT NOT NULL,
+  key_id TEXT NOT NULL,
+  status TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  last_run_on TEXT,
+  last_run_at TEXT,
+  last_summary TEXT,
+  runs INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS hosted_traders_investor ON hosted_traders(investor_id, status);
+
 -- Recurring investments: buy a fixed amount of a product on a schedule.
 CREATE TABLE IF NOT EXISTS recurring_plans (
   id TEXT PRIMARY KEY,

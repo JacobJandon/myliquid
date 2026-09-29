@@ -6,7 +6,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * set, every page and API asks for it (HTTP Basic auth, any user name) before the
  * app's own sign-in. Endpoints that connected agents call are left open: they
  * authenticate with an API key or a one-time invite, which only a signed-in
- * investor can create.
+ * investor can create. So is the daily cron job, which checks CRON_SECRET.
  */
 
 const AGENT_ENDPOINTS = [
@@ -15,6 +15,7 @@ const AGENT_ENDPOINTS = [
   "/api/agent-identity/",
   "/api/x402/",
   "/api/health",
+  "/api/cron/",
 ];
 
 function digest(value: string): Buffer {

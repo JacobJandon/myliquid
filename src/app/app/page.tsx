@@ -20,6 +20,7 @@ import { PetRoom } from "@/components/pet/PetRoom";
 import { AlertsList } from "@/components/app/AlertsList";
 import { CashPanel } from "@/components/app/CashPanel";
 import { ProposalInbox } from "@/components/app/ProposalInbox";
+import { listHostedTraders, traderRecord } from "@/lib/services/hostedTraders";
 import { AllocationBar } from "@/components/charts/AllocationBar";
 import { LineChart } from "@/components/charts/LineChart";
 import { LiquidityLadder } from "@/components/charts/LiquidityLadder";
@@ -60,6 +61,10 @@ export default async function DashboardPage() {
 
   const pet = getCompanionView(db, investorId);
   const quiz = getQuiz(db, investorId);
+  const traders = listHostedTraders(db, investorId).map((t) => ({
+    ...t,
+    record: traderRecord(db, investorId, t.keyId),
+  }));
 
   return (
     <div className="space-y-6">
@@ -208,6 +213,53 @@ export default async function DashboardPage() {
         <div className="min-w-0 space-y-6">
           <Card title="Approval inbox" subtitle="Agents propose. You decide.">
             <ProposalInbox proposals={proposals} />
+          </Card>
+          <Card
+            title="Your AI traders"
+            subtitle="AINRA-identified agents trading within your limits"
+            action={
+              <LinkButton href="/app/connect#hosted" size="sm" variant="ghost">
+                {traders.length ? "Manage →" : "Hire one →"}
+              </LinkButton>
+            }
+          >
+            {traders.length === 0 ? (
+              <p className="text-xs text-fg-2">
+                Hire a trader that identifies itself with its AINRA passport and trades once a
+                market day, on its own within your limits.
+              </p>
+            ) : (
+              <ul className="space-y-3">
+                {traders.map((t) => (
+                  <li key={t.id} className="text-xs">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium text-fg">{t.label}</span>
+                      <Badge tone={t.status === "active" ? "good" : "neutral"}>
+                        {t.status === "active" ? "working" : "paused"}
+                      </Badge>
+                      <span
+                        className={
+                          t.record.pnlCents >= 0 ? "ml-auto text-good" : "ml-auto text-critical"
+                        }
+                      >
+                        {formatUsd(t.record.pnlCents, { sign: true })}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 line-clamp-2 text-fg-2">
+                      {t.lastSummary
+                        ? t.lastSummary.stopped
+                          ? `Stopped: ${t.lastSummary.stopped}`
+                          : t.lastSummary.decisions.length
+                            ? `${t.lastSummary.date}: ${t.lastSummary.decisions
+                                .map((d) => `${d.title} (${d.outcome})`)
+                                .join("; ")}`
+                            : `${t.lastSummary.date}: ${t.lastSummary.note}`
+                        : "Starts on the next market day."}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </Card>
           <Card id="alerts" title="Alerts" subtitle="From Sentinel (risk) and Ledger (valuation)">
             <AlertsList alerts={alerts} />

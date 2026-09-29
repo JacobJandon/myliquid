@@ -78,6 +78,20 @@ deployment private. See [`DEPLOY.md`](DEPLOY.md).
   L3 $10,000, L4 $25,000), a declared `myliquid:trade`, and the per-trade and daily limits. `agentTrade` applies it
   for the `external` agent (the MCP tools pass the gate's `OutsideTrader`), then the mandate's autonomous checks;
   anything else becomes a proposal with the reason. Orders and proposals are stamped with the key and AINRA Number.
+- `services/hostedTraders.ts` and `domain/traderStrategies.ts`: reference traders MyLiquid runs for an investor.
+  - **Hiring** enrolls a testbed agent with an invite and its passport, like any outside agent.
+  - **Running.** `runTrader` claims the market day in the database, so it runs once a day even with several
+    servers. It then:
+    1. presents the passport (`presentPassport`) and passes `identityGate`;
+    2. calls MCP tools in-process with `callMcpTool` (the same `handleMcpRequest` path as HTTP);
+    3. parses their formatted output into numbers and decides with a pure strategy (momentum, treasury, research);
+    4. acts only through `propose_trade`.
+  - **Triggers:**
+    - the +1d/+7d route, after advancing;
+    - the app layout, with `after()` once the page is sent;
+    - `GET /api/cron/traders`, daily from `vercel.json`, checking `CRON_SECRET`;
+    - Run now.
+  - **Record:** `traderRecord` gives its trades, its proposals, and the P&L of its own trades at today's prices.
 - `services/agentInvites.ts`: one-time invites (`mli_…`, stored hashed, 15 minutes). `enrollAgent` verifies the
   agent's passport (fail closed; a revoked one raises an alert and leaves the invite open), then in one
   transaction spends the invite, creates the key, pins it to the passport's AINRA Number and applies the invite's
@@ -250,6 +264,9 @@ against a libSQL server):
 - `ainra.test.ts`: TEST-ROOT passports (valid, revoked, stale at real time, tampered, unreadable, base64url),
   capability and tier-floor scopes, pinning, the 5-minute window, revocation alerts, identity mismatch, and the
   whole HTTP flow (MCP refuses → agent presents → MCP answers, attributed to the AINRA Number).
+- `hosted-traders.test.ts`: parsing tool output, the momentum and treasury strategies (cash floor, position cap,
+  universe, band), hiring (enrollment with the passport), one run per market day, the daily cron's
+  authorization, pausing, firing (key revoked) and the research analyst never trading.
 - `agent-traders.test.ts`: the autonomy rule (identity, freshness, mode, tier, capability, per-trade and daily
   limits, tier ceilings); enrollment over HTTP (one-time invites, L1 read-only, revoked agents refused with the
   invite kept open, expired invites); an L2 trader executing within its limits and proposing beyond them, with

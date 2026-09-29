@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { after } from "next/server";
 import { getDb, simDate } from "@/lib/db";
 import { requireInvestor } from "@/lib/auth/current";
 import { agentMode, modelName } from "@/lib/agents/llm";
@@ -7,6 +8,7 @@ import { listAlerts } from "@/lib/services/alerts";
 import { listProposals } from "@/lib/services/proposals";
 import { getMandate } from "@/lib/services/repo";
 import { ensureMarketCurrent } from "@/lib/services/sim";
+import { runDueTraders, tradersDue } from "@/lib/services/hostedTraders";
 import { getCompanionView, pendingPaymentCount } from "@/lib/services/companion";
 import type { Stage } from "@/lib/domain/companion";
 import { MobileNav, Sidebar } from "@/components/app/Sidebar";
@@ -20,6 +22,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const investor = await requireInvestor();
   const db = getDb();
   ensureMarketCurrent(db);
+  // A new market day: the investor's hosted traders work it, after this page is sent.
+  if (tradersDue(db, investor.id)) after(() => runDueTraders(db, investor.id));
   const pending = listProposals(db, investor.id, { status: "pending" }).length;
   const alerts = listAlerts(db, investor.id, { openOnly: true }).filter(
     (a) => a.severity !== "info",
