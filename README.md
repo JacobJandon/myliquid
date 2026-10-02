@@ -355,6 +355,7 @@ src/
     ainra/             AINRA passport verification (@ainra/sdk), trust anchors, TEST-ROOT testbed agents
 docs/
   research/            Agentic-finance landscape; agent payments, AI companions and design; platform review and AINRA (Sept 2026)
+  startup/             The startup plan (what we sell, to whom, roadmap, budget) and the research behind it (Oct 2026)
   ARCHITECTURE.md      How the pieces fit together
   DEPLOY.md            Private deployment: Vercel + Turso, or Docker
 ```
@@ -362,6 +363,9 @@ docs/
 More detail in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Roadmap
+
+The company plan, with MyLiquid Gate (runtime governance for agents that trade and pay) as the first product, is
+in [`docs/startup/plan.md`](docs/startup/plan.md). For the app itself:
 
 - Email verification, password reset and passkeys
 - OAuth for MCP clients (in place of pasted API keys)
