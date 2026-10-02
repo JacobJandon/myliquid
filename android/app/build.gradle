@@ -24,6 +24,9 @@ plugins {
 // -PmyliquidHost=...; the default is the Vercel production domain.
 def myliquidHost = System.getenv('MYLIQUID_HOST') ?: findProperty('myliquidHost') ?: 'myliquid-jacobjandons-projects.vercel.app'
 
+// MyLiquid: the CI run number, or 1 for a local build.
+def buildNumber = (System.getenv('GITHUB_RUN_NUMBER') ?: '1') as Integer
+
 def twaManifest = [
     applicationId: 'com.myliquid.app',
     hostName: myliquidHost, // The domain being opened in the TWA.
@@ -62,8 +65,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 36
         // Every CI build is a newer version, so it installs over the last one (when signed with the same key).
-        versionCode (System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger()
-        versionName "1.0." + (System.getenv('GITHUB_RUN_NUMBER') ?: '0')
+        versionCode = buildNumber
+        versionName = "1.0." + buildNumber
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
@@ -89,9 +92,9 @@ android {
 
         // MyLiquid: the Digital Asset Links statement (moved here from strings.xml so it follows the host). The
         // site answers with /.well-known/assetlinks.json; when both agree, the app opens without a URL bar.
-        resValue "string", "assetStatements",
-            '[{\\"relation\\": [\\"delegate_permission/common.handle_all_urls\\"], \\"target\\": {\\"namespace\\": \\"web\\", \\"site\\": \\"https://' +
-                twaManifest.hostName + '\\"}}]'
+        def assetStatements = '[{\\"relation\\": [\\"delegate_permission/common.handle_all_urls\\"], ' +
+            '\\"target\\": {\\"namespace\\": \\"web\\", \\"site\\": \\"https://' + twaManifest.hostName + '\\"}}]'
+        resValue "string", "assetStatements", assetStatements
 
         // This attribute sets the status bar color for the TWA. It can be either set here or in
         // `res/values/colors.xml`. Setting in both places is an error and the app will not
@@ -157,16 +160,18 @@ android {
     // a keystore; this repository is public.
     signingConfigs {
         release {
-            storeFile System.getenv('ANDROID_KEYSTORE_PATH') ? file(System.getenv('ANDROID_KEYSTORE_PATH')) : null
-            storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
-            keyAlias System.getenv('ANDROID_KEY_ALIAS') ?: 'myliquid'
-            keyPassword System.getenv('ANDROID_KEY_PASSWORD') ?: System.getenv('ANDROID_KEYSTORE_PASSWORD')
+            storeFile = System.getenv('ANDROID_KEYSTORE_PATH') ? file(System.getenv('ANDROID_KEYSTORE_PATH')) : null
+            storePassword = System.getenv('ANDROID_KEYSTORE_PASSWORD')
+            keyAlias = System.getenv('ANDROID_KEY_ALIAS') ?: 'myliquid'
+            keyPassword = System.getenv('ANDROID_KEY_PASSWORD') ?: System.getenv('ANDROID_KEYSTORE_PASSWORD')
         }
     }
     buildTypes {
         release {
             minifyEnabled true
-            if (System.getenv('ANDROID_KEYSTORE_PATH')) signingConfig signingConfigs.release
+            if (System.getenv('ANDROID_KEYSTORE_PATH')) {
+                signingConfig = signingConfigs.release
+            }
         }
     }
     compileOptions {
