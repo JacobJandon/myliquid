@@ -66,11 +66,25 @@ record, and get certified.
 - **Why it matters for P1.** Developers bring agents; agents with a certified record are what brokers want to admit;
   brokers then want the same Gate in production.
 
-### P3. MyLiquid app (consumer, later)
+### P3. MyLiquid app (consumer: on phones now, real money later)
 
-Today's app: the pet, the agent desk, the liquidity ladder, Agent Pay. It stays in the repo as the **reference
-deployment of Gate**: every sales demo shows Gate inside a real product. Real money comes only after a decision gate
-(section 6), through partners:
+Today's app: the pet, the agent desk, the liquidity ladder, Agent Pay. It is also the **reference deployment of
+Gate**: every sales demo shows Gate inside a real product.
+
+**Decided on 2 October 2026:** the company and the app are called **MyLiquid**, and the app runs on phones now,
+at almost no cost ([`../MOBILE.md`](../MOBILE.md)).
+
+| Step | Cost |
+|---|---|
+| An installable app on Android and iPhone, straight from the browser | Free |
+| An Android APK, built by GitHub Actions | Free |
+| Google Play, once the company has an organization developer account (required for investing apps) | $25 once |
+| The iPhone App Store, when the app needs something native | $99 a year |
+
+Until then it runs on simulated markets and demo money, which lets people try the full experience and gives us
+users to learn from before any licence is needed.
+
+Real money comes only after a decision gate (section 6), through partners:
 
 - a state-registered investment adviser (RIA) we own;
 - brokerage and custody through Alpaca's Broker API (or DriveWealth, Apex);
@@ -174,7 +188,7 @@ What we listen for: a named owner, a regulator or auditor asking, an incident, a
 
 | Phase | When | Build | Business | Gate to pass |
 |---|---|---|---|---|
-| **0. Validate** | Weeks 0–4 | Extract `lib/gate`, decision API, MCP proxy v0 against Alpaca paper | Incorporate, 20 interviews, landing page, legal opinion on the vendor path | ≥10 interviews confirm the pain and a budget owner; ≥2 LOIs. Otherwise pivot the wedge to Arena-first or consumer-first. |
+| **0. Validate** | Weeks 0–4 | Phone app live (installable, Android APK: done). Extract `lib/gate`, decision API, MCP proxy v0 against Alpaca paper | Incorporate, 20 interviews, landing page, legal opinion on the vendor path; first testers on the phone app | ≥10 interviews confirm the pain and a budget owner; ≥2 LOIs. Otherwise pivot the wedge to Arena-first or consumer-first. |
 | **1. Pilot-ready** | Months 1–3 | Tenancy, Visa TAP adapter, evidence export, console, Arena v0, threat model and pen test | Sign 3–5 design partners, start SOC 2 (Type I), apply to sandboxes | 2 pilots running in staging or paper; p99 under 50 ms. Then raise the pre-seed. |
 | **2. First production** | Months 3–6 | Hardening, SLA tooling, on-prem option, certification suite | First production customer, pre-seed closed, first hires, SOC 2 Type I report | 1 paying production customer and a second in contract. |
 | **3. Scale** | Months 6–12 | Mastercard adapter, more brokers' MCP servers, evidence packs | ~$480k ARR target, SOC 2 Type II window, seed preparation | Seed-ready: live customers, growing governed actions, clear pipeline. Decide on consumer real money (below). |
@@ -235,6 +249,15 @@ compliance mapping.
 | Buffer (about 8%) | $55,000 |
 | **Total** | **$710,000** |
 
+**The phone app adds almost nothing to this.**
+
+| Item | Cost |
+|---|---|
+| Installing from the browser | Free |
+| Android builds on GitHub Actions | Free |
+| Google Play | $25 once |
+| Vercel Pro, once the app is commercial | $20 a month |
+
 **Funding path.**
 
 - **Pre-seed: $750k–1M** on a SAFE at a $10–15M cap, raised at the end of Phase 1 with design partners signed. It
@@ -279,7 +302,7 @@ compliance mapping.
 
 | Week | You | Claude (in this repo) |
 |---|---|---|
-| **1** | Decide the open questions below. Incorporate. List 40 target firms and book 20 interviews. Open an Alpaca account for paper-trading keys. | Extract the decision engine into `src/lib/gate/` with tests. Draft landing-page copy for Gate and a one-page interview guide. |
+| **1** | Install MyLiquid on your phone and share it with a few testers. Set the `MYLIQUID_HOST` repository variable and create your Android signing key (`docs/MOBILE.md`). Decide the open questions below. Incorporate. List 40 target firms and book 20 interviews. Open an Alpaca account for paper-trading keys. | Phone app: done (installable app, phone layout, Android APK pipeline). Extract the decision engine into `src/lib/gate/` with tests. Draft landing-page copy for Gate and a one-page interview guide. |
 | **2** | Run interviews. Book a fintech lawyer for the vendor-path opinion. Start the co-founder and CCO search. | Decision API (`/api/gate/v1/decide`, `/halt`, `/evidence`). MCP guardrail proxy v0 in front of Alpaca's paper-trading MCP server. |
 | **3** | More interviews. Ask the warmest prospects for LOIs. Reach out to AIUC and Alpaca partnerships. | Visa TAP adapter behind a `KyaVerifier` interface. Hash-chained evidence log and SAFR/FINRA-mapped export. |
 | **4** | Phase 0 review against its gate. Pre-seed deck first draft. Design-partner agreement template, reviewed by the lawyer. | Arena v0: Alpaca paper accounts for identified agents, a leaderboard, record pages. Demo script and recording plan. |
@@ -292,5 +315,5 @@ compliance mapping.
 3. **A co-founder,** and which half they cover.
 4. **AINRA's governance.** Agree to keep it in a separate, neutral entity, and decide who else sits on it.
 5. **Funding.** Bootstrap through Phase 0 and raise with LOIs (recommended), or raise now.
-6. **The name.** Keep MyLiquid for the company, with "Gate" and "Arena" as products, or rebrand the B2B side.
+6. **The name: decided.** MyLiquid, for the company and the app, with "Gate" and "Arena" as product names.
 7. **Your time.** Full-time from now, or a date when you go full-time.

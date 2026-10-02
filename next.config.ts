@@ -11,6 +11,18 @@ const nextConfig: NextConfig = {
   },
   // The Docker image builds a self-contained server (NEXT_OUTPUT=standalone).
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
+  // The service worker must never be served stale, or an installed app keeps an old one.
+  async headers() {
+    return [
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Type", value: "application/javascript; charset=utf-8" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

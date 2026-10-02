@@ -1,0 +1,123 @@
+name: Android app
+
+# Builds MyLiquid for Android: a Trusted Web Activity (android/) that opens the deployed site full screen.
+# Download the APK from the run's Artifacts and open it on a phone. See docs/MOBILE.md.
+
+on:
+  push:
+    branches: [main, claude/myliquid-fintech-ai-agents-1svwct]
+    paths: ["android/**", ".github/workflows/android.yml"]
+  workflow_dispatch:
+    inputs:
+      host:
+        description: "Site the app opens, e.g. myliquid.vercel.app (default: the MYLIQUID_HOST repository variable)"
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MYLIQUID_HOST: ${{ inputs.host || vars.MYLIQUID_HOST || 'myliquid-jacobjandons-projects.vercel.app' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # Also checks that the committed Gradle wrapper is an official one.
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          ks="$RUNNER_TEMP/myliquid.keystore"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$ks"
+            pw="$KEYSTORE_PASSWORD"; alias="${KEY_ALIAS:-myliquid}"; kpw="${KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
+            echo "SIGNING=your key (repository secrets)" >> "$GITHUB_ENV"
+          else
+            # No key configured: a throwaway one, so the APK still installs. It changes every build.
+            pw="$(openssl rand -hex 16)"; alias=myliquid; kpw="$pw"
+            keytool -genkeypair -keystore "$ks" -storetype PKCS12 -storepass "$pw" -keypass "$pw" \
+              -alias myliquid -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=MyLiquid test build" -noprompt
+            echo "SIGNING=a throwaway key (no ANDROID_KEYSTORE_BASE64 secret yet)" >> "$GITHUB_ENV"
+          fi
+          echo "::add-mask::$pw"
+          echo "::add-mask::$kpw"
+          {
+            echo "ANDROID_KEYSTORE_PATH=$ks"
+            echo "ANDROID_KEYSTORE_PASSWORD=$pw"
+            echo "ANDROID_KEY_ALIAS=$alias"
+            echo "ANDROID_KEY_PASSWORD=$kpw"
+            echo "FINGERPRINT=$(keytool -list -v -keystore "$ks" -storepass "$pw" -alias "$alias" | sed -n 's/^.*SHA256: //p')"
+          } >> "$GITHUB_ENV"
+
+      - name: Build the APK and the Play Store bundle
+        working-directory: android
+        run: ./gradlew --no-daemon assembleRelease bundleRelease
+
+      - name: Check the app
+        run: |
+          apk=android/app/build/outputs/apk/release/app-release.apk
+          bt="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          "$bt/apksigner" verify --print-certs "$apk" | head -4
+          "$bt/aapt2" dump badging "$apk" | head -2
+          # The asset statement must be valid JSON naming the host the app opens.
+          "$bt/aapt2" dump resources "$apk" > resources.txt
+          grep -A1 'string/assetStatements' resources.txt
+          python3 - <<'PY'
+          import json, os, re
+          text = open("resources.txt").read()
+          raw = re.search(r'string/assetStatements.*?\n\s*\(\) "(.*)"', text).group(1)
+          for candidate in (raw, raw.replace('\\"', '"')):
+              try:
+                  statements = json.loads(candidate)
+                  break
+              except ValueError:
+                  pass
+          else:
+              raise SystemExit("assetStatements is not JSON: " + raw)
+          site = statements[0]["target"]["site"]
+          assert site == "https://" + os.environ["MYLIQUID_HOST"], site
+          print("asset statement OK:", site)
+          PY
+
+      - name: Name the files
+        run: |
+          mkdir dist
+          cp android/app/build/outputs/apk/release/app-release.apk "dist/MyLiquid-${{ github.run_number }}.apk"
+          cp android/app/build/outputs/bundle/release/app-release.aab "dist/MyLiquid-${{ github.run_number }}.aab"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MyLiquid-android-${{ github.run_number }}
+          path: dist/
+          retention-days: 30
+
+      - name: Summary
+        run: |
+          {
+            echo "## MyLiquid for Android, build ${{ github.run_number }}"
+            echo ""
+            echo "- Opens: https://$MYLIQUID_HOST/app"
+            echo "- Signed with: $SIGNING"
+            echo "- SHA-256 fingerprint: \`$FINGERPRINT\`"
+            echo ""
+            echo "Download **MyLiquid-android-${{ github.run_number }}** under Artifacts, unzip it and open the .apk on your phone."
+            echo "For full screen without a URL bar, set \`ANDROID_CERT_FINGERPRINTS\` in Vercel to the fingerprint above"
+            echo "(docs/MOBILE.md). With a throwaway key that changes every build, so add your own key first."
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -109,7 +109,7 @@ export function CopilotChat({
   }
 
   return (
-    <div className="flex h-[calc(100vh-11rem)] min-h-[520px] flex-col rounded-3xl border border-line bg-surface">
+    <div className="flex h-[calc(100dvh-12rem)] min-h-[420px] flex-col rounded-3xl border border-line bg-surface lg:h-[calc(100vh-11rem)] lg:min-h-[520px]">
       <div className="flex items-center justify-between border-b border-line px-5 py-3">
         <div className="flex items-center gap-3">
           <PetAvatar pet={pet} size={40} />

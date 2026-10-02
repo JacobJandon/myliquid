@@ -11,7 +11,7 @@ import { ensureMarketCurrent } from "@/lib/services/sim";
 import { runDueTraders, tradersDue } from "@/lib/services/hostedTraders";
 import { getCompanionView, pendingPaymentCount } from "@/lib/services/companion";
 import type { Stage } from "@/lib/domain/companion";
-import { MobileNav, Sidebar } from "@/components/app/Sidebar";
+import { MobileTabBar, Sidebar } from "@/components/app/Sidebar";
 import { SimControls } from "@/components/app/SimControls";
 import { Badge } from "@/components/ui";
 import { LogoMark } from "@/components/brand/LogoMark";
@@ -31,6 +31,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const mandate = getMandate(db, investor.id);
   const mode = agentMode();
   const pet = getCompanionView(db, investor.id);
+  const paymentCount = pendingPaymentCount(db, investor.id);
 
   return (
     <div className="bg-glow min-h-screen">
@@ -39,7 +40,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <Sidebar
             pendingCount={pending}
             alertCount={alerts}
-            paymentCount={pendingPaymentCount(db, investor.id)}
+            paymentCount={paymentCount}
             user={{ name: investor.name, email: investor.email, kind: investor.kind }}
             pet={{
               name: pet.name,
@@ -51,7 +52,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           />
         </aside>
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-20 border-b border-line bg-bg/90 backdrop-blur">
+          <header className="sticky top-0 z-20 border-b border-line bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur">
             <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-8 sm:py-3">
               <div className="flex min-w-0 items-center gap-2 text-xs">
                 <Link
@@ -84,7 +85,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               </div>
               <SimControls />
             </div>
-            <MobileNav />
           </header>
           {investor.kind === "guest" && (
             <div className="border-b border-fg/10 bg-accent-2 px-4 py-2 text-xs text-accent-2-ink sm:px-8">
@@ -95,9 +95,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               to keep your portfolio and agents.
             </div>
           )}
-          <main className="px-4 py-6 sm:px-8 sm:py-8">{children}</main>
+          <main className="px-4 pt-6 pb-[calc(env(safe-area-inset-bottom)+6rem)] sm:px-8 sm:pt-8 lg:pb-8">
+            {children}
+          </main>
         </div>
       </div>
+      <MobileTabBar
+        pendingCount={pending}
+        alertCount={alerts}
+        paymentCount={paymentCount}
+        user={{ name: investor.name, email: investor.email, kind: investor.kind }}
+      />
     </div>
   );
 }

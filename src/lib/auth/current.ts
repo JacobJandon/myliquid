@@ -4,15 +4,11 @@ import { getDb } from "@/lib/db";
 import { HttpError } from "@/lib/api";
 import { findInvestor, type Investor } from "@/lib/services/repo";
 import { createSession, deleteSession, investorForSession } from "./sessions";
+import { secureCookies } from "./siteGate";
 
 /** Session cookie handling for server components and route handlers. */
 
 export const SESSION_COOKIE = "ml_session";
-
-function secureCookies(): boolean {
-  if (process.env.MYLIQUID_COOKIE_SECURE) return process.env.MYLIQUID_COOKIE_SECURE === "true";
-  return process.env.NODE_ENV === "production";
-}
 
 export async function currentInvestorId(): Promise<string | null> {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;

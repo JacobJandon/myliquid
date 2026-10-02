@@ -17,6 +17,8 @@ import { listProposals } from "@/lib/services/proposals";
 import { getProfile } from "@/lib/services/repo";
 import { getCompanionView, getQuiz } from "@/lib/services/companion";
 import { PetRoom } from "@/components/pet/PetRoom";
+import { PortfolioHero } from "@/components/app/PortfolioHero";
+import { InstallBanner } from "@/components/pwa/InstallApp";
 import { AlertsList } from "@/components/app/AlertsList";
 import { CashPanel } from "@/components/app/CashPanel";
 import { ProposalInbox } from "@/components/app/ProposalInbox";
@@ -66,9 +68,18 @@ export default async function DashboardPage() {
     record: traderRecord(db, investorId, t.keyId),
   }));
 
+  // Daily values ending at today's live total.
+  const heroPoints = [
+    ...nav.filter((p) => p.date < today).map((p) => ({ date: p.date, value: p.totalCents })),
+    { date: today, value: snapshot.totalCents },
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <InstallBanner />
+      <PortfolioHero points={heroPoints} cashCents={snapshot.cashCents} />
+
+      <div className="hidden flex-wrap items-end justify-between gap-4 lg:flex">
         <div>
           <p className="text-sm text-muted">Welcome back, {investor.name.split(" ")[0]}</p>
           <h1 className="font-display text-4xl text-fg">Home</h1>
@@ -85,6 +96,7 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <Stat
+          className="hidden lg:block"
           label="Total value"
           value={formatUsd(snapshot.totalCents)}
           sub={`${formatPct(snapshot.totalCents / yearAgo - 1, 1, true)} ${
@@ -94,6 +106,7 @@ export default async function DashboardPage() {
           } · ${formatUsd(snapshot.totalCents - contributions, { sign: true })} total gain`}
         />
         <Stat
+          className="hidden lg:block"
           label="Today"
           value={formatUsd(snapshot.totalCents - yesterday, { sign: true })}
           sub={`${formatPct(yesterday ? snapshot.totalCents / yesterday - 1 : 0, 2, true)} since the last market day`}
@@ -136,7 +149,11 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="min-w-0 space-y-6 xl:col-span-2">
-          <Card title="Portfolio value" subtitle="Daily net asset value, including cash">
+          <Card
+            className="hidden lg:block"
+            title="Portfolio value"
+            subtitle="Daily net asset value, including cash"
+          >
             <LineChart
               points={nav.map((p) => ({ date: p.date, value: p.totalCents }))}
               format="cents"

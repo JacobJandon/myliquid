@@ -1,0 +1,71 @@
+{
+  "packageId": "com.myliquid.app",
+  "host": "myliquid-jacobjandons-projects.vercel.app",
+  "name": "MyLiquid",
+  "launcherName": "MyLiquid",
+  "display": "standalone",
+  "themeColor": "#F5F3EE",
+  "themeColorDark": "#F5F3EE",
+  "navigationColor": "#FFFFFF",
+  "navigationColorDark": "#FFFFFF",
+  "navigationDividerColor": "#E9E6DD",
+  "navigationDividerColorDark": "#E9E6DD",
+  "backgroundColor": "#F5F3EE",
+  "enableNotifications": false,
+  "startUrl": "/app",
+  "iconUrl": "https://myliquid-jacobjandons-projects.vercel.app/icons/icon-512.png",
+  "maskableIconUrl": "https://myliquid-jacobjandons-projects.vercel.app/icons/maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "myliquid"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Invest",
+      "shortName": "Invest",
+      "url": "https://myliquid-jacobjandons-projects.vercel.app/app/invest",
+      "chosenIconUrl": "https://myliquid-jacobjandons-projects.vercel.app/icons/icon-192.png"
+    },
+    {
+      "name": "Agent Pay",
+      "shortName": "Pay",
+      "url": "https://myliquid-jacobjandons-projects.vercel.app/app/pay",
+      "chosenIconUrl": "https://myliquid-jacobjandons-projects.vercel.app/icons/icon-192.png"
+    },
+    {
+      "name": "Talk to your agent",
+      "shortName": "Talk",
+      "url": "https://myliquid-jacobjandons-projects.vercel.app/app/copilot",
+      "chosenIconUrl": "https://myliquid-jacobjandons-projects.vercel.app/icons/icon-192.png"
+    },
+    {
+      "name": "Activity",
+      "shortName": "Activity",
+      "url": "https://myliquid-jacobjandons-projects.vercel.app/app/activity",
+      "chosenIconUrl": "https://myliquid-jacobjandons-projects.vercel.app/icons/icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "minSdkVersion": 21,
+  "orientation": "default",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "1.0.0",
+  "webManifestUrl": "https://myliquid-jacobjandons-projects.vercel.app/manifest.webmanifest"
+}

@@ -1,47 +1,42 @@
-import { createHash, timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  SITE_COOKIE,
+  basicAuthPassword,
+  cookieMatches,
+  isPublicPath,
+  passwordMatches,
+} from "@/lib/auth/siteGate";
 
 /**
- * Optional site password for private test deployments. With MYLIQUID_SITE_PASSWORD
- * set, every page and API asks for it (HTTP Basic auth, any user name) before the
- * app's own sign-in. Endpoints that connected agents call are left open: they
- * authenticate with an API key or a one-time invite, which only a signed-in
- * investor can create. So is the daily cron job, which checks CRON_SECRET.
+ * Optional site password for private deployments. With MYLIQUID_SITE_PASSWORD set, every page and API asks for it
+ * before the app's own sign-in: browsers are sent to the password page (`/gate`), which remembers the device;
+ * scripts can send it with HTTP Basic auth (any user name). Agent endpoints, the cron job and the app shell stay
+ * open (see `isPublicPath`).
  */
-
-const AGENT_ENDPOINTS = [
-  "/api/mcp",
-  "/api/agent-identity",
-  "/api/agent-identity/",
-  "/api/x402/",
-  "/api/health",
-  "/api/cron/",
-];
-
-function digest(value: string): Buffer {
-  return createHash("sha256").update(value).digest();
-}
-
-function suppliedPassword(req: NextRequest): string | null {
-  const header = req.headers.get("authorization") ?? "";
-  if (!header.startsWith("Basic ")) return null;
-  const decoded = Buffer.from(header.slice(6), "base64").toString("utf8");
-  const colon = decoded.indexOf(":");
-  return colon === -1 ? null : decoded.slice(colon + 1);
-}
-
 export function proxy(req: NextRequest) {
   const password = process.env.MYLIQUID_SITE_PASSWORD;
   if (!password) return NextResponse.next();
   const path = req.nextUrl.pathname;
-  if (AGENT_ENDPOINTS.some((p) => path === p || (p.endsWith("/") && path.startsWith(p))))
+  if (isPublicPath(path)) return NextResponse.next();
+  if (cookieMatches(req.cookies.get(SITE_COOKIE)?.value, password)) return NextResponse.next();
+  if (passwordMatches(basicAuthPassword(req.headers.get("authorization")), password))
     return NextResponse.next();
-  const supplied = suppliedPassword(req);
-  if (supplied !== null && timingSafeEqual(digest(supplied), digest(password)))
-    return NextResponse.next();
+
+  const navigation =
+    (req.method === "GET" || req.method === "HEAD") &&
+    (req.headers.get("sec-fetch-mode") === "navigate" ||
+      (req.headers.get("accept") ?? "").includes("text/html"));
+  if (navigation) {
+    const gate = new URL("/gate", req.url);
+    gate.searchParams.set("next", path + req.nextUrl.search);
+    return NextResponse.redirect(gate);
+  }
+  // Browsers (which send Sec-Fetch-Mode) get no Basic challenge, so a background request never pops a dialog.
   return new NextResponse("MyLiquid is private. Enter the site password to continue.", {
     status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="MyLiquid", charset="UTF-8"' },
+    headers: req.headers.get("sec-fetch-mode")
+      ? {}
+      : { "WWW-Authenticate": 'Basic realm="MyLiquid", charset="UTF-8"' },
   });
 }
 

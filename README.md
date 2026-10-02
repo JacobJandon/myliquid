@@ -26,6 +26,10 @@ companions and YC-era product sites. See
 The logo is a living drop of liquid with eyes. It slowly morphs, breathes and blinks
 (`components/brand/LogoMark.tsx`, with a static `app/icon.svg` for the browser tab).
 
+**On your phone.** MyLiquid installs as an app on Android and iPhone for free: open it in the browser and tap
+Install (Android) or Add to Home Screen (iPhone). GitHub Actions also builds an Android APK, ready for Google Play
+later. See [`docs/MOBILE.md`](docs/MOBILE.md).
+
 > Demo software: simulated markets, fictional products and merchants, demo money. No
 > real cards or payments. Not investment advice.
 
@@ -339,7 +343,7 @@ docker run -p 3000:3000 -v myliquid-data:/data -e ANTHROPIC_API_KEY=... myliquid
 ```
 src/
   app/                 Next.js App Router: landing page, /app/* pages, /api/* routes
-  proxy.ts             Optional site password (MYLIQUID_SITE_PASSWORD)
+  proxy.ts             Optional site password (MYLIQUID_SITE_PASSWORD), with its password page at /gate
   components/          UI kit, charts, pet (pixel sprite, device, room), pay (card, POS terminal, panels), app components
   lib/
     domain/            Pure logic: catalog, market sim, liquidity, risk, valuation, diligence, rebalance, signals,
@@ -358,6 +362,9 @@ docs/
   startup/             The startup plan (what we sell, to whom, roadmap, budget) and the research behind it (Oct 2026)
   ARCHITECTURE.md      How the pieces fit together
   DEPLOY.md            Private deployment: Vercel + Turso, or Docker
+  MOBILE.md            The phone app: install from the browser, the Android APK, Google Play
+android/               The Android app (a Trusted Web Activity around the site), built by GitHub Actions
+public/                Service worker, app icons, install screenshots
 ```
 
 More detail in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
@@ -373,5 +380,7 @@ in [`docs/startup/plan.md`](docs/startup/plan.md). For the app itself:
 - Real agent cards through a licensed issuer on an agentic-token program
   (Mastercard Agent Pay, Visa Intelligent Commerce), and real x402 settlement
 - NFC/QR tap-to-pay from a phone in place of typed terminal codes
+- MyLiquid on Google Play once the company has an organization developer account (the APK is ready:
+  [`docs/MOBILE.md`](docs/MOBILE.md))
 - Scheduled desk cycles and push notifications (for example, "your pet is hungry",
   or a payment waiting for approval)

@@ -54,14 +54,19 @@ Under **Settings → Environment Variables**, add these:
 
 | Variable | Value |
 |---|---|
-| `MYLIQUID_SITE_PASSWORD` | Any password. Every page then asks for it before anything else (any user name works). |
+| `MYLIQUID_SITE_PASSWORD` | Any password. Every page then asks for it first, on a MyLiquid password page that remembers the device for 90 days. |
 | `ANTHROPIC_API_KEY` | Optional. Without it the agents run in their deterministic offline mode. |
 | `CRON_SECRET` | Optional but recommended: any long random string. It protects the daily job that lets your hosted AI traders work (Vercel sends it automatically). |
+| `ANDROID_CERT_FINGERPRINTS` | Optional: the Android app's signing-key fingerprint, so it opens full screen ([`MOBILE.md`](MOBILE.md)). |
 
-- **What the password protects.** It covers the whole site, including the public production URL.
+- **What the password protects.** It covers the whole site, including the public production URL. Scripts can send
+  it with HTTP Basic auth instead (any user name). Changing it signs every device out.
 - **What stays open.** The agent endpoints stay open for connected agents: `/api/mcp`, `/api/agent-identity`
   (including `/enroll`), `/api/x402/*` and `/api/health`. Each needs an API key or a one-time invite, which only a
   signed-in user can create (`/api/health` needs neither).
+- **The phone app's files stay open too:** the manifest, icons, service worker, offline screen and
+  `/.well-known/assetlinks.json`. They hold no account data, and phones fetch them without cookies when they
+  install the app ([`MOBILE.md`](MOBILE.md)).
 - **Preview deployments.** Vercel also protects preview deployments on its own (Deployment Protection → Vercel
   Authentication).
 
@@ -104,7 +109,7 @@ Under **Settings → Environment Variables**, add these:
   transaction that another one hasn't already advanced the day.
 - **Testing against libSQL.** `npm run test:libsql` runs the whole test suite against a libSQL server. Point
   `LIBSQL_TEST_URL` at a local `turso dev`; it wipes that database.
-- **`src/proxy.ts`** is the optional site password.
+- **`src/proxy.ts`** is the optional site password (helpers in `src/lib/auth/siteGate.ts`, page at `/gate`).
 
 ## Any host with a disk (Docker)
 

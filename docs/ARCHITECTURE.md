@@ -51,7 +51,22 @@ network client does differently:
 - `npm run test:libsql` runs the whole suite against a libSQL server.
 
 An optional site password (`src/proxy.ts`, `MYLIQUID_SITE_PASSWORD`) keeps a test
-deployment private. See [`DEPLOY.md`](DEPLOY.md).
+deployment private. Browsers get a password page that remembers the device; scripts can use
+HTTP Basic auth. See [`DEPLOY.md`](DEPLOY.md).
+
+## Phones
+
+MyLiquid is an installable web app, and an Android app that wraps it:
+
+- **The web app.** A manifest (`src/app/manifest.ts`), a service worker (`public/sw.js`)
+  and an offline screen. The service worker caches only build assets and icons, never pages
+  or API responses.
+- **The Android app.** `android/` is a Trusted Web Activity built by GitHub Actions; the site
+  vouches for it at `/.well-known/assetlinks.json`.
+- **The phone layout.** A bottom tab bar (`MobileTabBar`) and a portfolio header with a
+  chart you can scrub (`PortfolioHero`) replace the sidebar below the `lg` breakpoint.
+
+See [`MOBILE.md`](MOBILE.md).
 
 ## Accounts, sessions and connected agents
 
