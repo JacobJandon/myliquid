@@ -1,9 +1,13 @@
+import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
 import {
   ArrowRight,
   Check,
+  ChartSpline,
+  CreditCard,
   Hand,
+  LayoutGrid,
   Lock,
   Moon,
   Nfc,
@@ -11,6 +15,7 @@ import {
   Plug,
   ScrollText,
   ShieldCheck,
+  Smartphone,
   X,
 } from "lucide-react";
 import { AGENTS, DESK_AGENTS } from "@/lib/agents/registry";
@@ -21,6 +26,9 @@ import { Logo } from "@/components/brand/Logo";
 import { PixelPet } from "@/components/pet/PixelPet";
 import { TamaDevice } from "@/components/pet/TamaDevice";
 import { AgentCardVisual } from "@/components/pay/AgentCardVisual";
+import { InstallAppButton } from "@/components/pwa/InstallApp";
+import { PhoneQr } from "@/components/pwa/PhoneQr";
+import { ANDROID_APK_URL } from "@/lib/mobile/links";
 
 const SLEEVES = [
   { name: "Index funds", liquidity: "Daily", color: "var(--sleeve-index)" },
@@ -87,6 +95,50 @@ function Tile({
   );
 }
 
+const APP_FEATURES = [
+  {
+    icon: ChartSpline,
+    title: "Your money at a glance",
+    text: "Your balance up top. Drag along the chart to read any day.",
+  },
+  {
+    icon: LayoutGrid,
+    title: "Five tabs, one thumb",
+    text: "Home, Invest, Pay, Talk and More, like the apps you already use.",
+  },
+  {
+    icon: CreditCard,
+    title: "Your agent's card, in your pocket",
+    text: "Approve a payment or freeze the card in a tap.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Nothing stored on the phone",
+    text: "Balances and orders always load fresh. Offline, it simply says so.",
+  },
+];
+
+/** A phone-shaped frame around a screenshot of the app (`public/screenshots`). */
+function PhoneFrame({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  return (
+    <div
+      className={clsx(
+        "overflow-hidden rounded-[2rem] border-[6px] border-fg bg-fg shadow-[6px_6px_0_#111]",
+        className,
+      )}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        width={390}
+        height={844}
+        sizes="(min-width: 1024px) 240px, 60vw"
+        className="block h-auto w-full rounded-[1.6rem]"
+      />
+    </div>
+  );
+}
+
 function Kicker({ children, className }: { children: React.ReactNode; className?: string }) {
   return <div className={clsx("font-pixel text-[11px] uppercase", className)}>{children}</div>;
 }
@@ -127,6 +179,9 @@ export default function LandingPage() {
           </a>
           <a href="#pay" className="hover:text-fg">
             Agent Pay
+          </a>
+          <a href="#app" className="hover:text-fg">
+            The app
           </a>
           <a href="#desk" className="hover:text-fg">
             The desk
@@ -447,6 +502,68 @@ GET /api/x402/research/DL-NORDHAVN
                 </pre>
               </div>
             </Tile>
+          </div>
+        </section>
+
+        {/* The app */}
+        <section id="app" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6">
+          <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
+            <div className="min-w-0">
+              <Kicker className="text-accent">The app</Kicker>
+              <h2 className="mt-3 font-display text-4xl text-fg sm:text-5xl">
+                MyLiquid in your pocket.
+              </h2>
+              <p className="mt-3 max-w-xl text-fg-2">
+                Your portfolio, your pet and your agent&apos;s card on your home screen. Free on
+                Android and iPhone, straight from the browser: no app store, nothing to update.
+              </p>
+              <ul className="mt-6 space-y-4">
+                {APP_FEATURES.map(({ icon: Icon, title, text }) => (
+                  <li key={title} className="flex gap-3">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-fg bg-accent-2 text-accent-2-ink">
+                      <Icon className="h-4 w-4" aria-hidden />
+                    </span>
+                    <div className="text-sm">
+                      <div className="font-medium text-fg">{title}</div>
+                      <div className="text-fg-2">{text}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <InstallAppButton />
+                <a href={ANDROID_APK_URL} className={buttonClass("secondary")}>
+                  <Smartphone className="h-4 w-4" aria-hidden /> Android app (.apk)
+                </a>
+              </div>
+              <div className="mt-6 hidden max-w-md items-center gap-4 rounded-2xl border-2 border-fg bg-surface p-4 shadow-[3px_3px_0_#111] lg:flex">
+                <PhoneQr size={104} />
+                <div className="text-sm">
+                  <div className="font-medium text-fg">Scan to open it on your phone</div>
+                  <div className="mt-0.5 text-fg-2">
+                    Then tap <b>Install</b> on Android, or <b>Share → Add to Home Screen</b> on
+                    iPhone.
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="relative mx-auto flex w-full max-w-md items-center justify-center py-4 lg:max-w-none">
+              <PhoneFrame
+                src="/screenshots/pay.png"
+                alt="Agent Pay in the MyLiquid app: the agent's card and wallet"
+                className="absolute left-0 top-10 hidden w-[38%] -rotate-6 sm:block"
+              />
+              <PhoneFrame
+                src="/screenshots/home.png"
+                alt="MyLiquid's Home on a phone: portfolio value, chart and the pet"
+                className="relative z-10 w-[62%] sm:w-[44%]"
+              />
+              <PhoneFrame
+                src="/screenshots/traders.png"
+                alt="AI traders identified with AINRA, in the MyLiquid app"
+                className="absolute right-0 top-10 hidden w-[38%] rotate-6 sm:block"
+              />
+            </div>
           </div>
         </section>
 

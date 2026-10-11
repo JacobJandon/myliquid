@@ -27,8 +27,9 @@ The logo is a living drop of liquid with eyes. It slowly morphs, breathes and bl
 (`components/brand/LogoMark.tsx`, with a static `app/icon.svg` for the browser tab).
 
 **On your phone.** MyLiquid installs as an app on Android and iPhone for free: open it in the browser and tap
-Install (Android) or Add to Home Screen (iPhone). GitHub Actions also builds an Android APK, ready for Google Play
-later. See [`docs/MOBILE.md`](docs/MOBILE.md).
+Install (Android) or Add to Home Screen (iPhone). GitHub Actions also builds an
+[Android APK](https://github.com/JacobJandon/myliquid/releases/download/android-latest/MyLiquid.apk), ready for
+Google Play later. See [`docs/MOBILE.md`](docs/MOBILE.md).
 
 > Demo software: simulated markets, fictional products and merchants, demo money. No
 > real cards or payments. Not investment advice.

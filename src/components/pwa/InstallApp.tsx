@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { Download, Share, X } from "lucide-react";
+import { Check, Download, Share, X } from "lucide-react";
 import { useEffect, useSyncExternalStore } from "react";
 import { LogoMark } from "@/components/brand/LogoMark";
 import { buttonClass } from "@/components/ui";
@@ -91,6 +91,33 @@ export function InstallAppRow({ className }: { className?: string }) {
   return null;
 }
 
+/** The landing page's install button: Install where the browser offers it, how-to on iPhone, nothing elsewhere. */
+export function InstallAppButton() {
+  const state = useInstallState();
+  if (state === "prompt")
+    return (
+      <button type="button" className={buttonClass("primary")} onClick={install}>
+        <Download className="h-4 w-4" aria-hidden /> Install the app
+      </button>
+    );
+  if (state === "ios")
+    return (
+      <p className="flex items-center gap-2 text-sm text-fg-2">
+        <Share className="h-4 w-4 shrink-0" aria-hidden />
+        <span>
+          On iPhone: tap <b>Share</b>, then <b>Add to Home Screen</b>.
+        </span>
+      </p>
+    );
+  if (state === "installed")
+    return (
+      <p className="flex items-center gap-2 text-sm text-good">
+        <Check className="h-4 w-4" aria-hidden /> You&apos;re using the app.
+      </p>
+    );
+  return null;
+}
+
 const DISMISSED = "ml-install-dismissed";
 
 function readDismissed(): boolean {
@@ -106,7 +133,7 @@ function onDismissedChange(onChange: () => void) {
   return () => window.removeEventListener("ml-install-dismissed", onChange);
 }
 
-/** A card on the phone Home screen until the app is installed or the card is dismissed. */
+/** A card on the Home screen until the app is installed or the card is dismissed. */
 export function InstallBanner() {
   const state = useInstallState();
   const dismissed = useSyncExternalStore(onDismissedChange, readDismissed, () => true);
@@ -120,14 +147,23 @@ export function InstallBanner() {
     window.dispatchEvent(new Event("ml-install-dismissed"));
   };
   return (
-    <div className="flex items-center gap-3 rounded-2xl border-2 border-fg bg-surface p-3 shadow-[3px_3px_0_#111] lg:hidden">
+    <div className="flex items-center gap-3 rounded-2xl border-2 border-fg bg-surface p-3 shadow-[3px_3px_0_#111]">
       <LogoMark size={36} animate={false} />
       <div className="min-w-0 flex-1">
         <div className="text-sm font-medium text-fg">Get the MyLiquid app</div>
         <div className="text-xs text-fg-2">
-          {state === "prompt"
-            ? "Free. On your home screen, full screen, no app store."
-            : "Tap Share, then Add to Home Screen."}
+          {state === "prompt" ? (
+            <>
+              <span className="lg:hidden">
+                Free. On your home screen, full screen, no app store.
+              </span>
+              <span className="hidden lg:inline">
+                Free. Its own window and icon on this computer, no app store.
+              </span>
+            </>
+          ) : (
+            "Tap Share, then Add to Home Screen."
+          )}
         </div>
       </div>
       {state === "prompt" && (

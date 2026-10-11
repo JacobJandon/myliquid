@@ -38,12 +38,17 @@ full screen, and has shortcuts when you long-press the icon: Invest, Pay, Talk, 
 GitHub Actions builds an Android app (`android/`, a Trusted Web Activity that opens the site) on every change to
 it.
 
-**To build and install it:**
+**To install it:** on your phone, open
+[the latest APK](https://github.com/JacobJandon/myliquid/releases/download/android-latest/MyLiquid.apk). It is
+also linked from the front page's "MyLiquid in your pocket" section. Open the downloaded file, and allow
+installing from your browser or files app when Android asks.
 
-1. On GitHub, open **Actions → Android app**. Open the latest run, or click **Run workflow**. You can type the
-   site's address there.
-2. Under **Artifacts**, download **MyLiquid-android-N** and unzip it.
-3. Open `MyLiquid-N.apk` on your phone and allow installing from your browser or files app when Android asks.
+**To build it:**
+
+- Every build replaces the APK on the public `android-latest` release, so the link above always gets the newest.
+- To start a build yourself, open **Actions → Android app** on GitHub and click **Run workflow**. You can type
+  the site's address there.
+- Each run also keeps the APK and the Play Store bundle (`.aab`) under **Artifacts**.
 
 **Which site it opens.**
 
@@ -136,10 +141,12 @@ signs the published app (Play App Signing).
 |---|---|
 | App manifest (name, icons, shortcuts, screenshots) | `src/app/manifest.ts`, `public/icons/`, `public/screenshots/`, `src/app/apple-icon.png` |
 | Service worker | `public/sw.js` |
-| Install card and menu row | `src/components/pwa/InstallApp.tsx` |
+| Install card, menu row and the front page's install button | `src/components/pwa/InstallApp.tsx` |
+| "Scan to open it on your phone" QR code (front page, desktop) | `src/components/pwa/PhoneQr.tsx` |
+| Front page app section, APK link | `src/app/page.tsx` (`#app`), `src/lib/mobile/links.ts` |
 | Offline screen | `src/app/offline/page.tsx` |
 | Phone tab bar and More sheet | `MobileTabBar` in `src/components/app/Sidebar.tsx` |
-| Portfolio header | `src/components/app/PortfolioHero.tsx` |
+| Portfolio header with the scrubbable chart (phones and desktop) | `src/components/app/PortfolioHero.tsx` |
 | Site password page | `src/app/gate/page.tsx`, `src/app/api/site-gate/route.ts`, `src/lib/auth/siteGate.ts`, `src/proxy.ts` |
 | Android app | `android/` (generated with Bubblewrap; `twa-manifest.json` holds its settings) |
 | Android build | `.github/workflows/android.yml` |

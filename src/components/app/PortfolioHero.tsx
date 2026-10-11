@@ -30,16 +30,19 @@ function daysBetween(a: string, b: string) {
 }
 
 /**
- * The phone Home's headline: what the portfolio is worth, how it moved over a range, and a chart you can scrub
- * with a finger to read any day's value.
+ * Home's headline, on phones and desktop alike: what the portfolio is worth, how it moved over a range, and a
+ * chart you can scrub (finger or mouse) to read any day's value.
  */
 export function PortfolioHero({
   points,
   cashCents,
+  totalGainCents,
 }: {
   /** Daily values, oldest first; the last one is today. */
   points: ValuePoint[];
   cashCents: number;
+  /** Today's value minus everything paid in, net of withdrawals. */
+  totalGainCents: number;
 }) {
   const [range, setRange] = useState<RangeId>("1M");
   const [hover, setHover] = useState<number | null>(null);
@@ -82,9 +85,12 @@ export function PortfolioHero({
   };
 
   return (
-    <section aria-label="Portfolio" className="lg:hidden">
+    <section
+      aria-label="Portfolio"
+      className="lg:rounded-2xl lg:border lg:border-line lg:bg-surface lg:px-6 lg:pt-5"
+    >
       <div className="text-xs font-medium text-muted">Portfolio</div>
-      <div className="font-display text-[2.6rem] leading-tight text-fg tabular-nums">
+      <div className="font-display text-[2.6rem] leading-tight text-fg tabular-nums lg:text-5xl">
         {formatUsd(value)}
       </div>
       <div className={clsx("text-sm font-medium tabular-nums", up ? "text-good" : "text-critical")}>
@@ -97,7 +103,7 @@ export function PortfolioHero({
       <svg
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="none"
-        className="mt-3 h-36 w-full touch-none select-none"
+        className="mt-3 h-36 w-full touch-none select-none lg:h-56"
         role="img"
         aria-label={`Portfolio value, ${r.label.toLowerCase()}: ${formatUsd(first)} to ${formatUsd(current)}`}
         onPointerDown={scrub}
@@ -135,7 +141,10 @@ export function PortfolioHero({
         )}
       </svg>
 
-      <div className="mt-2 flex justify-between border-b border-line pb-3" role="tablist">
+      <div
+        className="mt-2 flex justify-between border-b border-line pb-3 lg:justify-start lg:gap-2"
+        role="tablist"
+      >
         {RANGES.map((x) => (
           <button
             key={x.id}
@@ -160,9 +169,20 @@ export function PortfolioHero({
         ))}
       </div>
 
+      <div className="flex items-center justify-between border-b border-line py-3 text-sm">
+        <span className="text-fg">Total gain</span>
+        <span
+          className={clsx(
+            "font-medium tabular-nums",
+            totalGainCents >= 0 ? "text-good" : "text-critical",
+          )}
+        >
+          {formatUsd(totalGainCents, { sign: true })}
+        </span>
+      </div>
       <Link
         href="/app/invest"
-        className="flex items-center justify-between border-b border-line py-3 text-sm"
+        className="flex items-center justify-between border-b border-line py-3 text-sm lg:border-b-0"
       >
         <span className="text-fg">Cash to invest</span>
         <span className="flex items-center gap-1 font-medium text-fg tabular-nums">

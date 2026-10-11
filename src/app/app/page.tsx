@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireInvestor } from "@/lib/auth/current";
 import { getDb, simDate } from "@/lib/db";
 import { SLEEVE_LABELS } from "@/lib/domain/catalog";
-import { addDays, formatDate } from "@/lib/domain/dates";
+import { formatDate } from "@/lib/domain/dates";
 import { formatPct, formatUsd } from "@/lib/domain/money";
 import { AGENTS, DESK_AGENTS } from "@/lib/agents/registry";
 import { listAlerts } from "@/lib/services/alerts";
@@ -24,7 +24,6 @@ import { CashPanel } from "@/components/app/CashPanel";
 import { ProposalInbox } from "@/components/app/ProposalInbox";
 import { listHostedTraders, traderRecord } from "@/lib/services/hostedTraders";
 import { AllocationBar } from "@/components/charts/AllocationBar";
-import { LineChart } from "@/components/charts/LineChart";
 import { LiquidityLadder } from "@/components/charts/LiquidityLadder";
 import { AgentAvatar, Badge, Card, LinkButton, Stat } from "@/components/ui";
 
@@ -55,9 +54,6 @@ export default async function DashboardPage() {
   const runs = lastRunByAgent(db, investorId);
   const today = simDate(db);
 
-  const yesterday = nav.findLast((p) => p.date < today)?.totalCents ?? snapshot.totalCents;
-  const yearAgo =
-    nav.find((p) => p.date >= addDays(today, -365))?.totalCents ?? snapshot.totalCents;
   const contributions = getNetContributions(db, investorId);
   const week = ladder.find((b) => b.id === "week");
 
@@ -77,7 +73,6 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <InstallBanner />
-      <PortfolioHero points={heroPoints} cashCents={snapshot.cashCents} />
 
       <div className="hidden flex-wrap items-end justify-between gap-4 lg:flex">
         <div>
@@ -92,25 +87,15 @@ export default async function DashboardPage() {
         </div>
       </div>
 
+      <PortfolioHero
+        points={heroPoints}
+        cashCents={snapshot.cashCents}
+        totalGainCents={snapshot.totalCents - contributions}
+      />
+
       <PetRoom initial={pet} initialQuiz={quiz} />
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
-        <Stat
-          className="hidden lg:block"
-          label="Total value"
-          value={formatUsd(snapshot.totalCents)}
-          sub={`${formatPct(snapshot.totalCents / yearAgo - 1, 1, true)} ${
-            (nav[0]?.date ?? today) > addDays(today, -300)
-              ? `since ${formatDate(nav[0]?.date ?? today)}`
-              : "over 1 year"
-          } · ${formatUsd(snapshot.totalCents - contributions, { sign: true })} total gain`}
-        />
-        <Stat
-          className="hidden lg:block"
-          label="Today"
-          value={formatUsd(snapshot.totalCents - yesterday, { sign: true })}
-          sub={`${formatPct(yesterday ? snapshot.totalCents / yesterday - 1 : 0, 2, true)} since the last market day`}
-        />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <Stat
           label="Cash within 7 days"
           value={formatPct(week?.cumulativePct ?? 0, 0)}
@@ -149,18 +134,6 @@ export default async function DashboardPage() {
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="min-w-0 space-y-6 xl:col-span-2">
-          <Card
-            className="hidden lg:block"
-            title="Portfolio value"
-            subtitle="Daily net asset value, including cash"
-          >
-            <LineChart
-              points={nav.map((p) => ({ date: p.date, value: p.totalCents }))}
-              format="cents"
-              label="Portfolio value"
-            />
-          </Card>
-
           <Card
             title="Liquidity ladder"
             subtitle="How much could be cash, and when: settlement, notice periods, gates and lock-ups included."

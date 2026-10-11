@@ -1,7 +1,8 @@
 name: Android app
 
 # Builds MyLiquid for Android: a Trusted Web Activity (android/) that opens the deployed site full screen.
-# Download the APK from the run's Artifacts and open it on a phone. See docs/MOBILE.md.
+# Every build is published as MyLiquid.apk on the "android-latest" release, a public download link (also in the
+# run's Artifacts, with the Play Store bundle). See docs/MOBILE.md.
 
 on:
   push:
@@ -24,6 +25,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write # publishes the APK to the android-latest release
     env:
       MYLIQUID_HOST: ${{ inputs.host || vars.MYLIQUID_HOST || 'myliquid-jacobjandons-projects.vercel.app' }}
     steps:
@@ -108,6 +111,20 @@ jobs:
           path: dist/
           retention-days: 30
 
+      - name: Publish the APK for download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp "dist/MyLiquid-${{ github.run_number }}.apk" dist/MyLiquid.apk
+          notes="MyLiquid for Android, build ${{ github.run_number }} (${GITHUB_SHA::7}). Opens https://$MYLIQUID_HOST/app. Signed with $SIGNING. Download MyLiquid.apk on your phone and open it; see docs/MOBILE.md."
+          if gh release view android-latest > /dev/null 2>&1; then
+            gh release upload android-latest dist/MyLiquid.apk --clobber
+            gh release edit android-latest --notes "$notes"
+          else
+            gh release create android-latest dist/MyLiquid.apk --prerelease \
+              --title "MyLiquid for Android" --notes "$notes" --target "$GITHUB_SHA"
+          fi
+
       - name: Summary
         run: |
           {
@@ -117,7 +134,8 @@ jobs:
             echo "- Signed with: $SIGNING"
             echo "- SHA-256 fingerprint: \`$FINGERPRINT\`"
             echo ""
-            echo "Download **MyLiquid-android-${{ github.run_number }}** under Artifacts, unzip it and open the .apk on your phone."
+            echo "Download it on your phone: https://github.com/${{ github.repository }}/releases/download/android-latest/MyLiquid.apk"
+            echo "(or **MyLiquid-android-${{ github.run_number }}** under Artifacts, with the Play Store bundle)."
             echo "For full screen without a URL bar, set \`ANDROID_CERT_FINGERPRINTS\` in Vercel to the fingerprint above"
             echo "(docs/MOBILE.md). With a throwaway key that changes every build, so add your own key first."
           } >> "$GITHUB_STEP_SUMMARY"
