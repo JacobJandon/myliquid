@@ -1,3 +1,4 @@
 # The iPhone app (Expo) and the Android app build separately; the website doesn't need them.
-mobile/
-android/
+# Anchored to the root: a bare "mobile/" would also drop src/lib/mobile.
+/mobile/
+/android/
