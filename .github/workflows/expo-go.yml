@@ -71,14 +71,18 @@ jobs:
           : > "$RUNNER_TEMP/sites.md"
           picked=""; guarded=""
           for u in $CHOSEN https://myliquid.vercel.app https://myliquid-jacobjandons-projects.vercel.app $deployed; do
-            [ -z "$u" ] || [ "$u" = "null" ] && continue
+            if [ -z "$u" ] || [ "$u" = "null" ]; then continue; fi
             u="${u%/}"
-            read -r code to < <(curl -s -o /dev/null -w "%{http_code} %{redirect_url}" --max-time 20 "$u/api/health" || true)
-            case "$to" in
-              *vercel.com*) note="behind Vercel's login (Deployment Protection)"; [ -z "$guarded" ] && guarded="$u" ;;
-              "") note="" ;;
-              *) note="redirects to $to" ;;
-            esac
+            out=$(curl -s -o /dev/null -w "%{http_code} %{redirect_url}" --max-time 20 "$u/api/health" || true)
+            code="${out%% *}"
+            to="${out#* }"
+            note=""
+            if [[ "$to" == *vercel.com* ]]; then
+              note="behind Vercel's login (Deployment Protection)"
+              if [ -z "$guarded" ]; then guarded="$u"; fi
+            elif [ -n "$to" ]; then
+              note="redirects to $to"
+            fi
             echo "- $u answered $code${note:+, $note}" | tee -a "$RUNNER_TEMP/sites.md"
             if [ -z "$picked" ] && [ "$code" = "200" ]; then picked="$u"; fi
           done
