@@ -1,0 +1,118 @@
+name: iPhone test (Expo Go)
+
+# One tap to try the iPhone app: runs the app (mobile/) on GitHub's servers behind a public tunnel and gives you a
+# link that opens it in Expo Go. Start it from the Actions tab (or the GitHub app), wait about two minutes, then open
+# the run and tap "Open in Expo Go". It keeps running for the minutes you choose.
+
+on:
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "How long to keep it running (minutes, up to 300)"
+        default: "60"
+      site:
+        description: "MyLiquid address the app opens (default: the MYLIQUID_SITE_URL variable, else mobile/site.ts)"
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: expo-go
+  cancel-in-progress: true
+
+jobs:
+  serve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 320
+    defaults:
+      run:
+        working-directory: mobile
+    env:
+      SITE_URL: ${{ inputs.site || vars.MYLIQUID_SITE_URL || 'https://myliquid-jacobjandons-projects.vercel.app' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - run: npm ci
+
+      - name: Open a public tunnel
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/cloudflared" https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x "$RUNNER_TEMP/cloudflared"
+          nohup "$RUNNER_TEMP/cloudflared" tunnel --no-autoupdate --url http://localhost:8081 > "$RUNNER_TEMP/tunnel.log" 2>&1 &
+          for i in $(seq 1 60); do
+            url=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$RUNNER_TEMP/tunnel.log" | head -1)
+            [ -n "$url" ] && break
+            sleep 2
+          done
+          if [ -z "$url" ]; then cat "$RUNNER_TEMP/tunnel.log"; echo "::error::The tunnel didn't start."; exit 1; fi
+          echo "TUNNEL_URL=$url" >> "$GITHUB_ENV"
+          echo "Tunnel: $url"
+
+      - name: Start the app
+        env:
+          EXPO_PACKAGER_PROXY_URL: ${{ env.TUNNEL_URL }}
+          EXPO_PUBLIC_SITE_URL: ${{ env.SITE_URL }}
+          EXPO_NO_TELEMETRY: "1"
+        run: |
+          nohup npx expo start --port 8081 --go > "$RUNNER_TEMP/expo.log" 2>&1 &
+          for i in $(seq 1 90); do
+            curl -fs -o /dev/null http://localhost:8081/status && break
+            sleep 2
+          done
+          curl -fs http://localhost:8081/status || { cat "$RUNNER_TEMP/expo.log"; echo "::error::The app server didn't start."; exit 1; }
+
+      - name: Check it the way Expo Go will
+        run: |
+          # The manifest Expo Go asks for, through the tunnel, and the app bundle it points to.
+          for i in $(seq 1 20); do
+            curl -fs -H "expo-platform: ios" -H "accept: application/expo+json,application/json" "$TUNNEL_URL/" -o manifest.json && break
+            sleep 3
+          done
+          bundle=$(node -e "const m=require('./manifest.json'); console.log(m.launchAsset?.url ?? m.bundleUrl ?? '')")
+          echo "Bundle: $bundle"
+          case "$bundle" in "$TUNNEL_URL"/*) ;; *) cat manifest.json; echo "::error::The manifest doesn't point at the tunnel."; exit 1;; esac
+          curl -fs -o bundle.js --max-time 300 "$bundle"
+          echo "Bundle size: $(wc -c < bundle.js) bytes"
+          grep -q "MyLiquidApp" bundle.js || { echo "::error::The bundle isn't the MyLiquid app."; exit 1; }
+
+      - name: Your link
+        run: |
+          host="${TUNNEL_URL#https://}"
+          go="exps://$host"
+          tap="$SITE_URL/expo-go?u=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$go")"
+          qr="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$go")"
+          echo "::notice title=Open in Expo Go::$tap"
+          {
+            echo "## MyLiquid in Expo Go is running"
+            echo ""
+            echo "**On your iPhone:** [Open in Expo Go]($tap)"
+            echo ""
+            echo "Or scan this with the iPhone camera:"
+            echo ""
+            echo "![QR code for Expo Go]($qr)"
+            echo ""
+            echo "Or paste this into Safari: \`$go\`"
+            echo ""
+            echo "Needs the free **Expo Go** app from the App Store. It runs for ${{ inputs.minutes || 60 }} minutes; cancel the run to stop it sooner."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Open in Expo Go: $tap"
+          echo "Expo Go link:    $go"
+
+      - name: Keep it running
+        run: |
+          m="${{ inputs.minutes || 60 }}"
+          case "$m" in ''|*[!0-9]*) m=60;; esac
+          [ "$m" -gt 300 ] && m=300
+          echo "Running for $m minutes. Cancel the run to stop it."
+          end=$(( $(date +%s) + m * 60 ))
+          while [ "$(date +%s)" -lt "$end" ]; do
+            sleep 60
+            curl -fs -o /dev/null http://localhost:8081/status || { tail -50 "$RUNNER_TEMP/expo.log"; echo "::error::The app server stopped."; exit 1; }
+          done

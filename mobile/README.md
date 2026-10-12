@@ -9,7 +9,23 @@ different.
 
 ## Test it on your iPhone
 
-Three ways, quickest first.
+### One tap: from GitHub, nothing to install but Expo Go
+
+1. On your iPhone, install **Expo Go** (free) from the App Store.
+2. In the GitHub app or on github.com, open this repository → **Actions** → **iPhone test (Expo Go)** → **Run
+   workflow**.
+3. After about two minutes, open the run and tap **Open in Expo Go** (or scan its QR code with the camera).
+
+It runs the app on GitHub's servers for an hour (you can choose up to five) and opens your MyLiquid site inside it.
+Set the repository variable `MYLIQUID_SITE_URL` (or type the address when you start the run) if your MyLiquid
+address isn't the default in `site.ts`.
+
+### One double-click: from your computer
+
+Install [Node.js](https://nodejs.org), then double-click **Start iPhone test.command** (Mac) or **Start iPhone
+test.bat** (Windows) in this folder. Scan the QR code it shows with your iPhone camera.
+
+### Other ways
 
 ### 1. Expo Go and Snack: free, about 5 minutes, no installs on your computer
 

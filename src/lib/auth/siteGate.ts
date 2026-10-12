@@ -15,6 +15,7 @@ export const SITE_COOKIE_MAX_AGE = 90 * 24 * 60 * 60;
  * - The daily cron job checks CRON_SECRET.
  * - The app shell (manifest, icons, service worker, offline page, Android asset links) holds no account data, and
  *   Android and Chrome fetch it without cookies when they install the app.
+ * - /expo-go only forwards to an Expo Go test link (lib/mobile/expoGo.ts).
  */
 const PUBLIC_PREFIXES = [
   "/api/mcp",
@@ -31,6 +32,7 @@ const PUBLIC_PREFIXES = [
   "/screenshots/",
   "/apple-icon.png",
   "/.well-known/assetlinks.json",
+  "/expo-go",
 ];
 
 export function isPublicPath(path: string): boolean {
