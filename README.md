@@ -29,7 +29,8 @@ The logo is a living drop of liquid with eyes. It slowly morphs, breathes and bl
 **On your phone.** MyLiquid installs as an app on Android and iPhone for free: open it in the browser and tap
 Install (Android) or Add to Home Screen (iPhone). GitHub Actions also builds an
 [Android APK](https://github.com/JacobJandon/myliquid/releases/download/android-latest/MyLiquid.apk), ready for
-Google Play later. See [`docs/MOBILE.md`](docs/MOBILE.md).
+Google Play later, and [`mobile/`](mobile/README.md) is the iPhone app for Expo Go and TestFlight. See
+[`docs/MOBILE.md`](docs/MOBILE.md).
 
 > Demo software: simulated markets, fictional products and merchants, demo money. No
 > real cards or payments. Not investment advice.
@@ -365,6 +366,7 @@ docs/
   DEPLOY.md            Private deployment: Vercel + Turso, or Docker
   MOBILE.md            The phone app: install from the browser, the Android APK, Google Play
 android/               The Android app (a Trusted Web Activity around the site), built by GitHub Actions
+mobile/                The iPhone app (Expo): test in Expo Go, ship to TestFlight
 public/                Service worker, app icons, install screenshots
 ```
 

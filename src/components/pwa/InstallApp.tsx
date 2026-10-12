@@ -38,7 +38,13 @@ function subscribe(onChange: () => void) {
 
 function snapshot(): InstallState {
   const nav = navigator as Navigator & { standalone?: boolean };
-  if (window.matchMedia("(display-mode: standalone)").matches || nav.standalone) return "installed";
+  // Installed from the browser, or running inside the iPhone app (mobile/, which tags its user agent).
+  if (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    nav.standalone ||
+    /MyLiquidApp\//.test(navigator.userAgent)
+  )
+    return "installed";
   if (window.__mlInstallPrompt) return "prompt";
   if (/iPad|iPhone|iPod/.test(navigator.userAgent)) return "ios";
   return "unavailable";

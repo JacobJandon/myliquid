@@ -1,0 +1,25 @@
+{
+  "name": "myliquid-mobile",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "expo": "~57.0.27",
+    "expo-splash-screen": "~57.0.9",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-webview": "^13.16.1"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "tunnel": "expo start --tunnel",
+    "ios": "expo start --ios",
+    "typecheck": "tsc --noEmit",
+    "testflight": "npx eas-cli@latest build --platform ios --profile production --auto-submit"
+  },
+  "private": true
+}

@@ -1,0 +1,3 @@
+# The iPhone app (Expo) and the Android app build separately; the website doesn't need them.
+mobile/
+android/

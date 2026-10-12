@@ -117,6 +117,10 @@ signs the published app (Play App Signing).
 - clear "simulated markets, demo money" wording until real money goes live through licensed partners (see
   [`startup/research.md`](startup/research.md) §5).
 
+**Testing on iPhone.** The iPhone app lives in [`mobile/`](../mobile/README.md) (Expo). Try it free today in
+Expo Go: paste `mobile/snack/App.js` into snack.expo.dev and scan the QR code. Or put it on TestFlight with an
+Apple Developer account and one command (`npm run testflight`). Step by step: [`mobile/README.md`](../mobile/README.md).
+
 **iPhone App Store.**
 
 - It costs $99 a year.
