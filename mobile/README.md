@@ -14,9 +14,14 @@ different.
 1. On your iPhone, install **Expo Go** (free) from the App Store.
 2. In the GitHub app or on github.com, open this repository → **Actions** → **iPhone test (Expo Go)** → **Run
    workflow**.
-3. After about two minutes, open the run and tap **Open in Expo Go** (or scan its QR code with the camera).
+3. After about two minutes, open
+   [the iPhone test page](https://github.com/JacobJandon/myliquid/releases/tag/iphone-test) and tap **Open in
+   Expo Go** (or scan its QR code with the camera). The page says whether it's running and how to start it
+   again: open the last run and tap **Re-run all jobs**.
 
 It runs the app on GitHub's servers for an hour (you can choose up to five) and opens your MyLiquid site inside it.
+If Vercel's own login (Deployment Protection → Vercel Authentication) is on, the app shows it before MyLiquid's
+password page; turn it off to skip it, since MyLiquid's site password keeps the site private.
 Set the repository variable `MYLIQUID_SITE_URL` (or type the address when you start the run) if your MyLiquid
 address isn't the default in `site.ts`.
 
