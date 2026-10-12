@@ -33,7 +33,7 @@ jobs:
       run:
         working-directory: mobile
     env:
-      SITE_URL: ${{ inputs.site || vars.MYLIQUID_SITE_URL || 'https://myliquid-jacobjandons-projects.vercel.app' }}
+      SITE_URL: https://myliquid-jacobjandons-projects.vercel.app # replaced by "Find the MyLiquid address"
     steps:
       - uses: actions/checkout@v4
 
@@ -58,6 +58,31 @@ jobs:
           if [ -z "$url" ]; then cat "$RUNNER_TEMP/tunnel.log"; echo "::error::The tunnel didn't start."; exit 1; fi
           echo "TUNNEL_URL=$url" >> "$GITHUB_ENV"
           echo "Tunnel: $url"
+
+      - name: Find the MyLiquid address
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CHOSEN: ${{ inputs.site || vars.MYLIQUID_SITE_URL || '' }}
+        run: |
+          # The address you set wins; otherwise the first of the likely Vercel addresses that answers.
+          latest=$(gh api "repos/$GITHUB_REPOSITORY/deployments?environment=Production&per_page=1" --jq '.[0].id' 2>/dev/null || true)
+          deployed=""
+          [ -n "$latest" ] && deployed=$(gh api "repos/$GITHUB_REPOSITORY/deployments/$latest/statuses" --jq '[.[] | select(.state=="success")][0].environment_url' 2>/dev/null || true)
+          : > "$RUNNER_TEMP/sites.md"
+          picked=""
+          for u in $CHOSEN https://myliquid.vercel.app https://myliquid-jacobjandons-projects.vercel.app $deployed; do
+            [ -z "$u" ] || [ "$u" = "null" ] && continue
+            u="${u%/}"
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$u/api/health" || true)
+            echo "- $u answered $code" | tee -a "$RUNNER_TEMP/sites.md"
+            if [ -z "$picked" ] && [ "$code" = "200" ]; then picked="$u"; fi
+          done
+          if [ -n "$picked" ]; then
+            echo "SITE_URL=$picked" >> "$GITHUB_ENV"; echo "SITE_OK=yes" >> "$GITHUB_ENV"
+          else
+            echo "SITE_OK=no" >> "$GITHUB_ENV"
+            echo "::warning::No MyLiquid address answered. Set the MYLIQUID_SITE_URL repository variable."
+          fi
 
       - name: Start the app
         env:
@@ -85,16 +110,6 @@ jobs:
           curl -fs -o bundle.js --max-time 300 "$bundle"
           echo "Bundle size: $(wc -c < bundle.js) bytes"
           grep -q "MyLiquidApp" bundle.js || { echo "::error::The bundle isn't the MyLiquid app."; exit 1; }
-
-      - name: Check the MyLiquid address
-        run: |
-          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$SITE_URL/api/health" || true)
-          if [ "$code" = "200" ]; then
-            echo "SITE_OK=yes" >> "$GITHUB_ENV"
-          else
-            echo "SITE_OK=no" >> "$GITHUB_ENV"
-            echo "::warning::$SITE_URL/api/health answered $code. Set the MYLIQUID_SITE_URL repository variable to your MyLiquid address."
-          fi
 
       - name: Your link
         env:
@@ -132,8 +147,12 @@ jobs:
             echo ""
             echo "Or paste into Safari: \`$go\`"
             echo ""
+            echo "The app opens **$SITE_URL**."
+            echo ""
             if [ "$SITE_OK" = "no" ]; then
-              echo "> The app opens $SITE_URL, which didn't answer. Set the MYLIQUID_SITE_URL repository variable to your MyLiquid address and run it again."
+              echo "> None of these MyLiquid addresses answered, so the app may show an error. Set the MYLIQUID_SITE_URL repository variable (Settings → Secrets and variables → Actions → Variables) to your address from Vercel → Settings → Domains, then run it again."
+              echo ""
+              cat "$RUNNER_TEMP/sites.md"
               echo ""
             fi
             echo "Needs the free Expo Go app from the App Store. Started by [this run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID); to start it again later, open that run and tap **Re-run all jobs**."
