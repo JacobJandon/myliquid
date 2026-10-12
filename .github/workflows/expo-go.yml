@@ -1,10 +1,14 @@
 name: iPhone test (Expo Go)
 
 # One tap to try the iPhone app: runs the app (mobile/) on GitHub's servers behind a public tunnel and gives you a
-# link that opens it in Expo Go. Start it from the Actions tab (or the GitHub app), wait about two minutes, then open
-# the run and tap "Open in Expo Go". It keeps running for the minutes you choose.
+# link that opens it in Expo Go. Start it from the Actions tab (Run workflow, or Re-run all jobs on an earlier run),
+# wait about two minutes, then open the run and tap "Open in Expo Go". It keeps running for the minutes you choose.
 
 on:
+  # Starts on its own when this file changes; after that, "Re-run all jobs" on any run starts a fresh one.
+  push:
+    branches: [main, claude/myliquid-fintech-ai-agents-1svwct]
+    paths: [".github/workflows/expo-go.yml"]
   workflow_dispatch:
     inputs:
       minutes:
