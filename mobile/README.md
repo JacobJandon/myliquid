@@ -20,7 +20,10 @@ different.
    again: open the last run and tap **Re-run all jobs**.
 
 It runs the app on GitHub's servers for an hour (you can choose up to five) and opens your MyLiquid site inside it.
-If Vercel's own login (Deployment Protection → Vercel Authentication) is on, the app shows it before MyLiquid's
+If Expo Go says you're "not signed in to Expo CLI", either sign out of Expo Go (your profile → settings → Sign
+out) or add your Expo access token (expo.dev → Account settings → Access tokens) as the repository secret
+`EXPO_TOKEN`; the run then signs in to your Expo account too. If Vercel's own login (Deployment Protection →
+Vercel Authentication) is on, the app shows it before MyLiquid's
 password page; turn it off to skip it, since MyLiquid's site password keeps the site private.
 Set the repository variable `MYLIQUID_SITE_URL` (or type the address when you start the run) if your MyLiquid
 address isn't the default in `site.ts`.

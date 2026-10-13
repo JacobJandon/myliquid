@@ -95,8 +95,25 @@ jobs:
             echo "::warning::No MyLiquid address answered. Set the MYLIQUID_SITE_URL repository variable."
           fi
 
+      # With an EXPO_TOKEN secret (expo.dev → Account settings → Access tokens), the app server signs in to your
+      # Expo account, so Expo Go can stay signed in too. Without it, sign out of Expo Go before opening the link.
+      - name: Sign in to Expo
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "EXPO_SIGNED_IN=no" >> "$GITHUB_ENV"
+            echo "No EXPO_TOKEN secret: serving the app without an Expo account."
+            exit 0
+          fi
+          npx --yes eas-cli@latest whoami
+          # Links the app to your Expo account for this run (the change to app.json isn't committed).
+          grep -q '"projectId"' app.json || npx --yes eas-cli@latest init --non-interactive --force
+          echo "EXPO_SIGNED_IN=yes" >> "$GITHUB_ENV"
+
       - name: Start the app
         env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EXPO_PACKAGER_PROXY_URL: ${{ env.TUNNEL_URL }}
           EXPO_PUBLIC_SITE_URL: ${{ env.SITE_URL }}
           EXPO_NO_TELEMETRY: "1"
@@ -188,6 +205,10 @@ jobs:
               echo "> None of these MyLiquid addresses answered, so the app may show an error. Set the MYLIQUID_SITE_URL repository variable (Settings → Secrets and variables → Actions → Variables) to your address from Vercel → Settings → Domains, then run it again."
               echo ""
               cat "$RUNNER_TEMP/sites.md"
+              echo ""
+            fi
+            if [ "$EXPO_SIGNED_IN" != "yes" ]; then
+              echo "> **Signed in to Expo Go?** Sign out first (Expo Go → your profile → settings → Sign out), or Expo Go says you're not signed in to Expo CLI. To stay signed in, add an EXPO_TOKEN repository secret (expo.dev → Account settings → Access tokens) and run it again."
               echo ""
             fi
             echo "Needs the free Expo Go app from the App Store. Started by [this run]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID); to start it again later, open that run and tap **Re-run all jobs**."
