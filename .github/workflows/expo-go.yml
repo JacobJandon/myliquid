@@ -128,7 +128,27 @@ jobs:
         run: |
           host="${TUNNEL_URL#https://}"
           go="exps://$host"
-          tap="$SITE_URL/expo-go?u=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$go")"
+          # A page of its own, behind a second tunnel: tapping its https link opens Expo Go straight away (GitHub
+          # pages can't link to exps:// themselves, and the MyLiquid site may sit behind Vercel's login).
+          mkdir -p "$RUNNER_TEMP/open"
+          cat > "$RUNNER_TEMP/open/index.html" <<HTML
+          <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Open MyLiquid in Expo Go</title><meta http-equiv="refresh" content="1;url=$go">
+          <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f3ee;color:#111;font:16px -apple-system,system-ui,sans-serif;text-align:center;padding:24px}
+          a.b{display:inline-block;margin:18px 0;background:#111;color:#f5f3ee;padding:14px 22px;border-radius:999px;text-decoration:none;font-weight:600}small{color:#86837b}</style></head>
+          <body><div><h1>MyLiquid</h1><p>Opening Expo Go…</p><a class="b" href="$go">Open in Expo Go</a>
+          <p><small>No Expo Go yet? <a href="https://apps.apple.com/app/expo-go/id982107779">Get it free on the App Store</a>, then tap the button.</small></p></div>
+          <script>location.href="$go";</script></body></html>
+          HTML
+          nohup python3 -m http.server 8090 --bind 127.0.0.1 --directory "$RUNNER_TEMP/open" > "$RUNNER_TEMP/open.log" 2>&1 &
+          nohup "$RUNNER_TEMP/cloudflared" tunnel --no-autoupdate --url http://localhost:8090 > "$RUNNER_TEMP/tunnel-open.log" 2>&1 &
+          for i in $(seq 1 60); do
+            tap=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$RUNNER_TEMP/tunnel-open.log" | head -1)
+            [ -n "$tap" ] && break
+            sleep 2
+          done
+          for i in $(seq 1 20); do curl -fs "$tap/" | grep -q "$go" && break; sleep 3; done
+          curl -fs "$tap/" | grep -q "$go" || { echo "::warning::The open page isn't reachable; use the QR code."; tap="$SITE_URL/expo-go?u=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$go")"; }
           qr="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$go")"
           echo "::notice title=Open in Expo Go::$tap"
           {
