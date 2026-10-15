@@ -1,0 +1,84 @@
+name: Production check
+
+# Drives the live MyLiquid site like a visitor (scripts/smoke/production.mjs): guest demo, every main screen, a
+# trade, a hosted trader, Gate and the phone app's pieces. Runs after every successful Vercel production deploy,
+# daily, and on demand. If something blocks access, the summary says exactly what.
+#
+# Optional repository secrets: MYLIQUID_SITE_PASSWORD (when the site password is on) and
+# VERCEL_AUTOMATION_BYPASS_SECRET (Vercel → Settings → Deployment Protection → Protection Bypass for Automation).
+# Optional repository variable: MYLIQUID_SITE_URL (default: the Vercel production domain).
+
+on:
+  deployment_status:
+  schedule:
+    - cron: "17 7 * * *"
+  push:
+    branches: [main, claude/myliquid-fintech-ai-agents-1svwct]
+    paths: [".github/workflows/production-check.yml", "scripts/smoke/**"]
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "Site to check (default: the MYLIQUID_SITE_URL variable or the Vercel production domain)"
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-check
+  cancel-in-progress: true
+
+jobs:
+  check:
+    if: github.event_name != 'deployment_status' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SITE_URL: ${{ inputs.site || vars.MYLIQUID_SITE_URL || 'https://myliquid-jacobjandons-projects.vercel.app' }}
+      SITE_PASSWORD: ${{ secrets.MYLIQUID_SITE_PASSWORD }}
+      VERCEL_BYPASS: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Can we reach it?
+        run: |
+          args=(-s -o /dev/null -w "%{http_code} %{redirect_url}" --max-time 30)
+          [ -n "$VERCEL_BYPASS" ] && args+=(-H "x-vercel-protection-bypass: $VERCEL_BYPASS")
+          out=$(curl "${args[@]}" "$SITE_URL/api/health" || true)
+          code="${out%% *}"; to="${out#* }"
+          echo "$SITE_URL/api/health → $out"
+          if [[ "$to" == *vercel.com* ]]; then
+            {
+              echo "## MyLiquid production check: blocked by Vercel's login"
+              echo ""
+              echo "$SITE_URL is behind **Vercel Authentication** (Deployment Protection), so visitors and the guest demo"
+              echo "see a Vercel login before MyLiquid. Fix one of:"
+              echo ""
+              echo "- Vercel → Settings → Deployment Protection → turn **Vercel Authentication** off (recommended;"
+              echo "  MyLiquid's own site password still keeps it private if you want), or"
+              echo "- add **Protection Bypass for Automation** there and save it as the repository secret"
+              echo "  \`VERCEL_AUTOMATION_BYPASS_SECRET\` (this check only)."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::Blocked by Vercel Authentication (Deployment Protection)."
+            exit 1
+          fi
+          if [ "$code" = "404" ]; then
+            echo "::error::$SITE_URL answered 404. Set the MYLIQUID_SITE_URL repository variable to your domain."
+            exit 1
+          fi
+
+      - name: Install a browser
+        run: |
+          mkdir -p "$RUNNER_TEMP/smoke" && cd "$RUNNER_TEMP/smoke"
+          npm init -y > /dev/null
+          npm install --no-fund --no-audit playwright@1 > /dev/null
+          npx playwright install --with-deps chromium > /dev/null
+          cp "$GITHUB_WORKSPACE/scripts/smoke/production.mjs" .
+
+      - name: Drive the site like a visitor
+        working-directory: ${{ runner.temp }}/smoke
+        run: node production.mjs
