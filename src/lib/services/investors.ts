@@ -258,6 +258,15 @@ export function deleteInvestor(db: Db, investorId: string): void {
 }
 
 /** Guest accounts are disposable: remove ones older than `days`. */
+/** How many guest accounts were opened in the last `ms` milliseconds. */
+export function recentGuestCount(db: Db, ms = 3_600_000): number {
+  const since = new Date(Date.now() - ms).toISOString();
+  const row = db
+    .prepare("SELECT COUNT(*) AS n FROM investors WHERE kind = 'guest' AND created_at >= ?")
+    .get(since) as { n: number };
+  return Number(row.n);
+}
+
 export function pruneGuests(db: Db, days = 7): number {
   const cutoff = new Date(Date.now() - days * 86_400_000).toISOString();
   const stale = db

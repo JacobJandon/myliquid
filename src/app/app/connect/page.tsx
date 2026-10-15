@@ -197,8 +197,8 @@ export default async function ConnectPage() {
         >
           <HostedTraders traders={hosted} agents={hireable} now={now} />
           <p className="mt-3 text-xs text-muted">
-            They work when you advance the market (+1d), when you open MyLiquid on a new market day,
-            and daily at 13:45 UTC on Vercel. Every trade passes their AINRA limits, your mandate
+            They work once every market day: when you open MyLiquid on a new one, when you advance
+            the market by hand (where that&apos;s allowed), and daily at 13:45 UTC on Vercel. Every trade passes their AINRA limits, your mandate
             and Sentinel&apos;s checks; pull the kill switch and they stop.
           </p>
         </Card>

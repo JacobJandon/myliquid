@@ -106,10 +106,12 @@ await step("Hire a hosted AI trader and let it work", async () => {
   return (card.match(/(live registrar|testbed)/) ?? ["?"])[0];
 });
 
-await step("Advance the market a day", async () => {
+await step("Market clock", async () => {
+  // On a shared site the market follows the calendar and refuses to be moved by hand (409); locally it may jump.
   const r = await page.request.post(`${SITE}/api/sim/advance`, { data: { days: 1 }, headers: { origin: SITE } });
+  if (r.status() === 409) return "follows the calendar (no time travel)";
   if (!r.ok()) throw new Error(`HTTP ${r.status()}`);
-  return "ok";
+  return "advanced a day (demo clock)";
 });
 
 await step("Gate decides (business playground API)", async () => {

@@ -7,7 +7,7 @@ import { formatDate } from "@/lib/domain/dates";
 import { listAlerts } from "@/lib/services/alerts";
 import { listProposals } from "@/lib/services/proposals";
 import { getMandate } from "@/lib/services/repo";
-import { ensureMarketCurrent } from "@/lib/services/sim";
+import { canAdvanceMarket, ensureMarketCurrent } from "@/lib/services/sim";
 import { runDueTraders, tradersDue } from "@/lib/services/hostedTraders";
 import { getCompanionView, pendingPaymentCount } from "@/lib/services/companion";
 import type { Stage } from "@/lib/domain/companion";
@@ -83,7 +83,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                   </span>
                 )}
               </div>
-              <SimControls />
+              <SimControls canAdvance={canAdvanceMarket()} />
             </div>
           </header>
           {investor.kind === "guest" && (

@@ -226,12 +226,32 @@ export function advanceDays(db: Db, days: number, reportFor?: string): DayReport
 }
 
 /**
- * Keeps the simulated market in step with the calendar: if real time has moved
- * past the market date, advance to today (up to 90 days at a time). Disabled with
- * MYLIQUID_MARKET_CLOCK=manual.
+ * How the market clock runs (`MYLIQUID_MARKET_CLOCK`):
+ * - `calendar`: the market follows the real date, a day at a time, and nobody can move it by hand. The market is
+ *   shared, so this is the default on Vercel, where anyone can open a guest account;
+ * - `demo`: it follows the calendar, and investors may also jump it ahead (+1d, +7d, +30d) to see time pass. The
+ *   default elsewhere (a local or single-team MyLiquid);
+ * - `manual`: it moves only by hand (tests).
+ */
+export type MarketClock = "calendar" | "demo" | "manual";
+
+export function marketClock(): MarketClock {
+  const v = process.env.MYLIQUID_MARKET_CLOCK;
+  if (v === "calendar" || v === "demo" || v === "manual") return v;
+  return process.env.VERCEL ? "calendar" : "demo";
+}
+
+/** Whether investors may move the shared market ahead by hand. */
+export function canAdvanceMarket(): boolean {
+  return marketClock() !== "calendar";
+}
+
+/**
+ * Keeps the simulated market in step with the calendar: if real time has moved past the market date, advance to
+ * today (up to 90 days at a time). Does nothing when the clock is manual.
  */
 export function ensureMarketCurrent(db: Db): number {
-  if (process.env.MYLIQUID_MARKET_CLOCK === "manual") return 0;
+  if (marketClock() === "manual") return 0;
   const behind = diffDays(simDate(db), toIsoDate(new Date()));
   if (behind <= 0) return 0;
   return advanceDays(db, Math.min(behind, 90)).length;

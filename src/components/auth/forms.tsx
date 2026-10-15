@@ -15,6 +15,7 @@ const input =
 
 const selected = "border-fg bg-surface-2 text-fg shadow-[2px_2px_0_#111]";
 
+/** Opens a guest account. Works without JavaScript too (a plain form post). */
 export function GuestButton({
   label = "Try the demo",
   variant = "secondary",
@@ -22,11 +23,39 @@ export function GuestButton({
   label?: string;
   variant?: "primary" | "secondary";
 }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      await postJson("/api/auth/guest", {});
+      router.push("/app");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setBusy(false);
+    }
+  }
+
   return (
-    <form action="/api/auth/guest" method="post">
-      <button type="submit" className={clsx(buttonClass(variant), "w-full sm:w-auto")}>
-        {label} <ArrowRight className="h-4 w-4" />
+    <form action="/api/auth/guest" method="post" onSubmit={submit}>
+      <button
+        type="submit"
+        disabled={busy}
+        className={clsx(buttonClass(variant), "w-full sm:w-auto")}
+      >
+        {label}{" "}
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
       </button>
+      {error && (
+        <p role="alert" className="mt-2 text-sm text-critical">
+          {error}
+        </p>
+      )}
     </form>
   );
 }

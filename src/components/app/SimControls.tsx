@@ -1,6 +1,6 @@
 "use client";
 
-import { FastForward } from "lucide-react";
+import { CalendarClock, FastForward } from "lucide-react";
 import { postJson, useAction } from "@/components/client";
 import { buttonClass } from "@/components/ui";
 
@@ -9,8 +9,19 @@ interface DayReport {
   events: string[];
 }
 
-export function SimControls() {
+/** Lets the investor jump the market ahead, where the clock allows it; otherwise says the market follows the calendar. */
+export function SimControls({ canAdvance }: { canAdvance: boolean }) {
   const { run, pending, error } = useAction();
+  if (!canAdvance)
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 text-xs text-muted"
+        title="The market is shared by everyone here, so it follows the calendar: one market day per day."
+      >
+        <CalendarClock className="h-3.5 w-3.5" aria-hidden />
+        <span className="hidden sm:inline">Moves daily</span>
+      </span>
+    );
   const advance = (days: number) =>
     run(async () => {
       const res = await postJson<{ reports: DayReport[] }>("/api/sim/advance", { days });

@@ -186,7 +186,7 @@ market day:
 | Northwind Research Analyst | L1 | Writes a daily market note; can't trade |
 
 - **When they work:**
-  - when you advance the market (+1d);
+  - when you advance the market (+1d), where the market clock allows it;
   - when you open MyLiquid on a new market day;
   - daily on Vercel (a cron job);
   - on **Run now**.
@@ -293,7 +293,8 @@ Things to try:
 6. **Talk.** Ask your pet *"How liquid am I?"*, *"What's in my wallet?"* or
    *"If bitcoin falls 20% from its high, buy $1,000"*.
 7. **Advance market (+1d / +7d / +30d).** Watch settlements, appraisals, quarterly
-   redemption gates and autopilot rules fire.
+   redemption gates and autopilot rules fire. (Running locally only: on Vercel the
+   shared market follows the calendar, so nobody can move it for everyone else.)
 8. **Guardrails.** Change the risk profile, switch to bounded autonomy, or pull
    the kill switch (or just put your pet to sleep).
 9. **Traders → Test drive.** Pick a testbed agent: watch it enroll with its AINRA
@@ -328,7 +329,8 @@ Things to try:
 | `CRON_SECRET` | (none) | Vercel sends it to the daily hosted-traders job; when set, nothing else can call it |
 | `MYLIQUID_SITE_PASSWORD` | (none) | Makes the whole site private behind one password (HTTP Basic auth; agent API endpoints stay key-authenticated) |
 | `MYLIQUID_SIM_START` | today | Market date to seed from (YYYY-MM-DD) |
-| `MYLIQUID_MARKET_CLOCK` | auto | `manual` stops the market from catching up to today's date |
+| `MYLIQUID_MARKET_CLOCK` | `calendar` on Vercel, `demo` elsewhere | `calendar`: the shared market follows the date and nobody can jump it ahead (the +1d buttons are hidden); `demo`: it follows the date and investors may also jump it ahead; `manual`: it moves only by hand |
+| `MYLIQUID_GUESTS_PER_HOUR` | `500` | Guest accounts all visitors together may open an hour (one visitor: 10) |
 | `MYLIQUID_COOKIE_SECURE` | `true` in production | Set `false` to serve over plain HTTP (e.g. Docker on a LAN IP) |
 | `AINRA_ROOTS_FILE` / `AINRA_DIRECTORY_FILE` | testbed | AINRA root keys and root-signed registrar directory (JSON). Unset = the bundled TEST-ROOT samples |
 | `AINRA_AUDIENCE` | empty | This service's audience for AINRA instance credentials. Empty accepts none (fail-closed) |
