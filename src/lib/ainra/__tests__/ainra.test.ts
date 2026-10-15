@@ -179,7 +179,9 @@ describe("pinning an API key to an agent's AINRA identity", () => {
     db.prepare("UPDATE api_key_identities SET ainra_number = ?").run(
       "did:ainra:registrar-07:northwind:other",
     );
-    expect(presentPassport(db, principal, await valid()).reason).toBe("identity_mismatch");
+    expect(presentPassport(db, principal, await valid()).reason).toBe(
+      "identity_mismatch",
+    );
   });
 
   it("works end to end over HTTP: MCP refuses until the passport is presented", async () => {
