@@ -17,7 +17,13 @@ import { TIER_AUTO_CEILING_CENTS } from "@/lib/domain/agentTrading";
 import { formatUsd } from "@/lib/domain/money";
 import { listConnections, listKeyIdentities, wallNow } from "@/lib/services/agentIdentity";
 import { listInvites } from "@/lib/services/agentInvites";
-import { HOSTED_STRATEGIES, listHostedTraders, traderRecord } from "@/lib/services/hostedTraders";
+import {
+  HOSTED_STRATEGIES,
+  hostingAvailable,
+  listHostedTraders,
+  traderRecord,
+} from "@/lib/services/hostedTraders";
+import { registrarEnabled, registrarHealth } from "@/lib/ainra/registrar";
 import {
   HostedTraders,
   type HireableAgent,
@@ -57,6 +63,8 @@ export default async function ConnectPage() {
   const endpoint = `${origin}/api/mcp`;
   const now = wallNow();
   const testbed = ainraMode() === "testbed";
+  const live = registrarEnabled();
+  const registrar = live ? await registrarHealth() : null;
 
   const activity = listEvents(db, investorId, { agent: "external", limit: 12 });
   const keys = listApiKeys(db, investorId);
@@ -120,6 +128,7 @@ export default async function ConnectPage() {
       },
       record: traderRecord(db, investorId, t.keyId),
       last: t.lastSummary,
+      ainraSub: t.ainraSub,
     };
   });
   const hireable: HireableAgent[] = TESTBED_AGENTS.filter((a) => HOSTED_STRATEGIES[a.id]).map(
@@ -162,17 +171,29 @@ export default async function ConnectPage() {
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
           <Badge tone={testbed ? "warning" : "good"}>{ainraModeLabel()}</Badge>
+          {registrar &&
+            (registrar.ok ? (
+              <Badge tone="good">
+                Live registrar · {registrar.registrar} · {registrar.records} identities
+              </Badge>
+            ) : (
+              <Badge tone="critical">Registrar unreachable</Badge>
+            ))}
           <span className="text-muted">
             Passports are verified here, offline, with the published <code>@ainra/sdk</code>.
           </span>
         </div>
       </div>
 
-      {testbed && (
+      {hostingAvailable() && (
         <Card
           id="hosted"
           title="Your AI traders"
-          subtitle="Testbed AINRA agents MyLiquid runs for you. Each works once every market day through the same MCP tools and identity gate as any outside agent."
+          subtitle={
+            live
+              ? `AINRA agents MyLiquid runs for you. Each gets its own passport from your registrar (${registrar?.registrar ?? "AINRA"}) and presents a fresh one at every run, through the same MCP tools and identity gate as any outside agent.`
+              : "Testbed AINRA agents MyLiquid runs for you. Each works once every market day through the same MCP tools and identity gate as any outside agent."
+          }
         >
           <HostedTraders traders={hosted} agents={hireable} now={now} />
           <p className="mt-3 text-xs text-muted">

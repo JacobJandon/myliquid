@@ -1,5 +1,11 @@
 import { newId, nowIso, simDate, type Db } from "@/lib/db";
 import { ainraMode, testbedBundle, TESTBED_AGENTS, type TestbedAgentId } from "@/lib/ainra";
+import {
+  issueIdentity,
+  presentIdentity,
+  registrarEnabled,
+  revokeIdentity,
+} from "@/lib/ainra/registrar";
 import type { TradeMode } from "@/lib/domain/agentTrading";
 import { requireProduct } from "@/lib/domain/catalog";
 import { formatUsd } from "@/lib/domain/money";
@@ -20,8 +26,12 @@ import { logEvent } from "./audit";
 import { currentPrice } from "./repo";
 
 /**
- * Reference traders MyLiquid hosts for the investor. Each is a testbed AINRA agent from an outside operator,
- * enrolled with an invite like any other. Once a market day it presents its passport, reads the portfolio and
+ * Reference traders MyLiquid hosts for the investor, enrolled with an invite like any outside agent. Their AINRA
+ * identity comes from one of two places:
+ * - a live AINRA registrar (`lib/ainra/registrar.ts`), when one is configured: hiring issues the trader its own
+ *   passport, every run presents a fresh one at the real time, and revoking it at the registrar cuts it off;
+ * - otherwise the testbed samples (TEST-ROOT), in testbed mode.
+ * Once a market day it presents its passport, reads the portfolio and
  * signals through the MCP tools, decides with its strategy, and trades through `propose_trade`, so its identity,
  * limits, the mandate and Sentinel's checks apply exactly as they would to an agent running elsewhere.
  */
@@ -47,10 +57,21 @@ export const HOSTED_STRATEGIES: Partial<
   },
 };
 
+/** The identity a live registrar issues each kind of hosted trader (the same as its testbed passport). */
+const LIVE_IDENTITY: Record<string, { tier: "L1" | "L2" | "L3"; capabilities: string[] }> = {
+  "momentum-trader": { tier: "L2", capabilities: ["myliquid:read", "myliquid:trade"] },
+  "treasury-agent": {
+    tier: "L3",
+    capabilities: ["myliquid:read", "myliquid:trade", "myliquid:pay"],
+  },
+  "research-analyst": { tier: "L1", capabilities: ["myliquid:read"] },
+};
+
 /** Proposal size when the agent may only propose. */
 const PROPOSAL_TICKET_CENTS = 500_00;
 
-export type HostedStatus = "active" | "paused" | "disconnected";
+/** "revoked": its AINRA identity was revoked at the registrar; it can't work again. */
+export type HostedStatus = "active" | "paused" | "revoked" | "disconnected";
 
 export interface RunDecision {
   title: string;
@@ -78,14 +99,18 @@ export interface HostedTrader {
   lastRunOn: string | null;
   runs: number;
   lastSummary: RunSummary | null;
+  /** The AINRA name of its passport at the live registrar; null for a testbed trader. */
+  ainraSub: string | null;
 }
 
 function mapTrader(r: Record<string, unknown>): HostedTrader {
   const agent = r.agent as TestbedAgentId;
+  const sample = TESTBED_AGENTS.find((a) => a.id === agent)?.label ?? agent;
   return {
     id: r.id as string,
     agent,
-    label: TESTBED_AGENTS.find((a) => a.id === agent)?.label ?? agent,
+    // A live trader's passport names MyLiquid as its operator, not the testbed's fictional one.
+    label: r.ainra_sub ? `MyLiquid ${sample.split(" ").slice(1).join(" ")}` : sample,
     description: HOSTED_STRATEGIES[agent]?.description ?? "",
     keyId: r.key_id as string,
     status: r.status as HostedStatus,
@@ -93,6 +118,7 @@ function mapTrader(r: Record<string, unknown>): HostedTrader {
     lastRunOn: (r.last_run_on as string | null) ?? null,
     runs: (r.runs as number) ?? 0,
     lastSummary: r.last_summary ? (JSON.parse(r.last_summary as string) as RunSummary) : null,
+    ainraSub: (r.ainra_sub as string | null) ?? null,
   };
 }
 
@@ -113,9 +139,24 @@ export function getHostedTrader(db: Db, investorId: string, id: string): HostedT
   return row ? mapTrader(row) : null;
 }
 
+/** Whether hosted traders can be hired here: with a live registrar, or in testbed mode. */
+export function hostingAvailable(): boolean {
+  return registrarEnabled() || ainraMode() === "testbed";
+}
+
+/** The passport a trader presents right now: a fresh one from the live registrar, or its testbed sample. */
+async function currentPassport(trader: Pick<HostedTrader, "agent" | "ainraSub">): Promise<unknown> {
+  if (trader.ainraSub) {
+    if (!registrarEnabled())
+      throw new Error("its identity is at an AINRA registrar that isn't configured here");
+    return presentIdentity(trader.ainraSub);
+  }
+  return testbedBundle(trader.agent);
+}
+
 /**
  * Hires a hosted trader: invites it and enrolls it with its AINRA passport, exactly as an outside agent would.
- * Only in testbed mode, where the testbed passports verify.
+ * With a live registrar, the trader is first issued a passport of its own.
  */
 export async function hireTrader(
   db: Db,
@@ -123,8 +164,10 @@ export async function hireTrader(
   agent: TestbedAgentId,
   limits: { mode: TradeMode; perTradeLimitCents: number; dailyLimitCents: number },
 ): Promise<HostedTrader> {
-  if (ainraMode() !== "testbed")
-    throw new Error("Hosted traders use testbed AINRA passports, so they need testbed mode.");
+  if (!hostingAvailable())
+    throw new Error(
+      "Hosted traders need an AINRA registrar (AINRA_REGISTRAR_URL) or testbed mode to get their passports.",
+    );
   const plan = HOSTED_STRATEGIES[agent];
   if (!plan) throw new Error("That agent can't be hosted.");
   const label = TESTBED_AGENTS.find((a) => a.id === agent)!.label;
@@ -138,11 +181,25 @@ export async function hireTrader(
     perTradeLimitCents: limits.perTradeLimitCents,
     dailyLimitCents: limits.dailyLimitCents,
   });
-  const enrolled = enrollAgent(db, code, await testbedBundle(agent), { name: label });
   const id = newId("htr");
+  let ainraSub: string | null = null;
+  if (registrarEnabled()) {
+    const spec = LIVE_IDENTITY[agent]!;
+    const record = await issueIdentity({
+      operator: "myliquid",
+      lineage: `${agent}-${id.replace(/^htr_?/, "").slice(0, 12)}`,
+      tier: spec.tier,
+      capabilities: spec.capabilities,
+      principal: `myliquid-investor-${investorId}`,
+    });
+    ainraSub = record.sub;
+  }
+  const enrolled = enrollAgent(db, code, await currentPassport({ agent, ainraSub }), {
+    name: label,
+  });
   db.prepare(
-    "INSERT INTO hosted_traders (id, investor_id, agent, key_id, status, created_at) VALUES (?, ?, ?, ?, 'active', ?)",
-  ).run(id, investorId, agent, enrolled.apiKey.id, nowIso());
+    "INSERT INTO hosted_traders (id, investor_id, agent, key_id, status, created_at, ainra_sub) VALUES (?, ?, ?, ?, 'active', ?, ?)",
+  ).run(id, investorId, agent, enrolled.apiKey.id, nowIso(), ainraSub);
   logEvent(db, investorId, {
     agent: "user",
     kind: "system",
@@ -159,7 +216,7 @@ export function setHostedStatus(
 ): HostedTrader {
   const result = db
     .prepare(
-      "UPDATE hosted_traders SET status = ? WHERE id = ? AND investor_id = ? AND status != 'disconnected'",
+      "UPDATE hosted_traders SET status = ? WHERE id = ? AND investor_id = ? AND status IN ('active', 'paused')",
     )
     .run(status, id, investorId);
   if (result.changes === 0) throw new Error("Trader not found");
@@ -175,6 +232,40 @@ export function fireTrader(db: Db, investorId: string, id: string): void {
     "UPDATE hosted_traders SET status = 'disconnected' WHERE id = ? AND investor_id = ?",
   ).run(id, investorId);
   logEvent(db, investorId, { agent: "user", kind: "system", title: `Let ${trader.label} go` });
+}
+
+/**
+ * Revokes a hosted trader's identity at the live registrar, as its operator would, then presents its passport
+ * once so MyLiquid applies the revocation now: the key is cut off and its pending proposals are withdrawn.
+ */
+export async function revokeTraderIdentity(
+  db: Db,
+  investorId: string,
+  id: string,
+): Promise<{ reason: string | null }> {
+  const trader = getHostedTrader(db, investorId, id);
+  if (!trader) throw new Error("Trader not found");
+  if (!trader.ainraSub)
+    throw new Error("This trader uses a testbed passport; only a live registrar can revoke.");
+  if (!registrarEnabled()) throw new Error("No AINRA registrar is configured here.");
+  await revokeIdentity(trader.ainraSub);
+  db.prepare("UPDATE hosted_traders SET status = 'revoked' WHERE id = ? AND investor_id = ?").run(
+    id,
+    investorId,
+  );
+  logEvent(db, investorId, {
+    agent: "user",
+    kind: "system",
+    title: `Revoked ${trader.label}'s AINRA identity (${trader.ainraSub}) at its registrar`,
+  });
+  const key = listApiKeys(db, investorId).find((k) => k.id === trader.keyId && !k.revokedAt);
+  if (!key) return { reason: null };
+  const presented = presentPassport(
+    db,
+    { investorId, keyId: key.id, keyName: key.name, scopes: key.scopes },
+    await presentIdentity(trader.ainraSub),
+  );
+  return { reason: presented.ok ? null : presented.reason };
 }
 
 function saveRun(
@@ -235,7 +326,16 @@ export async function runTrader(
   const principal = { investorId, keyId: key.id, keyName: key.name, scopes: key.scopes };
 
   // 1. Present its passport, as it must at least every five minutes.
-  const presented = presentPassport(db, principal, await testbedBundle(trader.agent));
+  let passport: unknown;
+  try {
+    passport = await currentPassport(trader);
+  } catch (e) {
+    return saveRun(db, investorId, trader, {
+      ...summary,
+      stopped: `couldn't get a fresh passport: ${e instanceof Error ? e.message : String(e)}`,
+    });
+  }
+  const presented = presentPassport(db, principal, passport);
   if (!presented.ok)
     return saveRun(db, investorId, trader, {
       ...summary,

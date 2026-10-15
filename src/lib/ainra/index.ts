@@ -17,7 +17,8 @@ import testbedRoots from "./testbed/roots.json";
  * it checks the passports of agents that connect to an investor's account, and pins API keys to an agent's
  * permanent AINRA Number. Verification is local and fails closed; nothing is sent to AINRA.
  *
- * Trust anchors come from `AINRA_ROOTS_FILE` and `AINRA_DIRECTORY_FILE` (JSON, as AINRA publishes them). Without
+ * Trust anchors come from `AINRA_ROOTS_FILE` and `AINRA_DIRECTORY_FILE` (JSON, as AINRA publishes them), or the
+ * same JSON in `AINRA_ROOTS_JSON` and `AINRA_DIRECTORY_JSON` on hosts without files (Vercel). Without
  * them MyLiquid runs in **testbed** mode on TEST-ROOT artifacts in `./testbed` (minted with AINRA's registrar),
  * verifying at their pinned issue time, and labels every result that way.
  */
@@ -37,21 +38,28 @@ interface Anchors {
 
 let cached: Anchors | null = null;
 
+/** An anchor from `<NAME>_FILE` (a path) or `<NAME>_JSON` (the JSON itself, for hosts without files, like Vercel). */
+function anchorSource(name: "AINRA_ROOTS" | "AINRA_DIRECTORY"): string | null {
+  const json = process.env[`${name}_JSON`];
+  if (json) return json;
+  const file = process.env[`${name}_FILE`];
+  return file ? fs.readFileSync(file, "utf8") : null;
+}
+
 function loadAnchors(): Anchors {
-  const rootsFile = process.env.AINRA_ROOTS_FILE;
-  const directoryFile = process.env.AINRA_DIRECTORY_FILE;
   const audience = process.env.AINRA_AUDIENCE ?? "";
-  const configured = !!(rootsFile && directoryFile);
+  const configured = !!(
+    (process.env.AINRA_ROOTS_FILE || process.env.AINRA_ROOTS_JSON) &&
+    (process.env.AINRA_DIRECTORY_FILE || process.env.AINRA_DIRECTORY_JSON)
+  );
   try {
     const roots = configured
-      ? (JSON.parse(fs.readFileSync(rootsFile!, "utf8")) as {
+      ? (JSON.parse(anchorSource("AINRA_ROOTS")!) as {
           root_ed25519: string;
           root_slh: string;
         })
       : testbedRoots;
-    const directory = configured
-      ? JSON.parse(fs.readFileSync(directoryFile!, "utf8"))
-      : testbedDirectory;
+    const directory = configured ? JSON.parse(anchorSource("AINRA_DIRECTORY")!) : testbedDirectory;
     const verifier = Verifier.fromDirectoryB64(
       directory,
       roots.root_ed25519,

@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { Fingerprint, Loader2, Pause, Play, UserMinus, UserPlus, Zap } from "lucide-react";
+import { Ban, Fingerprint, Loader2, Pause, Play, UserMinus, UserPlus, Zap } from "lucide-react";
 import { useState } from "react";
 import { postJson, useAction } from "@/components/client";
 import { formatUsd } from "@/components/format";
@@ -23,7 +23,7 @@ export interface HostedTraderView {
   agent: string;
   label: string;
   description: string;
-  status: "active" | "paused" | "disconnected";
+  status: "active" | "paused" | "revoked" | "disconnected";
   tier: string | null;
   ainraNumber: string | null;
   identifiedUntil: number | null;
@@ -37,6 +37,8 @@ export interface HostedTraderView {
     stopped: string | null;
     decisions: { title: string; outcome: string; detail: string }[];
   } | null;
+  /** Its passport's AINRA name at the live registrar; null for a testbed trader. */
+  ainraSub: string | null;
 }
 
 const OUTCOME_TONE: Record<string, Tone> = {
@@ -145,10 +147,19 @@ function TraderCard({ t, now }: { t: HostedTraderView; now: number }) {
         <Fingerprint className="h-4 w-4 text-accent" aria-hidden />
         <span className="text-sm font-medium text-fg">{t.label}</span>
         {t.tier && <Badge tone="accent">AINRA {t.tier}</Badge>}
-        <Badge tone={t.status === "active" ? "good" : "neutral"}>
-          {t.status === "active" ? "working" : "paused"}
+        <Badge
+          tone={t.status === "active" ? "good" : t.status === "revoked" ? "critical" : "neutral"}
+        >
+          {t.status === "active"
+            ? "working"
+            : t.status === "revoked"
+              ? "identity revoked"
+              : "paused"}
         </Badge>
         {identified && <Badge>passport fresh</Badge>}
+        <Badge tone={t.ainraSub ? "violet" : "neutral"}>
+          {t.ainraSub ? "live registrar" : "testbed"}
+        </Badge>
         <span className="ml-auto flex flex-wrap gap-1">
           <button
             className={buttonClass("secondary", "sm")}
@@ -165,6 +176,7 @@ function TraderCard({ t, now }: { t: HostedTraderView; now: number }) {
           <button
             className={buttonClass("ghost", "sm")}
             disabled={pending}
+            hidden={t.status === "revoked"}
             onClick={() =>
               run(() =>
                 postJson(
@@ -185,6 +197,16 @@ function TraderCard({ t, now }: { t: HostedTraderView; now: number }) {
               </>
             )}
           </button>
+          {t.ainraSub && t.status === "active" && (
+            <button
+              className={buttonClass("ghost", "sm")}
+              disabled={pending}
+              title="Revoke its AINRA passport at the registrar, as its operator would. MyLiquid cuts it off at once."
+              onClick={() => run(() => postJson(`/api/traders/${t.id}/revoke-identity`))}
+            >
+              <Ban className="h-3.5 w-3.5" /> Revoke identity
+            </button>
+          )}
           <button
             className={buttonClass("ghost", "sm")}
             disabled={pending}

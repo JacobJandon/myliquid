@@ -26,6 +26,10 @@ companions and YC-era product sites. See
 The logo is a living drop of liquid with eyes. It slowly morphs, breathes and blinks
 (`components/brand/LogoMark.tsx`, with a static `app/icon.svg` for the browser tab).
 
+**AINRA, live.** Run AINRA's own registrar next to MyLiquid (`scripts/ainra-live.sh`, or `docker compose up`)
+and hosted traders get real passports, verified at the real time and revocable from the Traders page. See
+[`docs/AINRA-LIVE.md`](docs/AINRA-LIVE.md).
+
 **For business: MyLiquid Gate.** The same rules, as an API any broker or fintech can put in front of its own
 customers' agents: identity through AINRA, limits, human review, a kill switch and evidence for every decision.
 Try it on `/business`; see [`docs/GATE.md`](docs/GATE.md).
@@ -370,6 +374,8 @@ docs/
   DEPLOY.md            Private deployment: Vercel + Turso, or Docker
   MOBILE.md            The phone app: install from the browser, the Android APK, Google Play
   GATE.md              MyLiquid Gate: the decision rules and the API
+  AINRA-LIVE.md        Running a live AINRA registrar with MyLiquid (local, Docker, Vercel)
+deploy/ainra/          The AINRA registrar image for compose.yaml
 android/               The Android app (a Trusted Web Activity around the site), built by GitHub Actions
 mobile/                The iPhone app (Expo): test in Expo Go, ship to TestFlight
 public/                Service worker, app icons, install screenshots

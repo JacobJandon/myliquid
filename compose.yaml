@@ -1,0 +1,43 @@
+# MyLiquid with a live AINRA registrar: agents get real passports, verified at the real time, revocable.
+#
+#   echo "AINRA_REGISTRAR_TOKEN=$(openssl rand -hex 24)" > .env
+#   docker compose up --build
+#
+# Then open http://localhost:3000. docs/AINRA-LIVE.md explains what runs and how to deploy it.
+services:
+  ainra:
+    build: deploy/ainra
+    environment:
+      AINRA_STAGE_ISSUE_TOKEN: ${AINRA_REGISTRAR_TOKEN:?set AINRA_REGISTRAR_TOKEN in .env}
+      AINRA_REGISTRAR_ID: ${AINRA_REGISTRAR_ID:-registrar-07}
+    volumes:
+      - ainra-data:/data
+      - ainra-anchors:/anchors
+    # The operator console, on this machine only.
+    ports:
+      - "127.0.0.1:4950:4950"
+    restart: unless-stopped
+
+  myliquid:
+    build: .
+    depends_on:
+      ainra:
+        condition: service_healthy
+    environment:
+      AINRA_REGISTRAR_URL: http://ainra:4950
+      AINRA_REGISTRAR_TOKEN: ${AINRA_REGISTRAR_TOKEN}
+      AINRA_ROOTS_FILE: /anchors/roots.json
+      AINRA_DIRECTORY_FILE: /anchors/directory.json
+      MYLIQUID_SITE_PASSWORD: ${MYLIQUID_SITE_PASSWORD:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes:
+      - myliquid-data:/data
+      - ainra-anchors:/anchors:ro
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+volumes:
+  ainra-data:
+  ainra-anchors:
+  myliquid-data:

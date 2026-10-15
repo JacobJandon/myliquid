@@ -411,6 +411,7 @@ export const ADDED_COLUMNS: [table: string, column: string, definition: string][
   ["api_key_identities", "trade_mode", "TEXT NOT NULL DEFAULT 'propose'"],
   ["api_key_identities", "per_trade_limit_cents", "INTEGER NOT NULL DEFAULT 0"],
   ["api_key_identities", "daily_limit_cents", "INTEGER NOT NULL DEFAULT 0"],
+  ["hosted_traders", "ainra_sub", "TEXT"],
 ];
 
 /** Indexes on added columns, created after the columns exist. */

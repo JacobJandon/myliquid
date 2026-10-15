@@ -111,6 +111,12 @@ Under **Settings → Environment Variables**, add these:
   `LIBSQL_TEST_URL` at a local `turso dev`; it wipes that database.
 - **`src/proxy.ts`** is the optional site password (helpers in `src/lib/auth/siteGate.ts`, page at `/gate`).
 
+## With a live AINRA registrar
+
+To issue and revoke real agent identities instead of using the testbed samples, run AINRA's registrar next to
+MyLiquid: `docker compose up --build` (both services), or point a Vercel deployment at a registrar hosted
+elsewhere. See [`AINRA-LIVE.md`](AINRA-LIVE.md).
+
 ## Any host with a disk (Docker)
 
 Hosts with a persistent disk run the app unchanged on its SQLite file. Examples are Railway, Fly.io, Render with a

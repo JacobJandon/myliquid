@@ -5,3 +5,6 @@ coverage
 .git
 .env*
 !.env.example
+mobile
+android
+deploy
