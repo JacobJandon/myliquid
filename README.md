@@ -26,6 +26,10 @@ companions and YC-era product sites. See
 The logo is a living drop of liquid with eyes. It slowly morphs, breathes and blinks
 (`components/brand/LogoMark.tsx`, with a static `app/icon.svg` for the browser tab).
 
+**For business: MyLiquid Gate.** The same rules, as an API any broker or fintech can put in front of its own
+customers' agents: identity through AINRA, limits, human review, a kill switch and evidence for every decision.
+Try it on `/business`; see [`docs/GATE.md`](docs/GATE.md).
+
 **On your phone.** MyLiquid installs as an app on Android and iPhone for free: open it in the browser and tap
 Install (Android) or Add to Home Screen (iPhone). GitHub Actions also builds an
 [Android APK](https://github.com/JacobJandon/myliquid/releases/download/android-latest/MyLiquid.apk), ready for
@@ -365,6 +369,7 @@ docs/
   ARCHITECTURE.md      How the pieces fit together
   DEPLOY.md            Private deployment: Vercel + Turso, or Docker
   MOBILE.md            The phone app: install from the browser, the Android APK, Google Play
+  GATE.md              MyLiquid Gate: the decision rules and the API
 android/               The Android app (a Trusted Web Activity around the site), built by GitHub Actions
 mobile/                The iPhone app (Expo): test in Expo Go, ship to TestFlight
 public/                Service worker, app icons, install screenshots

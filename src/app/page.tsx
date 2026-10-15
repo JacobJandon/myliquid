@@ -189,6 +189,9 @@ export default function LandingPage() {
           <a href="#why" className="hover:text-fg">
             Why
           </a>
+          <Link href="/business" className="hover:text-fg">
+            For business
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <Link href="/login" className={buttonClass("ghost", "sm")}>
@@ -661,6 +664,9 @@ GET /api/x402/research/DL-NORDHAVN
             products and merchants, no real money. Not investment advice.
           </span>
           <span className="flex items-center gap-3">
+            <Link href="/business" className="hover:text-fg">
+              MyLiquid Gate for business
+            </Link>
             <Link href="/terminal" className="hover:text-fg">
               Merchant terminal
             </Link>
