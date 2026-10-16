@@ -2,7 +2,12 @@ import { getDb } from "@/lib/db";
 import { requireInvestor } from "@/lib/auth/current";
 import { getMandate } from "@/lib/services/repo";
 import { marketsNote } from "@/lib/services/realPrices";
-import { AccountActions, KillSwitch, SettingsForm } from "@/components/app/SettingsForm";
+import {
+  AccountActions,
+  ChangePassword,
+  KillSwitch,
+  SettingsForm,
+} from "@/components/app/SettingsForm";
 import { Card, LinkButton } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +50,11 @@ export default async function SettingsPage() {
             </LinkButton>
           )}
         </div>
+        {investor.kind === "user" && investor.email && (
+          <div className="mt-5 border-t border-line pt-5">
+            <ChangePassword />
+          </div>
+        )}
         <div className="mt-5 border-t border-line pt-5">
           <AccountActions isGuest={investor.kind === "guest"} />
         </div>

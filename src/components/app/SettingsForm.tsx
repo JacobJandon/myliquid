@@ -361,3 +361,76 @@ export function AccountActions({ isGuest }: { isGuest: boolean }) {
     </div>
   );
 }
+
+const field =
+  "h-9 w-full rounded-lg border border-line-strong bg-surface-2 px-2.5 text-sm text-fg outline-none focus:border-accent";
+
+/** Change a saved account's password; other devices are signed out. */
+export function ChangePassword() {
+  const { run, pending, error } = useAction();
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [done, setDone] = useState<string | null>(null);
+  return (
+    <form
+      className="grid max-w-md gap-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        setDone(null);
+        void run(async () => {
+          const res = await postJson<{ signedOut: number }>("/api/account/password", {
+            current,
+            next,
+          });
+          setCurrent("");
+          setNext("");
+          setDone(
+            res.signedOut
+              ? `Password changed. Signed out ${res.signedOut} other session${res.signedOut === 1 ? "" : "s"}.`
+              : "Password changed.",
+          );
+          return res;
+        });
+      }}
+    >
+      <label className="text-xs text-fg-2">
+        Current password
+        <input
+          type="password"
+          autoComplete="current-password"
+          className={clsx(field, "mt-1")}
+          value={current}
+          onChange={(e) => setCurrent(e.target.value)}
+          required
+        />
+      </label>
+      <label className="text-xs text-fg-2">
+        New password (8+ characters)
+        <input
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          className={clsx(field, "mt-1")}
+          value={next}
+          onChange={(e) => setNext(e.target.value)}
+          required
+        />
+      </label>
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="submit" className={buttonClass("secondary", "sm")} disabled={pending}>
+          Change password
+        </button>
+        {done && (
+          <span role="status" className="text-xs text-good">
+            {done}
+          </span>
+        )}
+        {error && (
+          <span role="alert" className="text-xs text-critical">
+            {error}
+          </span>
+        )}
+      </div>
+    </form>
+  );
+}

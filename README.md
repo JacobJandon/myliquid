@@ -296,7 +296,8 @@ Things to try:
    redemption gates and autopilot rules fire. (Running locally only: on Vercel the
    shared market follows the calendar, so nobody can move it for everyone else.)
 8. **Guardrails.** Change the risk profile, switch to bounded autonomy, or pull
-   the kill switch (or just put your pet to sleep).
+   the kill switch (or just put your pet to sleep). A saved account can change its
+   password here (other devices are signed out), reset, or delete itself.
 9. **Traders → Test drive.** Pick a testbed agent: watch it enroll with its AINRA
    passport, trade on its own within its limits, and (the yield hunter) get cut
    off when its registrar revokes it. Or invite your own agent, or connect Claude

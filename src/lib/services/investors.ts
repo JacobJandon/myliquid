@@ -1,4 +1,5 @@
 import type { Db } from "@/lib/db";
+import { hashPassword, verifyPassword } from "@/lib/auth/crypto";
 import { getMeta } from "@/lib/db";
 import { insertMany, newId, nowIso } from "@/lib/db/util";
 import { requireProduct } from "@/lib/domain/catalog";
@@ -265,6 +266,22 @@ export function recentGuestCount(db: Db, ms = 3_600_000): number {
     .prepare("SELECT COUNT(*) AS n FROM investors WHERE kind = 'guest' AND created_at >= ?")
     .get(since) as { n: number };
   return Number(row.n);
+}
+
+/**
+ * Changes a saved account's password after checking the current one. Returns false when the current password is
+ * wrong (or the account has none, as guests don't).
+ */
+export function changePassword(db: Db, investorId: string, current: string, next: string): boolean {
+  const row = db
+    .prepare("SELECT password_hash FROM investors WHERE id = ? AND kind = 'user'")
+    .get(investorId) as { password_hash: string | null } | undefined;
+  if (!row || !verifyPassword(current, row.password_hash)) return false;
+  db.prepare("UPDATE investors SET password_hash = ? WHERE id = ?").run(
+    hashPassword(next),
+    investorId,
+  );
+  return true;
 }
 
 export function pruneGuests(db: Db, days = 7): number {

@@ -31,3 +31,12 @@ export function deleteSession(db: Db, token: string | undefined | null): void {
 export function deleteExpiredSessions(db: Db): void {
   db.prepare("DELETE FROM sessions WHERE expires_at <= ?").run(nowIso());
 }
+
+/** Signs the investor out everywhere except the session `keepToken` (after a password change). */
+export function deleteOtherSessions(db: Db, investorId: string, keepToken: string | null): number {
+  const keep = keepToken ? sha256(keepToken) : "";
+  return Number(
+    db.prepare("DELETE FROM sessions WHERE investor_id = ? AND id <> ?").run(investorId, keep)
+      .changes ?? 0,
+  );
+}

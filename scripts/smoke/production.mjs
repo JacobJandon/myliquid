@@ -69,6 +69,19 @@ await step("Front page (and the site password, if any)", async () => {
   return await page.title();
 });
 
+await step("Security headers", async () => {
+  const h = (await page.request.get(`${SITE}/`)).headers();
+  const want = {
+    "x-frame-options": "DENY",
+    "x-content-type-options": "nosniff",
+    "referrer-policy": "strict-origin-when-cross-origin",
+  };
+  const wrong = Object.entries(want).filter(([k, v]) => h[k] !== v);
+  if (wrong.length) throw new Error(`missing or wrong: ${wrong.map(([k]) => k).join(", ")}`);
+  if (h["x-powered-by"]) throw new Error("x-powered-by is set");
+  return "ok";
+});
+
 await step("Guest demo opens Home", async () => {
   await page.getByRole("button", { name: "Try the live demo" }).first().click();
   await page.waitForURL("**/app", { timeout: 90000 });
