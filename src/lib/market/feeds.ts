@@ -1,8 +1,9 @@
 /**
  * Real end-of-day prices for the market-priced products (`MYLIQUID_PRICES=real`). Each product follows a public
  * benchmark's daily moves (`BENCHMARKS`); the feeds here only fetch daily closes, never anything about investors.
- * Sources need no key: Coinbase's public candles for bitcoin; Stooq, then Yahoo's chart API, for funds. Every fetch is
- * time-boxed, and any failure just means the simulation prices that day (the price row says which).
+ * Sources need no key: Coinbase's public candles for bitcoin; Yahoo's chart API, then Nasdaq's, for funds. Every fetch
+ * is time-boxed, and any failure just means the simulation prices that day (the price row says which).
+ * `.github/workflows/market-data.yml` checks daily that each one still answers from a cloud server.
  */
 
 export interface DailyClose {
@@ -13,7 +14,7 @@ export interface DailyClose {
 export interface Benchmark {
   /** What the product follows, as shown to investors. */
   name: string;
-  /** Ticker on the fund feeds (Stooq, Yahoo), or a Coinbase product for crypto. */
+  /** Ticker on the fund feeds (Yahoo, Nasdaq), or a Coinbase product for crypto. */
   symbol: string;
   kind: "fund" | "crypto";
 }
@@ -39,25 +40,15 @@ async function get(url: string): Promise<string> {
   return res.text();
 }
 
-const ymd = (iso: string) => iso.replace(/-/g, "");
 const isoDay = (unixSeconds: number) => new Date(unixSeconds * 1000).toISOString().slice(0, 10);
 
-function clean(points: DailyClose[], from: string, to: string): DailyClose[] {
+/** In date order, one close per day, within the range. */
+export function clean(points: DailyClose[], from: string, to: string): DailyClose[] {
   const byDate = new Map<string, number>();
   for (const p of points)
     if (p.date >= from && p.date <= to && Number.isFinite(p.close) && p.close > 0)
       byDate.set(p.date, p.close);
   return [...byDate].sort(([a], [b]) => (a < b ? -1 : 1)).map(([date, close]) => ({ date, close }));
-}
-
-/** Stooq's daily CSV (Date,Open,High,Low,Close,Volume). */
-export function parseStooq(csv: string): DailyClose[] {
-  const lines = csv.trim().split(/\r?\n/);
-  if (!/^Date,/i.test(lines[0] ?? "")) throw new Error(lines[0]?.slice(0, 80) || "empty answer");
-  return lines.slice(1).map((l) => {
-    const c = l.split(",");
-    return { date: c[0]!, close: Number(c[4]) };
-  });
 }
 
 /** Yahoo's chart API: timestamps (session open, exchange time) and closes. */
@@ -70,6 +61,17 @@ export function parseYahoo(body: string): DailyClose[] {
   return ts.map((t, i) => ({ date: isoDay(t + offset), close: Number(closes[i]) }));
 }
 
+/** Nasdaq's historical quotes: rows of { date: "10/15/2026", close: "$771.79" }. */
+export function parseNasdaq(body: string): DailyClose[] {
+  const data = JSON.parse(body);
+  const rows: { date: string; close: string }[] = data?.data?.tradesTable?.rows ?? [];
+  if (!rows.length) throw new Error(data?.status?.bCodeMessage?.[0]?.errorMessage ?? "no data");
+  return rows.map((r) => {
+    const [m, d, y] = r.date.split("/");
+    return { date: `${y}-${m}-${d}`, close: Number(r.close.replace(/[$,]/g, "")) };
+  });
+}
+
 /** Coinbase candles: [time, low, high, open, close, volume], one per UTC day. */
 export function parseCoinbase(body: string): DailyClose[] {
   const rows = JSON.parse(body);
@@ -78,12 +80,6 @@ export function parseCoinbase(body: string): DailyClose[] {
 }
 
 export const SOURCES = {
-  stooq: async (symbol: string, from: string, to: string) =>
-    parseStooq(
-      await get(
-        `https://stooq.com/q/d/l/?s=${symbol.toLowerCase()}.us&d1=${ymd(from)}&d2=${ymd(to)}&i=d`,
-      ),
-    ),
   yahoo: async (symbol: string, from: string, to: string) => {
     const p1 = Math.floor(Date.parse(from) / 1000);
     const p2 = Math.floor(Date.parse(to) / 1000) + 86_400;
@@ -93,6 +89,12 @@ export const SOURCES = {
       ),
     );
   },
+  nasdaq: async (symbol: string, from: string, to: string) =>
+    parseNasdaq(
+      await get(
+        `https://api.nasdaq.com/api/quote/${symbol}/historical?assetclass=etf&fromdate=${from}&todate=${to}&limit=60`,
+      ),
+    ),
   coinbase: async (symbol: string, from: string, to: string) =>
     parseCoinbase(
       await get(
@@ -109,7 +111,7 @@ export async function fetchCloses(
   from: string,
   to: string,
 ): Promise<{ source: SourceId; closes: DailyClose[] }> {
-  const order: SourceId[] = b.kind === "crypto" ? ["coinbase"] : ["stooq", "yahoo"];
+  const order: SourceId[] = b.kind === "crypto" ? ["coinbase"] : ["yahoo", "nasdaq"];
   const errors: string[] = [];
   for (const source of order) {
     try {
