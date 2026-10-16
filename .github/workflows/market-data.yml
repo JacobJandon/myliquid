@@ -1,0 +1,27 @@
+name: Market data check
+
+# Checks that every real price feed MyLiquid can use (src/lib/market/feeds.ts) answers with sane daily closes.
+# A failing source only means MyLiquid falls back to the next one, or to the simulation, for that day.
+
+on:
+  schedule:
+    - cron: "23 6 * * *"
+  push:
+    branches: [main, claude/myliquid-fintech-ai-agents-1svwct]
+    paths:
+      [".github/workflows/market-data.yml", "scripts/market-data-check.ts", "src/lib/market/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  feeds:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npx --yes tsx@4 scripts/market-data-check.ts
