@@ -121,12 +121,22 @@ See [`MOBILE.md`](MOBILE.md).
 - `services/sim.ts`: one market clock for everyone. `ensureMarketCurrent` catches
   the market up to the real date on each app or MCP request. Each simulated day
   settles, gates, records NAV, checks circuit breakers and runs autopilot rules
-  for every investor.
+  for every investor. `marketClock()`: on Vercel the shared market only follows
+  the calendar (`calendar`); elsewhere investors may also jump it ahead (`demo`).
+- Real prices (`MYLIQUID_PRICES=real`, the default on Vercel): before the clock
+  advances, `services/realPrices.ts` fetches recent closes (`lib/market/feeds.ts`:
+  Yahoo for VT, SPY and BNDW, Coinbase for BTC-USD) into `market_quotes`. Each
+  market day is priced as of the previous close (`domain/realPrices.ts`): the
+  index funds move like their benchmark, bitcoin takes the real price (its
+  simulated past is re-denominated once, `rebaseToReal`, so no holding jumps).
+  `prices.feed` says which close priced a day; a day no feed can price is
+  simulated. `.github/workflows/market-data.yml` checks this daily on a runner.
 
 ## Layers
 
 **`lib/domain`: pure functions, no I/O.**
 - `catalog.ts`: the product shelf (13 fictional products) and deal facts.
+- `realPrices.ts`: pricing a product from its benchmark's closes (moves or level).
 - `market.ts`: deterministic simulation. Prices come from a hash of
   `(product, date)`, so history can always be rebuilt. Market products follow
   geometric Brownian motion with a common factor. Private products only move on

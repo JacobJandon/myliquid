@@ -207,7 +207,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                     {feed.benchmark}
                     <div className="text-[11px] text-muted" data-price-feed>
                       {feed.latest?.feed
-                        ? `Moves with its daily close (latest: ${feed.latest.feed})`
+                        ? `${feed.follow === "level" ? "Priced at" : "Moves with"} its daily close (latest: ${feed.latest.feed})`
                         : "Today's price is simulated: the feed didn't answer"}
                     </div>
                   </dd>

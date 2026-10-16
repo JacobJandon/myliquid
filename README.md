@@ -330,6 +330,7 @@ Things to try:
 | `MYLIQUID_SITE_PASSWORD` | (none) | Makes the whole site private behind one password (HTTP Basic auth; agent API endpoints stay key-authenticated) |
 | `MYLIQUID_SIM_START` | today | Market date to seed from (YYYY-MM-DD) |
 | `MYLIQUID_MARKET_CLOCK` | `calendar` on Vercel, `demo` elsewhere | `calendar`: the shared market follows the date and nobody can jump it ahead (the +1d buttons are hidden); `demo`: it follows the date and investors may also jump it ahead; `manual`: it moves only by hand |
+| `MYLIQUID_PRICES` | `real` on Vercel, `simulated` elsewhere | `real`: the index funds follow VT, SPY and BNDW and bitcoin is the real BTC price, as of the previous close (Yahoo, Coinbase; no keys); a day a feed can't price is simulated. Strategies and private assets are always simulated |
 | `MYLIQUID_GUESTS_PER_HOUR` | `500` | Guest accounts all visitors together may open an hour (one visitor: 10) |
 | `MYLIQUID_COOKIE_SECURE` | `true` in production | Set `false` to serve over plain HTTP (e.g. Docker on a LAN IP) |
 | `AINRA_ROOTS_FILE` / `AINRA_DIRECTORY_FILE` | testbed | AINRA root keys and root-signed registrar directory (JSON). Unset = the bundled TEST-ROOT samples |

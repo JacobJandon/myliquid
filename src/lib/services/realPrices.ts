@@ -136,6 +136,7 @@ export function rebaseToReal(db: Db, productId: string, factor: number): void {
 export function priceFeeds(db: Db): {
   productId: string;
   benchmark: string;
+  follow: Benchmark["follow"];
   latest: { date: string; feed: string | null } | null;
 }[] {
   if (!realPricesEnabled()) return [];
@@ -143,6 +144,6 @@ export function priceFeeds(db: Db): {
     const latest = db
       .prepare("SELECT date, feed FROM prices WHERE product_id = ? ORDER BY date DESC LIMIT 1")
       .get(productId) as { date: string; feed: string | null } | undefined;
-    return { productId, benchmark: b.name, latest: latest ?? null };
+    return { productId, benchmark: b.name, follow: b.follow, latest: latest ?? null };
   });
 }
