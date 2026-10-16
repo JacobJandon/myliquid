@@ -25,6 +25,9 @@ for (const [productId, b] of Object.entries(BENCHMARKS)) {
   }
 }
 console.log(lines.join("\n"));
+// On GitHub, each result is also an annotation, so it shows on the run's page (and through the API) without logs.
+if (process.env.GITHUB_ACTIONS)
+  for (const l of lines.slice(2)) console.log(`::${l.startsWith("❌") ? "warning" : "notice"}::${l}`);
 if (process.env.GITHUB_STEP_SUMMARY) {
   const { appendFileSync } = await import("node:fs");
   appendFileSync(process.env.GITHUB_STEP_SUMMARY, "```\n" + lines.join("\n") + "\n```\n");
