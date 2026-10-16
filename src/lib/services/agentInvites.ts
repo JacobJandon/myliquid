@@ -61,7 +61,9 @@ function mapInvite(r: Record<string, unknown>, now: number): AgentInvite {
 export function listInvites(db: Db, investorId: string, now = wallNow()): AgentInvite[] {
   return (
     db
-      .prepare("SELECT * FROM agent_invites WHERE investor_id = ? ORDER BY created_at DESC LIMIT 20")
+      .prepare(
+        "SELECT * FROM agent_invites WHERE investor_id = ? ORDER BY created_at DESC LIMIT 20",
+      )
       .all(investorId) as Record<string, unknown>[]
   ).map((r) => mapInvite(r, now));
 }
@@ -125,9 +127,10 @@ export function createInvite(
 }
 
 export function cancelInvite(db: Db, investorId: string, id: string): void {
-  db.prepare(
-    "DELETE FROM agent_invites WHERE id = ? AND investor_id = ? AND used_at IS NULL",
-  ).run(id, investorId);
+  db.prepare("DELETE FROM agent_invites WHERE id = ? AND investor_id = ? AND used_at IS NULL").run(
+    id,
+    investorId,
+  );
 }
 
 /** Why an enrollment failed, with the HTTP status the route should answer with. */
@@ -201,7 +204,8 @@ export function enrollAgent(
     );
   }
 
-  const agentName = opts.name?.trim() || check.name.replace(/^ainra:[^:]+:/, "").replace(/@.*$/, "");
+  const agentName =
+    opts.name?.trim() || check.name.replace(/^ainra:[^:]+:/, "").replace(/@.*$/, "");
   const result = db.transaction(() => {
     // Spend the invite first, so two agents racing with the same code can't both enroll.
     const spent = db

@@ -71,7 +71,16 @@ CREATE TABLE IF NOT EXISTS prices (
   date TEXT NOT NULL,
   price REAL NOT NULL,
   source TEXT NOT NULL,
+  feed TEXT,
   PRIMARY KEY (product_id, date)
+);
+
+CREATE TABLE IF NOT EXISTS market_quotes (
+  symbol TEXT NOT NULL,
+  date TEXT NOT NULL,
+  close REAL NOT NULL,
+  source TEXT NOT NULL,
+  PRIMARY KEY (symbol, date)
 );
 
 CREATE TABLE IF NOT EXISTS lots (
@@ -412,6 +421,7 @@ export const ADDED_COLUMNS: [table: string, column: string, definition: string][
   ["api_key_identities", "per_trade_limit_cents", "INTEGER NOT NULL DEFAULT 0"],
   ["api_key_identities", "daily_limit_cents", "INTEGER NOT NULL DEFAULT 0"],
   ["hosted_traders", "ainra_sub", "TEXT"],
+  ["prices", "feed", "TEXT"],
 ];
 
 /** Indexes on added columns, created after the columns exist. */

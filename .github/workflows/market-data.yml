@@ -1,7 +1,7 @@
 name: Market data check
 
-# Checks that every real price feed MyLiquid can use (src/lib/market/feeds.ts) answers with sane daily closes.
-# A failing source only means MyLiquid falls back to the next one, or to the simulation, for that day.
+# Checks that every real price feed MyLiquid uses (src/lib/market/feeds.ts) answers from a cloud server, and that
+# MyLiquid's market clock prices each day from them. A failing feed only means the simulation prices that day.
 
 on:
   schedule:
@@ -24,4 +24,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npx --yes tsx@4 scripts/market-data-check.ts
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx tsx scripts/market-data-check.ts

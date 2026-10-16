@@ -1,7 +1,7 @@
 /**
  * Real end-of-day prices for the market-priced products (`MYLIQUID_PRICES=real`). Each product follows a public
  * benchmark's daily moves (`BENCHMARKS`); the feeds here only fetch daily closes, never anything about investors.
- * Sources need no key: Coinbase's public candles for bitcoin; Yahoo's chart API, then Nasdaq's, for funds. Every fetch
+ * Sources need no key: Coinbase's public candles for bitcoin; Yahoo's chart API for funds (Stooq and Nasdaq refuse or hang on cloud servers). Every fetch
  * is time-boxed, and any failure just means the simulation prices that day (the price row says which).
  * `.github/workflows/market-data.yml` checks daily that each one still answers from a cloud server.
  */
@@ -14,17 +14,29 @@ export interface DailyClose {
 export interface Benchmark {
   /** What the product follows, as shown to investors. */
   name: string;
-  /** Ticker on the fund feeds (Yahoo, Nasdaq), or a Coinbase product for crypto. */
+  /** Ticker on Yahoo for funds, or a Coinbase product for crypto. */
   symbol: string;
   kind: "fund" | "crypto";
+  /** A fund moves like it ("moves"); an asset that is the benchmark takes its price ("level"). */
+  follow: "moves" | "level";
 }
 
 /** Which public benchmark each market-priced product follows. The rest (strategies, private assets) stay simulated. */
 export const BENCHMARKS: Record<string, Benchmark> = {
-  MLWX: { name: "Vanguard Total World Stock ETF (VT)", symbol: "VT", kind: "fund" },
-  MLUS: { name: "SPDR S&P 500 ETF (SPY)", symbol: "SPY", kind: "fund" },
-  MLBD: { name: "Vanguard Total World Bond ETF (BNDW)", symbol: "BNDW", kind: "fund" },
-  BTC: { name: "Bitcoin (BTC-USD)", symbol: "BTC-USD", kind: "crypto" },
+  MLWX: {
+    name: "Vanguard Total World Stock ETF (VT)",
+    symbol: "VT",
+    kind: "fund",
+    follow: "moves",
+  },
+  MLUS: { name: "SPDR S&P 500 ETF (SPY)", symbol: "SPY", kind: "fund", follow: "moves" },
+  MLBD: {
+    name: "Vanguard Total World Bond ETF (BNDW)",
+    symbol: "BNDW",
+    kind: "fund",
+    follow: "moves",
+  },
+  BTC: { name: "Bitcoin (BTC-USD)", symbol: "BTC-USD", kind: "crypto", follow: "level" },
 };
 
 const TIMEOUT_MS = 4_000;
@@ -61,17 +73,6 @@ export function parseYahoo(body: string): DailyClose[] {
   return ts.map((t, i) => ({ date: isoDay(t + offset), close: Number(closes[i]) }));
 }
 
-/** Nasdaq's historical quotes: rows of { date: "10/15/2026", close: "$771.79" }. */
-export function parseNasdaq(body: string): DailyClose[] {
-  const data = JSON.parse(body);
-  const rows: { date: string; close: string }[] = data?.data?.tradesTable?.rows ?? [];
-  if (!rows.length) throw new Error(data?.status?.bCodeMessage?.[0]?.errorMessage ?? "no data");
-  return rows.map((r) => {
-    const [m, d, y] = r.date.split("/");
-    return { date: `${y}-${m}-${d}`, close: Number(r.close.replace(/[$,]/g, "")) };
-  });
-}
-
 /** Coinbase candles: [time, low, high, open, close, volume], one per UTC day. */
 export function parseCoinbase(body: string): DailyClose[] {
   const rows = JSON.parse(body);
@@ -89,12 +90,6 @@ export const SOURCES = {
       ),
     );
   },
-  nasdaq: async (symbol: string, from: string, to: string) =>
-    parseNasdaq(
-      await get(
-        `https://api.nasdaq.com/api/quote/${symbol}/historical?assetclass=etf&fromdate=${from}&todate=${to}&limit=60`,
-      ),
-    ),
   coinbase: async (symbol: string, from: string, to: string) =>
     parseCoinbase(
       await get(
@@ -111,7 +106,7 @@ export async function fetchCloses(
   from: string,
   to: string,
 ): Promise<{ source: SourceId; closes: DailyClose[] }> {
-  const order: SourceId[] = b.kind === "crypto" ? ["coinbase"] : ["yahoo", "nasdaq"];
+  const order: SourceId[] = b.kind === "crypto" ? ["coinbase"] : ["yahoo"];
   const errors: string[] = [];
   for (const source of order) {
     try {

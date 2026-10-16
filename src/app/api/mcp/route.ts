@@ -46,7 +46,7 @@ export async function POST(req: Request): Promise<Response> {
   // Keys pinned to an AINRA identity need a live passport presentation, and are narrowed to its capabilities.
   const gate = identityGate(db, principal);
   if (!gate.allow) return jsonRpcError(403, gate.message);
-  ensureMarketCurrent(db);
+  await ensureMarketCurrent(db);
   return handleMcpRequest(req, db, gate.principal);
 }
 

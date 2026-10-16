@@ -9,6 +9,7 @@ import { listProposals } from "@/lib/services/proposals";
 import { getMandate } from "@/lib/services/repo";
 import { canAdvanceMarket, ensureMarketCurrent } from "@/lib/services/sim";
 import { runDueTraders, tradersDue } from "@/lib/services/hostedTraders";
+import { marketsNote } from "@/lib/services/realPrices";
 import { getCompanionView, pendingPaymentCount } from "@/lib/services/companion";
 import type { Stage } from "@/lib/domain/companion";
 import { MobileTabBar, Sidebar } from "@/components/app/Sidebar";
@@ -21,7 +22,7 @@ export const dynamic = "force-dynamic";
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const investor = await requireInvestor();
   const db = getDb();
-  ensureMarketCurrent(db);
+  await ensureMarketCurrent(db);
   // A new market day: the investor's hosted traders work it, after this page is sent.
   if (tradersDue(db, investor.id)) after(() => runDueTraders(db, investor.id));
   const pending = listProposals(db, investor.id, { status: "pending" }).length;
@@ -42,6 +43,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             alertCount={alerts}
             paymentCount={paymentCount}
             user={{ name: investor.name, email: investor.email, kind: investor.kind }}
+            marketsNote={marketsNote()}
             pet={{
               name: pet.name,
               color: pet.color,
@@ -105,6 +107,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         alertCount={alerts}
         paymentCount={paymentCount}
         user={{ name: investor.name, email: investor.email, kind: investor.kind }}
+        marketsNote={marketsNote()}
       />
     </div>
   );

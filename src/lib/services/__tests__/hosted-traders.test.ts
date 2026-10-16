@@ -47,7 +47,9 @@ describe("hosted trader strategies (pure)", () => {
     expect(parseUsdCents("-$50")).toBe(-5_000);
     expect(parsePct("+1.25%")).toBeCloseTo(0.0125);
     expect(parsePct("-3.4%")).toBeCloseTo(-0.034);
-    expect(ticketCents({ trading: { perTradeLimit: "$1,000", leftToday: "$600" } }, 500_00)).toEqual({
+    expect(
+      ticketCents({ trading: { perTradeLimit: "$1,000", leftToday: "$600" } }, 500_00),
+    ).toEqual({
       cents: 600_00,
       auto: true,
     });
@@ -71,16 +73,14 @@ describe("hosted trader strategies (pure)", () => {
 
   it("momentum respects its cash floor, position cap and used-up limit", () => {
     const up = [sig("MLUS", "uptrend", 0.02)];
-    expect(momentumStrategy(up, book(4_000_00, [["MLWX", 96_000_00]]), 1_000_00).ideas).toEqual(
-      [],
-    ); // cash below the 5% floor
+    expect(momentumStrategy(up, book(4_000_00, [["MLWX", 96_000_00]]), 1_000_00).ideas).toEqual([]); // cash below the 5% floor
     expect(momentumStrategy(up, book(10_000_00, [["MLUS", 30_000_00]]), 1_000_00).ideas).toEqual(
       [],
     ); // already 75% MLUS
     expect(momentumStrategy(up, book(50_000_00), 20_00).note).toMatch(/used up/);
-    expect(momentumStrategy([sig("MLBTC", "uptrend", 0.1)], book(50_000_00), 1_000_00).ideas).toEqual(
-      [],
-    ); // outside its universe
+    expect(
+      momentumStrategy([sig("MLBTC", "uptrend", 0.1)], book(50_000_00), 1_000_00).ideas,
+    ).toEqual([]); // outside its universe
   });
 
   it("treasury keeps cash inside its band", () => {
@@ -88,9 +88,16 @@ describe("hosted trader strategies (pure)", () => {
       expect.objectContaining({ productId: "MLBD", side: "buy", amountCents: 5_000_00 }),
     ]);
     expect(
-      treasuryStrategy(book(2_000_00, [["MLBD", 50_000_00], ["MLUS", 48_000_00]]), 5_000_00)
-        .ideas,
-    ).toEqual([expect.objectContaining({ productId: "MLBD", side: "sell", amountCents: 5_000_00 })]);
+      treasuryStrategy(
+        book(2_000_00, [
+          ["MLBD", 50_000_00],
+          ["MLUS", 48_000_00],
+        ]),
+        5_000_00,
+      ).ideas,
+    ).toEqual([
+      expect.objectContaining({ productId: "MLBD", side: "sell", amountCents: 5_000_00 }),
+    ]);
     expect(treasuryStrategy(book(8_000_00, [["MLUS", 92_000_00]]), 5_000_00)).toMatchObject({
       ideas: [],
       note: expect.stringMatching(/Inside the band/),

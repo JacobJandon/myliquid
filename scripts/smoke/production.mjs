@@ -10,7 +10,10 @@ import { chromium } from "playwright";
 const SITE = (process.env.SITE_URL ?? "").replace(/\/+$/, "");
 if (!SITE) throw new Error("Set SITE_URL");
 const headers = process.env.VERCEL_BYPASS
-  ? { "x-vercel-protection-bypass": process.env.VERCEL_BYPASS, "x-vercel-set-bypass-cookie": "true" }
+  ? {
+      "x-vercel-protection-bypass": process.env.VERCEL_BYPASS,
+      "x-vercel-set-bypass-cookie": "true",
+    }
   : {};
 const results = [];
 const failures = [];
@@ -27,7 +30,12 @@ const step = async (name, fn) => {
 const text = (s) => s.replace(/\s+/g, " ").trim();
 
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, extraHTTPHeaders: headers });
+const ctx = await browser.newContext({
+  viewport: { width: 390, height: 844 },
+  isMobile: true,
+  hasTouch: true,
+  extraHTTPHeaders: headers,
+});
 const page = await ctx.newPage();
 const errors = [];
 page.on("pageerror", (e) => errors.push(`page error: ${e.message}`));
@@ -40,13 +48,19 @@ await step("Health", async () => {
   if (r.status() !== 200) throw new Error(`HTTP ${r.status()} ${r.headers().location ?? ""}`);
   const h = await r.json();
   if (!h.ok) throw new Error(JSON.stringify(h));
-  return `database ${h.database}, agents ${h.agentMode}, market day ${h.simDate}`;
+  const feeds = (h.priceFeeds ?? []).map((f) => `${f.product}: ${f.latest ?? "simulated today"}`);
+  return [
+    `database ${h.database}, agents ${h.agentMode}, market day ${h.simDate}`,
+    `clock ${h.marketClock ?? "?"}, prices ${h.prices ?? "simulated"}`,
+    ...feeds,
+  ].join("; ");
 });
 
 await step("Front page (and the site password, if any)", async () => {
   await page.goto(`${SITE}/`, { waitUntil: "load" });
   if (new URL(page.url()).pathname === "/gate") {
-    if (!process.env.SITE_PASSWORD) throw new Error("the site password page is up; add SITE_PASSWORD");
+    if (!process.env.SITE_PASSWORD)
+      throw new Error("the site password page is up; add SITE_PASSWORD");
     await page.getByLabel("Site password").fill(process.env.SITE_PASSWORD);
     await page.getByRole("button", { name: "Continue" }).click();
     await page.waitForURL((u) => u.pathname !== "/gate", { timeout: 20000 });
@@ -77,7 +91,8 @@ for (const [name, path, expect] of [
     const r = await page.goto(`${SITE}${path}`, { waitUntil: "load" });
     if (!r || r.status() >= 400) throw new Error(`HTTP ${r?.status()}`);
     const body = await page.locator("main").innerText();
-    if (!body.toLowerCase().includes(expect.toLowerCase())) throw new Error(`"${expect}" not on the page`);
+    if (!body.toLowerCase().includes(expect.toLowerCase()))
+      throw new Error(`"${expect}" not on the page`);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     if (overflow > 0) throw new Error(`${overflow}px wider than the phone`);
   });
@@ -108,7 +123,10 @@ await step("Hire a hosted AI trader and let it work", async () => {
 
 await step("Market clock", async () => {
   // On a shared site the market follows the calendar and refuses to be moved by hand (409); locally it may jump.
-  const r = await page.request.post(`${SITE}/api/sim/advance`, { data: { days: 1 }, headers: { origin: SITE } });
+  const r = await page.request.post(`${SITE}/api/sim/advance`, {
+    data: { days: 1 },
+    headers: { origin: SITE },
+  });
   if (r.status() === 409) return "follows the calendar (no time travel)";
   if (!r.ok()) throw new Error(`HTTP ${r.status()}`);
   return "advanced a day (demo clock)";

@@ -67,7 +67,12 @@ export function statementRows(db: Db, investorId: string): Row[] {
     .prepare(
       "SELECT created_on, kind, amount_cents, status FROM cash_movements WHERE investor_id = ?",
     )
-    .all(investorId) as { created_on: string; kind: string; amount_cents: number; status: string }[];
+    .all(investorId) as {
+    created_on: string;
+    kind: string;
+    amount_cents: number;
+    status: string;
+  }[];
   for (const c of cash) {
     const deposit = c.kind === "deposit";
     rows.push([

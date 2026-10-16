@@ -633,7 +633,8 @@ const getMyPermissions = defineTool({
   schema: z.object({}),
   trades: false,
   run: (_input, { db, investorId, outside }) => {
-    if (!outside) return { error: "Only outside agents connected over MCP have permissions to report." };
+    if (!outside)
+      return { error: "Only outside agents connected over MCP have permissions to report." };
     const ceiling = tierAutoCeilingCents(outside.tier);
     const autoAllowed =
       !!outside.ainraNumber &&
@@ -652,7 +653,7 @@ const getMyPermissions = defineTool({
             capabilities: outside.capabilities,
             presentationFresh: outside.identified,
             present:
-              "POST your passport as {\"ainra_passport\": …} to /api/agent-identity at least every 5 minutes.",
+              'POST your passport as {"ainra_passport": …} to /api/agent-identity at least every 5 minutes.',
           }
         : null,
       trading: autoAllowed

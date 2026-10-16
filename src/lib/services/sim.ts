@@ -17,6 +17,7 @@ import { getSnapshot, recordNav } from "./portfolio";
 import { adjustCash, getMandate, listInvestorIds, updateMandate } from "./repo";
 import { evaluateRules } from "./rules";
 import { evaluateLimitOrders, runDuePlans } from "./automation";
+import { realPrice, rebaseToReal, refreshQuotes } from "./realPrices";
 
 /**
  * The market clock. It is shared by every investor. Advancing a day moves prices,
@@ -57,14 +58,21 @@ export function advanceOneDay(db: Db, reportFor?: string): DayReport {
     if (addDays(simDate(db), 1) !== today) throw new MarketMovedError();
     setMeta(db, "sim_date", today);
 
-    // 1. Prices and appraisals (shared market)
+    // 1. Prices and appraisals (shared market). With real prices on, a product with a benchmark follows it (as of
+    // the previous close); otherwise, or when its feed couldn't say, the simulation prices it.
     const insert = db.prepare(
-      "INSERT OR REPLACE INTO prices (product_id, date, price, source) VALUES (?, ?, ?, ?)",
+      "INSERT OR REPLACE INTO prices (product_id, date, price, source, feed) VALUES (?, ?, ?, ?, ?)",
     );
     for (const product of PRODUCTS) {
       const last = lastPoint(db, product.id);
+      const real = realPrice(db, product.id, last.price, today);
+      if (real) {
+        if (real.rebase) rebaseToReal(db, product.id, real.price / last.price);
+        insert.run(product.id, today, real.price, "market", real.feed);
+        continue;
+      }
       const next = simulateNextPoint(product, last, last.date, today);
-      if (next) insert.run(product.id, next.date, next.price, next.source);
+      if (next) insert.run(product.id, next.date, next.price, next.source, null);
     }
 
     // 2. Settle sale proceeds
@@ -247,13 +255,14 @@ export function canAdvanceMarket(): boolean {
 }
 
 /**
- * Keeps the simulated market in step with the calendar: if real time has moved past the market date, advance to
- * today (up to 90 days at a time). Does nothing when the clock is manual.
+ * Keeps the market in step with the calendar: if real time has moved past the market date, fetch the real closes
+ * (when real prices are on) and advance to today (up to 90 days at a time). Does nothing when the clock is manual.
  */
-export function ensureMarketCurrent(db: Db): number {
+export async function ensureMarketCurrent(db: Db): Promise<number> {
   if (marketClock() === "manual") return 0;
   const behind = diffDays(simDate(db), toIsoDate(new Date()));
   if (behind <= 0) return 0;
+  await refreshQuotes(db);
   return advanceDays(db, Math.min(behind, 90)).length;
 }
 

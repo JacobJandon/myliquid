@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
+import { marketsNote } from "@/lib/services/realPrices";
 
 /** Centered card layout shared by the log-in and sign-up pages. */
 export function AuthShell({
@@ -22,7 +23,7 @@ export function AuthShell({
         <div className="mt-6">{children}</div>
       </div>
       <p className="mt-6 max-w-md text-center text-[11px] text-muted">
-        Simulated markets, fictional products, demo money. Not investment advice.
+        {marketsNote()}. Fictional products. Not investment advice.
       </p>
     </div>
   );

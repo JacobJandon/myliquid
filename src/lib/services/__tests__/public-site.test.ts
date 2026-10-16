@@ -46,16 +46,16 @@ describe("market clock", () => {
     expect(simDate(db)).toBe("2026-10-22");
   });
 
-  it("catches up with the calendar, a day at a time, unless the clock is manual", () => {
+  it("catches up with the calendar, a day at a time, unless the clock is manual", async () => {
     const db = openDatabase(":memory:", { today: "2026-10-15" });
     vi.useFakeTimers({ now: new Date("2026-10-18T12:00:00Z"), toFake: ["Date"] });
     try {
       vi.stubEnv("MYLIQUID_MARKET_CLOCK", "manual");
-      expect(ensureMarketCurrent(db)).toBe(0);
+      expect(await ensureMarketCurrent(db)).toBe(0);
       vi.stubEnv("MYLIQUID_MARKET_CLOCK", "calendar");
-      expect(ensureMarketCurrent(db)).toBe(3);
+      expect(await ensureMarketCurrent(db)).toBe(3);
       expect(simDate(db)).toBe("2026-10-18");
-      expect(ensureMarketCurrent(db)).toBe(0);
+      expect(await ensureMarketCurrent(db)).toBe(0);
     } finally {
       vi.useRealTimers();
     }

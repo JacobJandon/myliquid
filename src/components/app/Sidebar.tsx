@@ -64,12 +64,15 @@ export function Sidebar({
   alertCount,
   paymentCount,
   user,
+  marketsNote,
   pet,
 }: {
   pendingCount: number;
   alertCount: number;
   paymentCount: number;
   user: { name: string; email: string | null; kind: string };
+  /** What's real here and what's demo (`marketsNote()`). */
+  marketsNote: string;
   pet: Pick<CompanionView, "name" | "color" | "level"> & {
     stage: Stage;
     mood: CompanionView["vitals"]["mood"];
@@ -154,9 +157,7 @@ export function Sidebar({
           </button>
         </div>
         <InstallAppRow className="rounded-xl px-1 text-xs text-fg-2 hover:text-fg" />
-        <p className="text-[11px] text-muted">
-          Simulated markets, demo money. Not investment advice.
-        </p>
+        <p className="text-[11px] text-muted">{marketsNote}. Not investment advice.</p>
       </div>
     </div>
   );
@@ -176,11 +177,14 @@ export function MobileTabBar({
   alertCount,
   paymentCount,
   user,
+  marketsNote,
 }: {
   pendingCount: number;
   alertCount: number;
   paymentCount: number;
   user: { name: string; email: string | null; kind: string };
+  /** What's real here and what's demo (`marketsNote()`). */
+  marketsNote: string;
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -299,9 +303,7 @@ export function MobileTabBar({
                   <LogOut className="h-3.5 w-3.5" /> Log out
                 </button>
               </div>
-              <p className="text-[11px] text-muted">
-                Simulated markets, demo money. Not investment advice.
-              </p>
+              <p className="text-[11px] text-muted">{marketsNote}. Not investment advice.</p>
             </div>
           </div>
         </div>

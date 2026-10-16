@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db";
 import { requireInvestor } from "@/lib/auth/current";
 import { getMandate } from "@/lib/services/repo";
+import { marketsNote } from "@/lib/services/realPrices";
 import { AccountActions, KillSwitch, SettingsForm } from "@/components/app/SettingsForm";
 import { Card, LinkButton } from "@/components/ui";
 
@@ -35,7 +36,7 @@ export default async function SettingsPage() {
                 : (investor.email ?? "Demo account")}
             </div>
             <div className="mt-1 text-xs text-muted">
-              Identity {investor.kycStatus}. Markets are simulated and money is demo money.
+              Identity {investor.kycStatus}. {marketsNote()}.
             </div>
           </div>
           {investor.kind === "guest" && (

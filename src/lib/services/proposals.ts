@@ -16,12 +16,7 @@ import { getMandate } from "./repo";
  */
 
 export type ProposalStatus =
-  | "pending"
-  | "executed"
-  | "partially_executed"
-  | "failed"
-  | "rejected"
-  | "withdrawn";
+  "pending" | "executed" | "partially_executed" | "failed" | "rejected" | "withdrawn";
 
 export interface ProposedOrder extends OrderIntent {
   reason?: string;

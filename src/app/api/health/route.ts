@@ -1,6 +1,8 @@
 import { getDb, simDate } from "@/lib/db";
 import { isRemoteUrl } from "@/lib/db/remote";
 import { agentMode, modelName } from "@/lib/agents/llm";
+import { marketClock } from "@/lib/services/sim";
+import { priceFeeds, realPricesEnabled } from "@/lib/services/realPrices";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -15,6 +17,12 @@ export function GET() {
       database: isRemoteUrl(db.name) ? "hosted" : "file",
       agentMode: agentMode(),
       model: agentMode() === "claude" ? modelName() : null,
+      marketClock: marketClock(),
+      prices: realPricesEnabled() ? "real" : "simulated",
+      priceFeeds: priceFeeds(db).map((f) => ({
+        product: f.productId,
+        latest: f.latest?.feed ?? null,
+      })),
     });
   } catch (err) {
     return Response.json(

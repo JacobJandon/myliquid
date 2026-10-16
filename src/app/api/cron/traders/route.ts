@@ -23,7 +23,7 @@ function authorized(req: Request): boolean {
 export async function GET(req: Request): Promise<Response> {
   if (!authorized(req)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const db = getDb();
-  const days = ensureMarketCurrent(db);
+  const days = await ensureMarketCurrent(db);
   const ran = await runAllDueTraders(db);
   return Response.json({ ok: true, marketDaysAdvanced: days, tradersRan: ran });
 }

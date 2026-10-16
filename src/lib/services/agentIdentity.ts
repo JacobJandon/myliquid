@@ -372,7 +372,8 @@ export function listConnections(db: Db, investorId: string, now = wallNow()): Co
 
 export type GatedPrincipal = ApiPrincipal & { ainraNumber: string | null; trader: OutsideTrader };
 
-export type GateResult = { allow: true; principal: GatedPrincipal } | { allow: false; message: string };
+export type GateResult =
+  { allow: true; principal: GatedPrincipal } | { allow: false; message: string };
 
 /** The gate in front of MCP and x402: pinned keys need a live presentation; scopes narrow to the passport's. */
 export function identityGate(db: Db, principal: ApiPrincipal, now = wallNow()): GateResult {

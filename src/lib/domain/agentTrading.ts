@@ -68,10 +68,10 @@ export function autonomyDecision(
   if (!trader.identified)
     return {
       auto: false,
-      reason: "The agent hasn't presented a fresh AINRA passport, so its trades wait for your approval.",
+      reason:
+        "The agent hasn't presented a fresh AINRA passport, so its trades wait for your approval.",
     };
-  if (trader.mode !== "auto")
-    return { auto: false, reason: "You set this agent to propose only." };
+  if (trader.mode !== "auto") return { auto: false, reason: "You set this agent to propose only." };
   const ceiling = tierAutoCeilingCents(trader.tier);
   if (ceiling === 0)
     return {

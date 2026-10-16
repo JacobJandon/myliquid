@@ -9,6 +9,7 @@ import { unlockedUnits } from "@/lib/domain/risk";
 import { reviewValuation } from "@/lib/domain/valuation";
 import { describeLiquidity } from "@/lib/agents/tools";
 import { getDealReview } from "@/lib/services/deals";
+import { priceFeeds } from "@/lib/services/realPrices";
 import { getSnapshot } from "@/lib/services/portfolio";
 import { getAvailableLots, getLots, priceHistory } from "@/lib/services/repo";
 import { TradeTicket } from "@/components/app/TradeTicket";
@@ -41,6 +42,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const review = deal ? getDealReview(db, product.id) : null;
   const valuation = reviewValuation(product, history.slice(-12), today);
   const appraised = product.valuation.source !== "market";
+  const feed = priceFeeds(db).find((f) => f.productId === product.id);
 
   return (
     <div className="space-y-6">
@@ -198,6 +200,19 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                     : product.valuation.appraiser}
                 </dd>
               </div>
+              {feed && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted">Follows</dt>
+                  <dd className="text-right text-fg">
+                    {feed.benchmark}
+                    <div className="text-[11px] text-muted" data-price-feed>
+                      {feed.latest?.feed
+                        ? `Moves with its daily close (latest: ${feed.latest.feed})`
+                        : "Today's price is simulated: the feed didn't answer"}
+                    </div>
+                  </dd>
+                </div>
+              )}
               {product.valuation.everyDays && (
                 <div className="flex justify-between gap-4">
                   <dt className="text-muted">Re-marked</dt>
@@ -209,7 +224,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
                 <dd className="text-right text-fg tabular">{formatUsd(product.minTicketCents)}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-muted">Simulated expected return</dt>
+                <dt className="text-muted">
+                  {feed ? "Long-run return assumed" : "Simulated expected return"}
+                </dt>
                 <dd className="text-right text-fg tabular">
                   {formatPct(product.annualDrift)} / yr
                 </dd>

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { marketsNote } from "@/lib/services/realPrices";
 import Link from "next/link";
 import clsx from "clsx";
 import {
@@ -227,8 +228,7 @@ export default function LandingPage() {
               </Link>
             </div>
             <p className="mt-4 text-xs text-muted">
-              One click opens a private guest account with its own pet. Simulated markets, demo
-              money.
+              One click opens a private guest account with its own pet. {marketsNote()}.
             </p>
           </div>
 
@@ -660,8 +660,8 @@ GET /api/x402/research/DL-NORDHAVN
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-xs text-muted sm:px-6">
           <Logo size="sm" />
           <span>
-            © {new Date().getFullYear()} MyLiquid. A demo platform: simulated markets, fictional
-            products and merchants, no real money. Not investment advice.
+            © {new Date().getFullYear()} MyLiquid. A demo platform. {marketsNote()}; fictional
+            products and merchants. Not investment advice.
           </span>
           <span className="flex items-center gap-3">
             <Link href="/business" className="hover:text-fg">
