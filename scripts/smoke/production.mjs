@@ -145,6 +145,22 @@ await step("Market clock", async () => {
   return "advanced a day (demo clock)";
 });
 
+await step("AINRA lab: a real passport verifies, a tampered copy is refused", async () => {
+  const post = async (data) => {
+    const r = await page.request.post(`${SITE}/api/ainra/inspect`, { data });
+    const d = await r.json();
+    if (!r.ok()) throw new Error(`HTTP ${r.status()} ${d.error ?? ""}`);
+    return d;
+  };
+  const good = await post({ sample: "momentum-trader" });
+  if (good.check.status !== "valid") throw new Error(`as issued: ${good.check.reason}`);
+  const bad = await post({ sample: "momentum-trader", tamper: "widen" });
+  if (bad.check.reason !== "sig_invalid") throw new Error(`tampered: ${bad.check.reason}`);
+  await page.goto(`${SITE}/ainra`, { waitUntil: "load" });
+  await page.locator("[data-verdict=valid]").waitFor({ timeout: 20000 });
+  return `${good.trust}: valid; tampered → ${bad.check.reason}`;
+});
+
 await step("Gate decides (business playground API)", async () => {
   const r = await page.request.post(`${SITE}/api/gate/v1/decide`, {
     data: {

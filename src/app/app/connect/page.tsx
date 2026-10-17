@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { headers } from "next/headers";
 import { getDb } from "@/lib/db";
 import { requireInvestor } from "@/lib/auth/current";
@@ -167,7 +168,10 @@ export default async function ConnectPage() {
           </a>{" "}
           passport: who runs it, its tier, what it declares it may do, and whether its registrar
           still vouches for it. That identity decides what it can do here, on top of your guardrails
-          and Sentinel&apos;s checks.
+          and Sentinel&apos;s checks.{" "}
+          <Link href="/ainra" className="font-medium text-accent underline underline-offset-2">
+            How MyLiquid verifies passports
+          </Link>
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
           <Badge tone={testbed ? "warning" : "good"}>{ainraModeLabel()}</Badge>

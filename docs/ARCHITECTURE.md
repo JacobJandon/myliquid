@@ -88,6 +88,10 @@ See [`MOBILE.md`](MOBILE.md).
     scopes to the tier floor and to `myliquid:*` capabilities.
   - A revoked presentation closes the window, withdraws the key's pending proposals and raises a critical alert.
   - `listConnections` is the investor's view: identity, freshness, effective scopes, limits and today's volume.
+  - `lib/ainra/inspect.ts` (the public `/ainra` page and `POST /api/ainra/inspect`): decodes a presentation,
+    alters a copy (widened capabilities, raised tier, stripped ML-DSA-65 signature, wrong log leaf, late, expired;
+    or the yield hunter's revoked one), runs the same `checkPassport` and maps AINRA's reason to the check that
+    failed. `grantFor` shows what MyLiquid would let it do. Read-only; stores nothing.
 - `domain/agentTrading.ts`: what an outside agent may do on its own. `autonomyDecision` requires a pinned,
   freshly presented identity, the investor's "trade on its own" setting, tier L2+ (per-trade ceilings: L2 $2,500,
   L3 $10,000, L4 $25,000), a declared `myliquid:trade`, and the per-trade and daily limits. `agentTrade` applies it

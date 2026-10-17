@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import Link from "next/link";
 import { ArrowRight, Fingerprint, Gauge, OctagonX, ScrollText, UserCheck } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
@@ -76,6 +77,9 @@ export default function BusinessPage() {
           <Link href="/" className={buttonClass("ghost", "sm")}>
             For investors
           </Link>
+          <Link href="/ainra" className={clsx(buttonClass("ghost", "sm"), "hidden sm:inline-flex")}>
+            Agent identity
+          </Link>
           <a href="#try" className={buttonClass("primary", "sm")}>
             Try Gate <ArrowRight className="h-3.5 w-3.5" />
           </a>
@@ -123,7 +127,11 @@ export default function BusinessPage() {
           <h2 className="font-display text-4xl text-fg sm:text-5xl">Try a decision.</h2>
           <p className="mt-3 max-w-2xl text-fg-2">
             These are real AINRA passports from the testbed, verified here as they would be in
-            production. Change anything and Gate decides again.
+            production. Change anything and Gate decides again.{" "}
+            <Link href="/ainra#lab" className="text-accent underline underline-offset-2">
+              See how the passports are checked
+            </Link>
+            .
           </p>
           <div className="mt-8">
             <GatePlayground />

@@ -298,7 +298,11 @@ Things to try:
 8. **Guardrails.** Change the risk profile, switch to bounded autonomy, or pull
    the kill switch (or just put your pet to sleep). A saved account can change its
    password here (other devices are signed out), reset, or delete itself.
-9. **Traders → Test drive.** Pick a testbed agent: watch it enroll with its AINRA
+9. **Agent identity (`/ainra`, public).** How MyLiquid implements AINRA: the chain of
+   trust, a tamper lab where the real verifier refuses altered passports (widened
+   capabilities, a stripped post-quantum signature, an unlogged or stale or revoked
+   passport) with AINRA's reason, and what each tier may do.
+10. **Traders → Test drive.** Pick a testbed agent: watch it enroll with its AINRA
    passport, trade on its own within its limits, and (the yield hunter) get cut
    off when its registrar revokes it. Or invite your own agent, or connect Claude
    with a key under *Manual setup*.

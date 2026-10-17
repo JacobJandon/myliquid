@@ -190,6 +190,9 @@ export default function LandingPage() {
           <a href="#why" className="hover:text-fg">
             Why
           </a>
+          <Link href="/ainra" className="hover:text-fg">
+            Agent identity
+          </Link>
           <Link href="/business" className="hover:text-fg">
             For business
           </Link>
@@ -666,6 +669,9 @@ GET /api/x402/research/DL-NORDHAVN
           <span className="flex items-center gap-3">
             <Link href="/business" className="hover:text-fg">
               MyLiquid Gate for business
+            </Link>
+            <Link href="/ainra" className="hover:text-fg">
+              AINRA agent identity
             </Link>
             <Link href="/terminal" className="hover:text-fg">
               Merchant terminal
