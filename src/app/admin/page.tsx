@@ -32,7 +32,9 @@ export default async function AdminPage() {
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="font-pixel text-[10px] uppercase text-accent">Founder dashboard</div>
-          <h1 className="font-display text-4xl text-fg">What the data says</h1>
+          <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">
+            What the data says
+          </h1>
           <p className="mt-1 text-sm text-fg-2">
             {m.since} to {m.today}. First-party events only; bots and visitors who opted out
             aren&apos;t counted. Decision rules: docs/discovery/4-measure-and-iterate.md.
@@ -96,7 +98,7 @@ export default async function AdminPage() {
         >
           <div data-admin="pmf">
             <div className="flex items-baseline gap-3">
-              <span className="font-display text-4xl text-fg">
+              <span className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">
                 {m.pmf.n ? pct(m.pmf.veryShare) : "—"}
               </span>
               <span className="text-sm text-fg-2">very disappointed · {m.pmf.n} answers</span>

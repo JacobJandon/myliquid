@@ -41,9 +41,9 @@ export default async function InvestPage() {
   );
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 sm:space-y-10">
       <div>
-        <h1 className="font-display text-4xl text-fg">Invest</h1>
+        <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">Invest</h1>
         <p className="mt-1 max-w-2xl text-sm text-fg-2">
           Every product shows its real liquidity terms and who values it. Private deals only appear
           after Scout&apos;s diligence, and rejected deals can&apos;t be bought.
@@ -59,8 +59,8 @@ export default async function InvestPage() {
             />
             <h2 className="text-lg font-semibold text-fg">{SLEEVE_LABELS[sleeve]}</h2>
           </div>
-          <p className="mb-4 text-sm text-muted">{blurb}</p>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <p className="mb-3 text-sm text-muted sm:mb-4">{blurb}</p>
+          <div className="grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
             {PRODUCTS.filter((p) => p.sleeve === sleeve).map((p) => {
               const review = p.kind === "deal" ? getDealReview(db, p.id) : null;
               const price = prices.get(p.id);
@@ -68,7 +68,7 @@ export default async function InvestPage() {
                 <Link
                   key={p.id}
                   href={`/app/invest/${p.id}`}
-                  className="group flex flex-col rounded-2xl border border-line bg-surface p-5 transition hover:border-line-strong hover:bg-surface-2"
+                  className="group flex flex-col rounded-2xl border border-line bg-surface p-4 transition hover:border-line-strong hover:bg-surface-2 sm:p-5"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -96,7 +96,7 @@ export default async function InvestPage() {
                     )}
                   </div>
                   <p className="mt-1 text-sm text-fg-2">{p.tagline}</p>
-                  <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+                  <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs sm:mt-4 sm:gap-y-2">
                     <dt className="text-muted">
                       {p.valuation.source === "market" ? "Price" : "NAV / unit"}
                     </dt>
@@ -117,7 +117,7 @@ export default async function InvestPage() {
                     <dd className="text-right text-fg tabular">{formatUsd(p.minTicketCents)}</dd>
                   </dl>
                   {held.has(p.id) && (
-                    <div className="mt-4 border-t border-line pt-3 text-xs text-fg-2">
+                    <div className="mt-3 border-t border-line pt-2.5 text-xs text-fg-2 sm:mt-4 sm:pt-3">
                       You hold {formatUsd(held.get(p.id)!)}
                     </div>
                   )}

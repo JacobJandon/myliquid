@@ -92,10 +92,10 @@ export default function BusinessPage() {
           <div className="font-pixel text-[10px] uppercase text-accent">
             MyLiquid Gate · for brokers and fintechs
           </div>
-          <h1 className="mt-3 max-w-4xl font-display text-5xl leading-[1.02] text-fg sm:text-6xl">
+          <h1 className="mt-3 max-w-4xl font-display text-4xl leading-[1.05] text-fg sm:text-5xl lg:text-6xl">
             Let AI agents trade and pay for your customers, safely.
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-fg-2">
+          <p className="mt-5 max-w-2xl text-base text-fg-2 sm:text-lg">
             Gate sits between the agents and your systems. For every action it checks who the agent
             is, what the customer and your firm allow, and decides: go ahead, ask a person, or stop.
             One API call, with the evidence a supervisor will ask for.
@@ -124,8 +124,10 @@ export default function BusinessPage() {
           </ul>
         </section>
 
-        <section id="try" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-14 sm:px-6">
-          <h2 className="font-display text-4xl text-fg sm:text-5xl">Try a decision.</h2>
+        <section id="try" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-10 sm:py-14 sm:px-6">
+          <h2 className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
+            Try a decision.
+          </h2>
           <p className="mt-3 max-w-2xl text-fg-2">
             These are real AINRA passports from the testbed, verified here as they would be in
             production. Change anything and Gate decides again.{" "}
@@ -139,8 +141,10 @@ export default function BusinessPage() {
           </div>
         </section>
 
-        <section id="api" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-14 sm:px-6">
-          <h2 className="font-display text-4xl text-fg sm:text-5xl">One call.</h2>
+        <section id="api" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-10 sm:py-14 sm:px-6">
+          <h2 className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
+            One call.
+          </h2>
           <p className="mt-3 max-w-2xl text-fg-2">
             Send the action, the agent&apos;s passport as it presented it, and your policy. Gate
             answers <code className="font-mono text-sm">allow</code>,{" "}
@@ -155,12 +159,15 @@ export default function BusinessPage() {
 
         <section
           id="design-partners"
-          className="mx-auto max-w-6xl scroll-mt-6 px-4 py-14 sm:px-6"
+          className="mx-auto max-w-6xl scroll-mt-6 px-4 py-10 sm:py-14 sm:px-6"
           aria-labelledby="partners"
         >
           <div className="grid gap-10 rounded-[2rem] border-2 border-fg bg-surface p-6 shadow-[6px_6px_0_#111] sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <h2 id="partners" className="font-display text-4xl text-fg sm:text-5xl">
+              <h2
+                id="partners"
+                className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl"
+              >
                 Become a design partner.
               </h2>
               <p className="mt-3 text-fg-2">
@@ -172,8 +179,14 @@ export default function BusinessPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6" aria-labelledby="pricing">
-          <h2 id="pricing" className="font-display text-4xl text-fg sm:text-5xl">
+        <section
+          className="mx-auto max-w-6xl px-4 py-10 sm:py-14 sm:px-6"
+          aria-labelledby="pricing"
+        >
+          <h2
+            id="pricing"
+            className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl"
+          >
             Pricing
           </h2>
           <p className="mt-3 max-w-2xl text-fg-2">

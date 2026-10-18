@@ -86,7 +86,7 @@ function Tile({
   return (
     <div
       className={clsx(
-        "relative min-w-0 overflow-hidden rounded-3xl border-2 border-fg p-6 shadow-[5px_5px_0_#111]",
+        "relative min-w-0 overflow-hidden rounded-3xl border-2 border-fg p-5 shadow-[4px_4px_0_#111] sm:p-6 sm:shadow-[5px_5px_0_#111]",
         tone === "surface" && "bg-surface text-fg",
         tone === "ink" && "bg-fg text-bg",
         tone === "lime" && "bg-accent-2 text-accent-2-ink",
@@ -247,12 +247,12 @@ export default async function LandingPage() {
               Agent Pay · MCP
             </div>
             <h1
-              className="mt-6 font-display text-5xl leading-[1.02] text-fg sm:text-6xl lg:text-[4.4rem]"
+              className="mt-5 font-display text-[2.5rem] leading-[1.05] text-fg sm:text-6xl lg:text-[4.2rem]"
               data-variant={variant}
             >
               {headline.title}
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-fg-2">{headline.text}</p>
+            <p className="mt-6 max-w-xl text-base text-fg-2 sm:text-lg">{headline.text}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <GuestButton label="Try the live demo" variant="primary" />
               <Link href="/signup" className={buttonClass("secondary")}>
@@ -264,7 +264,7 @@ export default async function LandingPage() {
             </p>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[420px] py-6">
+          <div className="relative mx-auto w-full max-w-[420px] py-6 max-sm:[zoom:0.8]">
             <TamaDevice name="Drip" stage="splash" mood="happy" color="blue" level={5} size={260} />
             <Chip
               className="drift -left-2 top-0 sm:-left-10"
@@ -311,8 +311,8 @@ export default async function LandingPage() {
         </section>
 
         {/* Bento */}
-        <section id="alive" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6">
-          <h2 className="max-w-3xl font-display text-4xl text-fg sm:text-5xl">
+        <section id="alive" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
+          <h2 className="max-w-3xl font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
             Not a chatbot. A pet with a job.
           </h2>
           <p className="mt-3 max-w-2xl text-fg-2">
@@ -321,7 +321,7 @@ export default async function LandingPage() {
             after you.
           </p>
 
-          <div className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-6">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:mt-10 sm:gap-5 lg:grid-cols-6">
             <Tile className="lg:col-span-4">
               <Kicker className="text-muted">Evolves with your habits</Kicker>
               <h3 className="mt-2 font-display text-2xl">From Drop to Tide in ten levels.</h3>
@@ -431,11 +431,11 @@ export default async function LandingPage() {
         </section>
 
         {/* Agent Pay */}
-        <section id="pay" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6">
+        <section id="pay" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="min-w-0">
               <Kicker className="text-accent">Agent Pay</Kicker>
-              <h2 className="mt-3 font-display text-4xl text-fg sm:text-5xl">
+              <h2 className="mt-3 font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
                 Your agent taps to pay. You set the rules.
               </h2>
               <p className="mt-4 text-fg-2">
@@ -516,7 +516,9 @@ export default async function LandingPage() {
               <div className="grid items-center gap-8 lg:grid-cols-2">
                 <div>
                   <Kicker className="text-accent-2">HTTP 402 · x402-style</Kicker>
-                  <h3 className="mt-2 font-display text-3xl">Agents that buy what they need.</h3>
+                  <h3 className="mt-2 font-display text-2xl sm:text-3xl">
+                    Agents that buy what they need.
+                  </h3>
                   <p className="mt-3 text-sm text-bg/75">
                     Premium diligence data answers <code>402 Payment Required</code> with a price.
                     Scout pays 50¢ from the wallet, retries and gets the report, all under the same
@@ -541,11 +543,11 @@ GET /api/x402/research/DL-NORDHAVN
         </section>
 
         {/* The app */}
-        <section id="app" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6">
+        <section id="app" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
           <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
             <div className="min-w-0">
               <Kicker className="text-accent">The app</Kicker>
-              <h2 className="mt-3 font-display text-4xl text-fg sm:text-5xl">
+              <h2 className="mt-3 font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
                 MyLiquid in your pocket.
               </h2>
               <p className="mt-3 max-w-xl text-fg-2">
@@ -603,13 +605,15 @@ GET /api/x402/research/DL-NORDHAVN
         </section>
 
         {/* The desk */}
-        <section id="desk" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6">
-          <h2 className="font-display text-4xl text-fg sm:text-5xl">Your agent runs a desk.</h2>
+        <section id="desk" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
+          <h2 className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
+            Your agent runs a desk.
+          </h2>
           <p className="mt-3 max-w-2xl text-fg-2">
             Separated duties, like a well-run fund: the agents that propose trades never value the
             book or police risk. Powered by Claude, with a deterministic offline mode.
           </p>
-          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 sm:mt-10">
             {DESK_AGENTS.map((id) => {
               const a = AGENTS[id];
               return (
@@ -628,15 +632,15 @@ GET /api/x402/research/DL-NORDHAVN
         </section>
 
         {/* Why */}
-        <section id="why" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6">
-          <h2 className="max-w-3xl font-display text-4xl text-fg sm:text-5xl">
+        <section id="why" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
+          <h2 className="max-w-3xl font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
             Built against the shadow-banking playbook.
           </h2>
           <p className="mt-3 max-w-3xl text-fg-2">
             Funds that sold &ldquo;liquid&rdquo; products, bought bespoke bonds from one originator
             and marked them themselves ended with gates and losses. MyLiquid inverts every step.
           </p>
-          <div className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-10 sm:gap-4 lg:grid-cols-3">
             {LESSONS.map((l) => (
               <div key={l.bad} className="rounded-2xl border border-line-strong bg-surface p-5">
                 <Kicker className="text-muted">The trap</Kicker>
@@ -651,10 +655,15 @@ GET /api/x402/research/DL-NORDHAVN
         </section>
 
         {/* Early access: the waitlist doubles as audience research (docs/discovery). */}
-        <section id="early-access" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6">
-          <div className="grid gap-10 rounded-[2rem] border border-line-strong bg-surface p-6 sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
+        <section
+          id="early-access"
+          className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6"
+        >
+          <div className="grid gap-6 rounded-[2rem] border border-line-strong bg-surface p-5 sm:gap-10 sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <h2 className="font-display text-4xl text-fg sm:text-5xl">Get early access.</h2>
+              <h2 className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
+                Get early access.
+              </h2>
               <p className="mt-3 text-fg-2">
                 MyLiquid runs on demo money today. Tell us what you&apos;d trust an agent with, and
                 you help decide what we build first. Real-money accounts come later, through
@@ -667,9 +676,9 @@ GET /api/x402/research/DL-NORDHAVN
 
         {/* CTA */}
         <section className="mx-auto max-w-6xl px-4 pb-24 pt-8 sm:px-6">
-          <div className="grid items-center gap-10 rounded-[2rem] border-2 border-fg bg-accent-2 p-8 shadow-[6px_6px_0_#111] sm:p-12 lg:grid-cols-[1fr_auto]">
+          <div className="grid items-center gap-8 rounded-[2rem] border-2 border-fg bg-accent-2 p-6 shadow-[5px_5px_0_#111] sm:gap-10 sm:p-12 sm:shadow-[6px_6px_0_#111] lg:grid-cols-[1fr_auto]">
             <div>
-              <h2 className="font-display text-4xl text-accent-2-ink sm:text-5xl">
+              <h2 className="font-display text-3xl leading-tight text-accent-2-ink sm:text-4xl lg:text-5xl">
                 Your agent is ready to hatch.
               </h2>
               <p className="mt-3 max-w-xl text-accent-2-ink/80">

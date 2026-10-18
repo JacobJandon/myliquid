@@ -156,7 +156,9 @@ export default async function ConnectPage() {
   return (
     <div className="max-w-6xl space-y-6">
       <div>
-        <h1 className="font-display text-4xl text-fg">Agent traders</h1>
+        <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">
+          Agent traders
+        </h1>
         <p className="mt-1 max-w-3xl text-sm text-fg-2">
           Let outside AI agents trade for you, and know who they are. An agent identifies itself
           with its{" "}

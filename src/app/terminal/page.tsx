@@ -23,7 +23,7 @@ export default function TerminalPage() {
           <div className="inline-flex items-center gap-2 rounded-full border-2 border-fg bg-accent-2 px-3 py-1 font-pixel text-[11px] uppercase">
             Merchant demo
           </div>
-          <h1 className="mt-5 font-display text-5xl leading-[1.02] text-fg sm:text-6xl">
+          <h1 className="mt-5 font-display text-4xl leading-[1.05] text-fg sm:text-5xl lg:text-6xl">
             A till that takes payments from agents.
           </h1>
           <p className="mt-5 max-w-lg text-lg text-fg-2">

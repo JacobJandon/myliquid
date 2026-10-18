@@ -128,10 +128,10 @@ export default async function AinraPage() {
           <div className="font-pixel text-[10px] uppercase text-accent">
             AINRA · agent identity, inside MyLiquid
           </div>
-          <h1 className="mt-3 max-w-4xl font-display text-5xl leading-[1.02] text-fg sm:text-6xl">
+          <h1 className="mt-3 max-w-4xl font-display text-4xl leading-[1.05] text-fg sm:text-5xl lg:text-6xl">
             Before an AI agent touches money, MyLiquid checks its passport.
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-fg-2">
+          <p className="mt-5 max-w-2xl text-base text-fg-2 sm:text-lg">
             <a href={AINRA} className="underline underline-offset-2">
               AINRA
             </a>{" "}
@@ -161,7 +161,10 @@ export default async function AinraPage() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6" aria-labelledby="chain">
-          <h2 id="chain" className="font-display text-3xl text-fg sm:text-4xl">
+          <h2
+            id="chain"
+            className="font-display text-2xl leading-tight text-fg sm:text-3xl lg:text-4xl"
+          >
             The chain of trust
           </h2>
           <ol className="mt-6 grid gap-3 lg:grid-cols-5">
@@ -183,8 +186,10 @@ export default async function AinraPage() {
           </ol>
         </section>
 
-        <section id="lab" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-14 sm:px-6">
-          <h2 className="font-display text-4xl text-fg sm:text-5xl">Try to fool it.</h2>
+        <section id="lab" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-10 sm:py-14 sm:px-6">
+          <h2 className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
+            Try to fool it.
+          </h2>
           <p className="mt-3 max-w-2xl text-fg-2">
             Pick a real passport, then alter a copy the way a dishonest or careless agent might.
             Each result is MyLiquid&apos;s own verifier running now, the same check every agent
@@ -203,7 +208,10 @@ export default async function AinraPage() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6" aria-labelledby="tiers">
-          <h2 id="tiers" className="font-display text-3xl text-fg sm:text-4xl">
+          <h2
+            id="tiers"
+            className="font-display text-2xl leading-tight text-fg sm:text-3xl lg:text-4xl"
+          >
             Identity decides autonomy
           </h2>
           <p className="mt-3 max-w-2xl text-fg-2">
@@ -241,7 +249,10 @@ export default async function AinraPage() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6" aria-labelledby="uses">
-          <h2 id="uses" className="font-display text-3xl text-fg sm:text-4xl">
+          <h2
+            id="uses"
+            className="font-display text-2xl leading-tight text-fg sm:text-3xl lg:text-4xl"
+          >
             Where MyLiquid uses it
           </h2>
           <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -268,7 +279,10 @@ export default async function AinraPage() {
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6" aria-labelledby="interest">
           <div className="grid gap-8 rounded-[2rem] border border-line-strong bg-surface p-6 sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <h2 id="interest" className="font-display text-3xl text-fg sm:text-4xl">
+              <h2
+                id="interest"
+                className="font-display text-2xl leading-tight text-fg sm:text-3xl lg:text-4xl"
+              >
                 Want this for your agents?
               </h2>
               <p className="mt-3 text-fg-2">
@@ -281,7 +295,10 @@ export default async function AinraPage() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6" aria-labelledby="code">
-          <h2 id="code" className="font-display text-3xl text-fg sm:text-4xl">
+          <h2
+            id="code"
+            className="font-display text-2xl leading-tight text-fg sm:text-3xl lg:text-4xl"
+          >
             Read the code
           </h2>
           <p className="mt-3 max-w-2xl text-fg-2">

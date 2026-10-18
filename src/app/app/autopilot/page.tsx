@@ -26,7 +26,9 @@ export default async function AutopilotPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-4xl text-fg">Autopilot</h1>
+        <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">
+          Autopilot
+        </h1>
         <p className="mt-1 max-w-3xl text-sm text-fg-2">
           Put your investing on a schedule, set the prices you want to trade at, and write
           strategies as rules. The market clock runs all of them every market day, and every trade

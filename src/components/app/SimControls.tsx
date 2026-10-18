@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import { CalendarClock, FastForward } from "lucide-react";
 import { postJson, useAction } from "@/components/client";
 import { buttonClass } from "@/components/ui";
@@ -30,17 +31,17 @@ export function SimControls({ canAdvance }: { canAdvance: boolean }) {
       return res;
     });
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-1 sm:gap-1.5">
       <span className="hidden text-xs text-muted sm:inline">Advance market</span>
       {[1, 7, 30].map((d) => (
         <button
           key={d}
-          className={buttonClass("secondary", "sm")}
+          className={clsx(buttonClass("secondary", "xs"), "gap-1 sm:h-8 sm:px-3 sm:text-xs")}
           disabled={pending}
           onClick={() => advance(d)}
           title={`Advance the simulated market ${d} day${d > 1 ? "s" : ""}`}
         >
-          {d === 1 && <FastForward className="h-3.5 w-3.5" />}+{d}d
+          {d === 1 && <FastForward className="h-3 w-3" />}+{d}d
         </button>
       ))}
       {error && <span className="text-xs text-critical">{error}</span>}

@@ -30,7 +30,7 @@ export function ProposalInbox({ proposals }: { proposals: Proposal[] }) {
       {proposals.map((p) => {
         const warnings = p.checks.flat().filter((c) => c.status === "warn");
         return (
-          <article key={p.id} className="rounded-xl border border-line bg-surface-2/60 p-4">
+          <article key={p.id} className="rounded-xl border border-line bg-surface-2/60 p-3 sm:p-4">
             <div className="flex items-start gap-3">
               <AgentAvatar agent={p.agent} />
               <div className="min-w-0 flex-1">

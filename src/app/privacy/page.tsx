@@ -60,7 +60,9 @@ export default function PrivacyPage() {
         </Link>
       </header>
       <main className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
-        <h1 className="font-display text-4xl text-fg sm:text-5xl">Privacy</h1>
+        <h1 className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
+          Privacy
+        </h1>
         <p className="mt-3 text-fg-2">What MyLiquid records, why, and how to stop it.</p>
         <div className="mt-8 space-y-6">
           {SECTIONS.map(([title, body]) => (

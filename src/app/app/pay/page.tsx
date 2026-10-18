@@ -38,7 +38,9 @@ export default async function PayPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-4xl text-fg">Agent Pay</h1>
+        <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">
+          Agent Pay
+        </h1>
         <p className="mt-1 max-w-3xl text-sm text-fg-2">
           {pet.name} carries a tokenized agent card, so it can tap to pay at a terminal, check out
           online, or pay per call for data. It never sees a card number. Every payment is checked

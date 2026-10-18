@@ -138,7 +138,7 @@ export function CopilotChat({
             <div className="mx-auto mb-4 flex h-28 w-28 items-center justify-center rounded-3xl border-2 border-fg bg-lcd shadow-[4px_4px_0_#111]">
               <PixelPet stage={pet.stage} mood={pet.mood} color={pet.color} lcd size={92} />
             </div>
-            <h2 className="font-display text-3xl text-fg">Talk to {pet.name}.</h2>
+            <h2 className="font-display text-2xl text-fg sm:text-3xl">Talk to {pet.name}.</h2>
             <p className="mt-2 text-sm text-fg-2">
               {pet.name} answers from live tool calls, runs the agent desk and can pay terminals
               with its agent card. Nothing trades or pays without passing Sentinel&apos;s checks

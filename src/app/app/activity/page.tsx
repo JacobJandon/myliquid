@@ -32,7 +32,9 @@ export default async function ActivityPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-4xl text-fg">Activity</h1>
+          <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">
+            Activity
+          </h1>
           <p className="mt-1 text-sm text-fg-2">
             An append-only record of every order, cash movement and agent action, including the ones
             Sentinel blocked.

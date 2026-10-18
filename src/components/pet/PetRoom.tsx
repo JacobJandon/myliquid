@@ -165,9 +165,9 @@ export function PetRoom({
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-line bg-surface">
-      <div className="grid gap-6 p-5 sm:p-6 lg:grid-cols-[300px_1fr_280px]">
-        {/* The device */}
-        <div className="relative flex flex-col items-center">
+      <div className="grid gap-5 p-4 sm:gap-6 sm:p-6 lg:grid-cols-[300px_1fr_280px]">
+        {/* The device: drawn at a fixed size, so it's zoomed down on phones rather than redrawn. */}
+        <div className="relative flex flex-col items-center max-sm:[zoom:0.78]">
           <TamaDevice
             name={pet.name}
             stage={stage}
@@ -239,7 +239,7 @@ export function PetRoom({
         {/* Status */}
         <div className="flex min-w-0 flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="font-display text-3xl text-fg">{pet.name}</h2>
+            <h2 className="font-display text-2xl text-fg sm:text-3xl">{pet.name}</h2>
             <span className="rounded-full bg-fg px-2 py-0.5 font-pixel text-[10px] uppercase text-bg">
               {pet.stage.name} · LV {pet.level}
             </span>
@@ -370,7 +370,7 @@ export function PetRoom({
           {/* Evolution chart: stages not reached yet are mystery silhouettes */}
           <div>
             <div className="mb-1.5 font-pixel text-[10px] uppercase text-muted">Evolution</div>
-            <ol className="grid grid-cols-5 gap-1.5">
+            <ol className="grid grid-cols-5 gap-1.5 max-sm:[zoom:0.85]">
               {STAGES.map((st) => {
                 const reached = pet.level >= st.fromLevel;
                 const current = st.id === stage;
@@ -406,13 +406,13 @@ export function PetRoom({
         </div>
 
         {/* Quests + care */}
-        <div className="flex flex-col gap-4">
-          <div className="rounded-2xl bg-surface-2 p-4">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          <div className="rounded-2xl bg-surface-2 p-3 sm:p-4">
             <div className="mb-2 flex items-center justify-between">
               <span className="font-pixel text-[11px] uppercase">Today&apos;s quests</span>
               <span className="text-[11px] text-muted">+{pet.xpToday} XP today</span>
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5 sm:space-y-2">
               {pet.quests.map((q) => (
                 <li key={q.id} className="flex items-start gap-2 text-sm">
                   <span

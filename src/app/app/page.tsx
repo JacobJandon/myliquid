@@ -84,7 +84,7 @@ export default async function DashboardPage() {
       <div className="hidden flex-wrap items-end justify-between gap-4 lg:flex">
         <div>
           <p className="text-sm text-muted">Welcome back, {investor.name.split(" ")[0]}</p>
-          <h1 className="font-display text-4xl text-fg">Home</h1>
+          <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">Home</h1>
         </div>
         <div className="flex items-center gap-2">
           <Badge tone="accent">{profile.label} profile</Badge>

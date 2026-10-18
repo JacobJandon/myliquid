@@ -90,7 +90,7 @@ export function PortfolioHero({
       className="lg:rounded-2xl lg:border lg:border-line lg:bg-surface lg:px-6 lg:pt-5"
     >
       <div className="text-xs font-medium text-muted">Portfolio</div>
-      <div className="font-display text-[2.6rem] leading-tight text-fg tabular-nums lg:text-5xl">
+      <div className="font-display text-[2.25rem] leading-tight text-fg tabular-nums lg:text-[2.75rem]">
         {formatUsd(value)}
       </div>
       <div className={clsx("text-sm font-medium tabular-nums", up ? "text-good" : "text-critical")}>
@@ -103,7 +103,7 @@ export function PortfolioHero({
       <svg
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="none"
-        className="mt-3 h-36 w-full touch-none select-none lg:h-56"
+        className="mt-3 h-36 w-full touch-none select-none lg:h-44"
         role="img"
         aria-label={`Portfolio value, ${r.label.toLowerCase()}: ${formatUsd(first)} to ${formatUsd(current)}`}
         onPointerDown={scrub}

@@ -51,7 +51,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           ← Invest
         </Link>
         <div className="mt-2 flex flex-wrap items-center gap-3">
-          <h1 className="font-display text-4xl text-fg">{product.name}</h1>
+          <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">
+            {product.name}
+          </h1>
           <Badge>{SLEEVE_LABELS[product.sleeve]}</Badge>
           {review && (
             <Badge

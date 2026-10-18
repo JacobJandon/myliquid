@@ -30,7 +30,7 @@ export function Card({
       )}
     >
       {(title || action) && (
-        <header className="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
+        <header className="flex items-start justify-between gap-4 border-b border-line px-4 py-3 sm:px-5 sm:py-4">
           <div className="min-w-0">
             {title && <h2 className="text-sm font-semibold text-fg">{title}</h2>}
             {subtitle && <p className="mt-0.5 text-xs text-muted">{subtitle}</p>}
@@ -38,7 +38,8 @@ export function Card({
           {action && <div className="shrink-0">{action}</div>}
         </header>
       )}
-      <div className={clsx("p-5", bodyClassName)}>{children}</div>
+      {/* Tighter on phones; a card that sets its own body padding (p-0 for tables) keeps it. */}
+      <div className={bodyClassName ?? "p-4 sm:p-5"}>{children}</div>
     </section>
   );
 }
@@ -192,11 +193,15 @@ export const SLEEVE_COLORS: Record<Sleeve, string> = {
 
 export function buttonClass(
   variant: "primary" | "secondary" | "ghost" | "danger" | "accent" = "secondary",
-  size: "sm" | "md" = "md",
+  size: "xs" | "sm" | "md" = "md",
 ) {
   return clsx(
     "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium transition active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50",
-    size === "sm" ? "h-8 px-3 text-xs" : "h-10 px-4 text-sm",
+    size === "xs"
+      ? "h-7 px-2.5 text-[11px]"
+      : size === "sm"
+        ? "h-8 px-3 text-xs"
+        : "h-10 px-4 text-sm",
     variant === "primary" && "bg-fg text-bg hover:bg-fg/85",
     variant === "accent" && "bg-accent text-accent-ink hover:brightness-110",
     variant === "secondary" && "border border-line-strong bg-surface text-fg hover:bg-surface-2",

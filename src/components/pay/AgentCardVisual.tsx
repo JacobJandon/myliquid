@@ -23,7 +23,7 @@ export function AgentCardVisual({
   return (
     <div
       className={clsx(
-        "relative aspect-[1.586] w-full max-w-sm overflow-hidden rounded-3xl border-2 border-fg p-5 text-bg shadow-[6px_6px_0_#111]",
+        "relative aspect-[1.586] w-full max-w-[19rem] overflow-hidden rounded-3xl border-2 border-fg p-4 text-bg shadow-[5px_5px_0_#111] max-sm:mx-auto sm:max-w-sm sm:p-5 sm:shadow-[6px_6px_0_#111]",
         frozen && "grayscale",
         className,
       )}
