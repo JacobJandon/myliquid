@@ -64,6 +64,22 @@ export function getProposal(db: Db, investorId: string, id: string): Proposal | 
   return row ? mapProposal(row) : undefined;
 }
 
+/** The investor's most recent decision on a proposal, if made in the last `minutes` (for "here's what happened"). */
+export function recentDecision(
+  db: Db,
+  investorId: string,
+  minutes = 10,
+  now = Date.now(),
+): Proposal | undefined {
+  return listProposals(db, investorId, { limit: 5 }).find(
+    (p) =>
+      p.status !== "pending" &&
+      p.status !== "withdrawn" &&
+      !!p.decidedAt &&
+      now - Date.parse(p.decidedAt) < minutes * 60_000,
+  );
+}
+
 export function listProposals(
   db: Db,
   investorId: string,

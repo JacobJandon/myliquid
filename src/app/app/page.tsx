@@ -13,7 +13,7 @@ import {
   getNetContributions,
   getSnapshot,
 } from "@/lib/services/portfolio";
-import { listProposals } from "@/lib/services/proposals";
+import { listProposals, recentDecision } from "@/lib/services/proposals";
 import { getProfile } from "@/lib/services/repo";
 import { getCompanionView, getQuiz } from "@/lib/services/companion";
 import { PetRoom } from "@/components/pet/PetRoom";
@@ -51,16 +51,7 @@ export default async function DashboardPage() {
   const nav = getNavHistory(db, investorId, 366);
   const proposals = listProposals(db, investorId, { status: "pending" });
   // Right after a decision, say what happened where the proposal was (the loop's last step).
-  const justDecided =
-    proposals.length === 0
-      ? listProposals(db, investorId, { limit: 5 }).find(
-          (p) =>
-            p.status !== "pending" &&
-            p.status !== "withdrawn" &&
-            !!p.decidedAt &&
-            Date.now() - Date.parse(p.decidedAt) < 10 * 60_000,
-        )
-      : undefined;
+  const justDecided = proposals.length === 0 ? recentDecision(db, investorId) : undefined;
   const alerts = listAlerts(db, investorId, { openOnly: true }).filter(
     (a) => a.severity !== "info",
   );

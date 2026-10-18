@@ -104,3 +104,30 @@ describe("guest accounts", () => {
     expect(recentGuestCount(db)).toBe(2);
   });
 });
+
+describe("after a decision", () => {
+  it("Home can say what just happened, for ten minutes", async () => {
+    const { recentDecision, listProposals, approveProposal } = await import("../proposals");
+    const db = openDatabase(":memory:", { today: "2026-10-15" });
+    setDb(db);
+    expect(
+      (
+        await guestPost(
+          new Request("http://x/api/auth/guest", {
+            method: "POST",
+            headers: { "content-type": "application/json", "x-forwarded-for": "203.0.113.90" },
+            body: "{}",
+          }),
+        )
+      ).status,
+    ).toBe(200);
+    const guest = (
+      db.prepare("SELECT id FROM investors WHERE kind = 'guest'").get() as { id: string }
+    ).id;
+    expect(recentDecision(db, guest)).toBeUndefined();
+    const [pending] = listProposals(db, guest, { status: "pending" });
+    approveProposal(db, guest, pending!.id);
+    expect(recentDecision(db, guest)?.status).toBe("executed");
+    expect(recentDecision(db, guest, 10, Date.now() + 11 * 60_000)).toBeUndefined();
+  });
+});
