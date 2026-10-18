@@ -94,6 +94,14 @@ export function PetRoom({
   const [name, setName] = useState(initial.name);
   const [event, setEvent] = useState<LcdEvent | null>(null);
   const [screenMode, setScreenMode] = useState<"pet" | "stats">("pet");
+  // When the page refreshes (after approving a proposal, say), take the server's fresh view of the pet.
+  const [seen, setSeen] = useState(initial);
+  if (initial !== seen) {
+    setSeen(initial);
+    setPet(initial);
+    setQuiz(initialQuiz);
+    if (!playing) setSpeech(initial.thought);
+  }
   const toastId = useRef(0);
   const eventId = useRef(0);
   const checkedIn = useRef(initial.checkedInToday);

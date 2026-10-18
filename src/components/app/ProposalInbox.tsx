@@ -2,6 +2,7 @@
 
 import { Check, X } from "lucide-react";
 import { useState } from "react";
+import { getProduct } from "@/lib/domain/catalog";
 import type { Proposal } from "@/lib/services/proposals";
 import { postJson, useAction } from "@/components/client";
 import { formatUsd } from "@/components/format";
@@ -49,13 +50,15 @@ export function ProposalInbox({ proposals }: { proposals: Proposal[] }) {
                 </div>
                 <ul className="mt-2 space-y-1 text-xs text-fg-2">
                   {p.orders.map((o, i) => (
-                    <li key={i} className="flex gap-2 tabular">
-                      <span className={o.side === "buy" ? "text-fg" : "text-fg"}>
-                        {o.side === "buy" ? "Buy" : "Sell"}
+                    <li key={i} className="tabular">
+                      <span className="text-fg">{o.side === "buy" ? "Buy" : "Sell"}</span>{" "}
+                      <span className="font-medium text-fg">{formatUsd(o.amountCents)}</span> of{" "}
+                      <span className="text-fg">
+                        {getProduct(o.productId)?.name ?? o.productId}
                       </span>
-                      <span className="font-medium text-fg">{formatUsd(o.amountCents)}</span>
-                      <span>{o.productId}</span>
-                      {o.reason && <span className="truncate text-muted">· {o.reason}</span>}
+                      {o.reason && (
+                        <span className="block text-muted sm:inline"> · {o.reason}</span>
+                      )}
                     </li>
                   ))}
                 </ul>

@@ -81,3 +81,4 @@ Backlog, highest expected learning first:
 | Date | Change or experiment | Result | Decision |
 |---|---|---|---|
 | 2026-10-18 | Analytics, research instruments, `landing_headline` and the opening Atlas proposal for guests | Waiting for traffic | Review one week after the site is public |
+| 2026-10-18 | Walked the core loop as a new visitor on a phone: the approval inbox was 3,470 px down (four screens), order reasons were cut off, nothing confirmed an approval | Pending proposals now sit under the portfolio (529 px), reasons wrap with fund names, Home says what happened; the production check runs the loop | Watch activation (H3) once there's traffic |

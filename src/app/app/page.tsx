@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireInvestor } from "@/lib/auth/current";
 import { getDb, simDate } from "@/lib/db";
-import { SLEEVE_LABELS } from "@/lib/domain/catalog";
+import { SLEEVE_LABELS, requireProduct } from "@/lib/domain/catalog";
 import { formatDate } from "@/lib/domain/dates";
 import { formatPct, formatUsd } from "@/lib/domain/money";
 import { AGENTS, DESK_AGENTS } from "@/lib/agents/registry";
@@ -50,6 +50,17 @@ export default async function DashboardPage() {
   const ladder = getLadder(db, investorId, snapshot);
   const nav = getNavHistory(db, investorId, 366);
   const proposals = listProposals(db, investorId, { status: "pending" });
+  // Right after a decision, say what happened where the proposal was (the loop's last step).
+  const justDecided =
+    proposals.length === 0
+      ? listProposals(db, investorId, { limit: 5 }).find(
+          (p) =>
+            p.status !== "pending" &&
+            p.status !== "withdrawn" &&
+            !!p.decidedAt &&
+            Date.now() - Date.parse(p.decidedAt) < 10 * 60_000,
+        )
+      : undefined;
   const alerts = listAlerts(db, investorId, { openOnly: true }).filter(
     (a) => a.severity !== "info",
   );
@@ -97,6 +108,56 @@ export default async function DashboardPage() {
         cashCents={snapshot.cashCents}
         totalGainCents={snapshot.totalCents - contributions}
       />
+
+      {/* The core loop: when an agent is waiting on a decision, that comes first. */}
+      {proposals.length > 0 && (
+        <Card
+          id="inbox"
+          title={`Waiting for you · ${proposals.length}`}
+          subtitle="An agent proposed this. Nothing happens until you approve."
+          className="border-2! border-fg! shadow-[4px_4px_0_#111]!"
+        >
+          <ProposalInbox proposals={proposals} />
+        </Card>
+      )}
+
+      {justDecided && (
+        <Card
+          id="inbox"
+          title={
+            justDecided.status === "rejected"
+              ? "You rejected it. Nothing was traded."
+              : justDecided.status === "executed"
+                ? "Done. Your approval went through."
+                : justDecided.status === "partially_executed"
+                  ? "Partly done. Some orders were blocked."
+                  : "Nothing went through. The checks blocked it."
+          }
+          subtitle={justDecided.title}
+        >
+          {justDecided.result && justDecided.status !== "rejected" && (
+            <ul className="space-y-1 text-sm" data-decided={justDecided.status}>
+              {justDecided.orders.map((o, i) => (
+                <li key={i} className="text-fg-2">
+                  <span className="text-fg">
+                    {o.side === "buy" ? "Buy" : "Sell"} {formatUsd(o.amountCents)} of{" "}
+                    {requireProduct(o.productId).name}
+                  </span>
+                  : {justDecided.result!.messages[i] ?? "—"}
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-3 flex flex-wrap gap-2">
+            <LinkButton href="/app/activity" size="sm" variant="secondary">
+              See it in Activity
+            </LinkButton>
+            <LinkButton href="/app/settings" size="sm" variant="ghost">
+              Change what agents may do
+            </LinkButton>
+          </div>
+        </Card>
+      )}
 
       {askPmf && <PmfSurvey />}
 
@@ -208,9 +269,11 @@ export default async function DashboardPage() {
         </div>
 
         <div className="min-w-0 space-y-6">
-          <Card title="Approval inbox" subtitle="Agents propose. You decide.">
-            <ProposalInbox proposals={proposals} />
-          </Card>
+          {proposals.length === 0 && (
+            <Card title="Approval inbox" subtitle="Agents propose. You decide.">
+              <ProposalInbox proposals={proposals} />
+            </Card>
+          )}
           <Card
             title="Your AI traders"
             subtitle="AINRA-identified agents trading within your limits"

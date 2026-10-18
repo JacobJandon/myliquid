@@ -90,6 +90,14 @@ await step("Guest demo opens Home", async () => {
   return hero.slice(0, 70);
 });
 
+await step("The core loop: approve Atlas's opening proposal", async () => {
+  await page.locator("#inbox").waitFor({ timeout: 20000 });
+  await page.getByRole("button", { name: /^Approve/ }).first().click();
+  const done = page.locator("[data-decided]");
+  await done.waitFor({ timeout: 30000 });
+  return `${await done.getAttribute("data-decided")}: ${text(await done.innerText()).slice(0, 90)}`;
+});
+
 for (const [name, path, expect] of [
   ["Invest", "/app/invest", "Index funds"],
   ["Pay", "/app/pay", "Agent Pay"],
