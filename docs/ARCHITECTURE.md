@@ -136,6 +136,16 @@ See [`MOBILE.md`](MOBILE.md).
   `prices.feed` says which close priced a day; a day no feed can price is
   simulated. `.github/workflows/market-data.yml` checks this daily on a runner.
 
+## Evidence
+
+The Activity log is tamper-evident. `logEvent` writes an entry in one statement; `sealActivity` links new entries
+in id order inside one write transaction: each `hash` is SHA-256 (or HMAC-SHA256 with `MYLIQUID_EVIDENCE_KEY`)
+over `myliquid-evidence-v1`, the previous hash and the canonical entry (`lib/domain/evidence.ts`). Sealing runs
+when Activity opens, on `GET /api/evidence` (a JSON export with every link and the hashing rule) and in the daily
+cron. `verifyChain` re-derives the chain: an edited entry fails its own hash (`content_changed`); a removed or
+inserted one breaks the next link (`link_broken`). Truncating the newest entries is caught by comparing with a
+head someone kept (the export, a statement).
+
 ## Layers
 
 **`lib/domain`: pure functions, no I/O.**
