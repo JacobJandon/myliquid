@@ -4,6 +4,8 @@ import { startSession } from "@/lib/auth/current";
 import { tooManyAttempts } from "@/lib/auth/rateLimit";
 import { deleteExpiredSessions } from "@/lib/auth/sessions";
 import { createInvestor, pruneGuests, recentGuestCount } from "@/lib/services/investors";
+import { trackRequest } from "@/lib/analytics/request";
+import { runOpeningRebalance } from "@/lib/agents/runner";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,7 +33,9 @@ export const POST = handle(async (req: Request) => {
     riskProfile: "balanced",
     starter: "sample",
   });
+  runOpeningRebalance(db, id);
   await startSession(id);
+  trackRequest(req, "guest_started", id);
   const isForm = (req.headers.get("content-type") ?? "").includes("form");
   if (isForm) return new Response(null, { status: 303, headers: { location: "/app" } });
   return json({ ok: true });

@@ -5,6 +5,7 @@ import { hashPassword } from "@/lib/auth/crypto";
 import { currentInvestor, startSession } from "@/lib/auth/current";
 import { createInvestor, findInvestorByEmail, upgradeGuest } from "@/lib/services/investors";
 import { customize } from "@/lib/services/companion";
+import { trackRequest } from "@/lib/analytics/request";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -39,6 +40,7 @@ export const POST = handle(async (req: Request) => {
       passwordHash,
       riskProfile: body.riskProfile,
     });
+    trackRequest(req, "signed_up", current.id, { fromGuest: true });
     return json({ ok: true, upgraded: true });
   }
   const id = createInvestor(db, {
@@ -51,5 +53,6 @@ export const POST = handle(async (req: Request) => {
     pet: body.pet,
   });
   await startSession(id);
+  trackRequest(req, "signed_up", id, { fromGuest: false });
   return json({ ok: true, upgraded: false });
 });

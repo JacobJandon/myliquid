@@ -275,6 +275,9 @@ compliance mapping.
 
 ## 9. How we measure it
 
+How the consumer app is validated step by step (problem, research, MVP, measure and iterate, and the same for
+AINRA), with the bars set in advance and the dashboard that measures them: [`../discovery/`](../discovery/).
+
 - **North star: governed agent actions per month.** It grows with customers, with agents per customer, and with
   how much those agents do.
 - **Leading indicators:**

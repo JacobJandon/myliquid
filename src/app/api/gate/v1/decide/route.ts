@@ -4,6 +4,7 @@ import { TESTBED_AGENT_IDS } from "@/lib/ainra";
 import { tooManyAttempts } from "@/lib/auth/rateLimit";
 import { GATE_MAX_ACTION_CENTS, decide } from "@/lib/gate/engine";
 import { identityFromPassport, samplePassport } from "@/lib/gate/identity";
+import { trackRequest } from "@/lib/analytics/request";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -71,5 +72,9 @@ export const POST = handle(async (req: Request) => {
     },
     { now: new Date() },
   );
+  trackRequest(req, "gate_decided", null, {
+    decision: decision.decision,
+    verified: identity.verified,
+  });
   return json({ ...decision, identity });
 });

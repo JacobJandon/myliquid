@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Fingerprint, Gauge, OctagonX, ScrollText, UserCheck } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { GatePlayground } from "@/components/gate/GatePlayground";
+import { DesignPartnerForm } from "@/components/research/Research";
 import { buttonClass } from "@/components/ui";
 
 export const metadata = {
@@ -150,6 +151,25 @@ export default function BusinessPage() {
           <pre className="mt-6 overflow-x-auto rounded-2xl border-2 border-fg bg-fg p-5 font-mono text-xs leading-relaxed text-bg shadow-[4px_4px_0_#111]">
             {CURL}
           </pre>
+        </section>
+
+        <section
+          id="design-partners"
+          className="mx-auto max-w-6xl scroll-mt-6 px-4 py-14 sm:px-6"
+          aria-labelledby="partners"
+        >
+          <div className="grid gap-10 rounded-[2rem] border-2 border-fg bg-surface p-6 shadow-[6px_6px_0_#111] sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <h2 id="partners" className="font-display text-4xl text-fg sm:text-5xl">
+                Become a design partner.
+              </h2>
+              <p className="mt-3 text-fg-2">
+                Five firms get Gate free for six months, shaped around their agents and their
+                regulator, in exchange for a weekly call and honest feedback.
+              </p>
+            </div>
+            <DesignPartnerForm />
+          </div>
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6" aria-labelledby="pricing">

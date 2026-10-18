@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { amountUsd, handle, json, parseBody, toCents } from "@/lib/api";
 import { requireApiInvestor } from "@/lib/auth/current";
 import { executeOrder, listOrders } from "@/lib/services/orders";
+import { trackRequest } from "@/lib/analytics/request";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,5 +23,7 @@ export const POST = handle(async (req: Request) => {
     { productId: body.productId, side: body.side, amountCents: toCents(body.amountUsd) },
     "user",
   );
+  if (order.status !== "rejected")
+    trackRequest(req, "trade_placed", investorId, { productId: body.productId, side: body.side });
   return json({ order }, order.status === "rejected" ? 422 : 200);
 });

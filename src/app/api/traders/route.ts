@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db";
 import { handle, json, parseBody } from "@/lib/api";
 import { requireApiInvestor } from "@/lib/auth/current";
 import { hireTrader, listHostedTraders, runTrader } from "@/lib/services/hostedTraders";
+import { trackRequest } from "@/lib/analytics/request";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,5 +31,6 @@ export const POST = handle(async (req: Request) => {
     dailyLimitCents: Math.round(body.dailyLimitUsd * 100),
   });
   const summary = await runTrader(db, investorId, trader.id);
+  trackRequest(req, "trader_hired", investorId, { kind: body.agent });
   return json({ trader, summary }, 201);
 });

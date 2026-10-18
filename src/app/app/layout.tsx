@@ -16,6 +16,8 @@ import { MobileTabBar, Sidebar } from "@/components/app/Sidebar";
 import { SimControls } from "@/components/app/SimControls";
 import { Badge } from "@/components/ui";
 import { LogoMark } from "@/components/brand/LogoMark";
+import { currentVisitor } from "@/lib/analytics/request";
+import { trackAppOpened } from "@/lib/services/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const investor = await requireInvestor();
   const db = getDb();
   await ensureMarketCurrent(db);
+  const visitor = await currentVisitor();
+  if (visitor.tracked) trackAppOpened(db, investor.id, visitor.id);
   // A new market day: the investor's hosted traders work it, after this page is sent.
   if (tradersDue(db, investor.id)) after(() => runDueTraders(db, investor.id));
   const pending = listProposals(db, investor.id, { status: "pending" }).length;

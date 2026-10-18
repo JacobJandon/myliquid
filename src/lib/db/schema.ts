@@ -406,6 +406,34 @@ CREATE TABLE IF NOT EXISTS payments (
   decided_at TEXT
 );
 CREATE INDEX IF NOT EXISTS payments_investor ON payments(investor_id, created_at);
+
+-- First-party product analytics (lib/services/analytics.ts). No IP addresses; investor ids are replaced by an
+-- anonymous id when the account goes away.
+CREATE TABLE IF NOT EXISTS events (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  visitor_id TEXT,
+  investor_id TEXT,
+  props TEXT NOT NULL DEFAULT '{}',
+  day TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  dedupe TEXT UNIQUE
+);
+CREATE INDEX IF NOT EXISTS events_name_day ON events(name, day);
+CREATE INDEX IF NOT EXISTS events_investor ON events(investor_id, day);
+
+-- Answers to MyLiquid's own research: the product-market-fit survey, the early-access list, Gate design-partner
+-- requests and AINRA interest. The only place MyLiquid keeps an email given for research.
+CREATE TABLE IF NOT EXISTS research_responses (
+  id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  visitor_id TEXT,
+  investor_id TEXT,
+  answers TEXT NOT NULL,
+  email TEXT,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS research_kind ON research_responses(kind, created_at);
 `;
 
 /**

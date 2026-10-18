@@ -1,4 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { VISITOR_COOKIE, VISITOR_MAX_AGE } from "@/lib/analytics/constants";
+import { shouldTrack } from "@/lib/domain/analytics";
 import {
   SITE_COOKIE,
   basicAuthPassword,
@@ -15,12 +17,12 @@ import {
  */
 export function proxy(req: NextRequest) {
   const password = process.env.MYLIQUID_SITE_PASSWORD;
-  if (!password) return NextResponse.next();
+  if (!password) return withVisitor(req);
   const path = req.nextUrl.pathname;
-  if (isPublicPath(path)) return NextResponse.next();
-  if (cookieMatches(req.cookies.get(SITE_COOKIE)?.value, password)) return NextResponse.next();
+  if (isPublicPath(path)) return withVisitor(req);
+  if (cookieMatches(req.cookies.get(SITE_COOKIE)?.value, password)) return withVisitor(req);
   if (passwordMatches(basicAuthPassword(req.headers.get("authorization")), password))
-    return NextResponse.next();
+    return withVisitor(req);
 
   const navigation =
     (req.method === "GET" || req.method === "HEAD") &&
@@ -38,6 +40,41 @@ export function proxy(req: NextRequest) {
       ? {}
       : { "WWW-Authenticate": 'Basic realm="MyLiquid", charset="UTF-8"' },
   });
+}
+
+/**
+ * Lets the request through, giving a new visitor a random first-party id (`ml_vid`) for MyLiquid's own analytics,
+ * on pages only, and never to bots or visitors who opted out (Global Privacy Control, Do Not Track). The page being
+ * rendered sees the id at once.
+ */
+function withVisitor(req: NextRequest): NextResponse {
+  const page =
+    req.method === "GET" &&
+    !req.nextUrl.pathname.startsWith("/api/") &&
+    (req.headers.get("accept") ?? "").includes("text/html");
+  if (
+    !page ||
+    req.cookies.has(VISITOR_COOKIE) ||
+    !shouldTrack({
+      userAgent: req.headers.get("user-agent"),
+      gpc: req.headers.get("sec-gpc"),
+      dnt: req.headers.get("dnt"),
+    })
+  )
+    return NextResponse.next();
+  const id = crypto.randomUUID();
+  const forwarded = new Headers(req.headers);
+  const cookie = forwarded.get("cookie");
+  forwarded.set("cookie", `${cookie ? `${cookie}; ` : ""}${VISITOR_COOKIE}=${id}`);
+  const res = NextResponse.next({ request: { headers: forwarded } });
+  res.cookies.set(VISITOR_COOKIE, id, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: req.nextUrl.protocol === "https:",
+    path: "/",
+    maxAge: VISITOR_MAX_AGE,
+  });
+  return res;
 }
 
 export const config = {

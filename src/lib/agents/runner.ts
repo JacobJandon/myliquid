@@ -104,6 +104,24 @@ export async function runAgentRoutine(
   }
 }
 
+/**
+ * A new sample account's first agent action: Atlas checks the allocation and, as it drifts on purpose, proposes
+ * a rebalance for approval, so a visitor reaches the core loop (an agent proposes, you decide) in their first
+ * minute. Always the offline routine: deterministic, instant, and no model call per visitor.
+ */
+export function runOpeningRebalance(db: Db, investorId: string): string {
+  const runId = startRun(db, investorId, "atlas", "opening", "offline");
+  try {
+    const summary = runOfflineRoutine("atlas", { db, investorId, agent: "atlas", runId }, () => {});
+    finishRun(db, runId, { summary });
+    return summary;
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    finishRun(db, runId, { error });
+    return error;
+  }
+}
+
 /** Runs the whole desk in dependency order: marks first, then diligence, risk, strategy, trading. */
 export async function runDeskCycle(
   investorId: string,

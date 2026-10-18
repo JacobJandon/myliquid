@@ -6,6 +6,7 @@ import { requireProduct } from "@/lib/domain/catalog";
 import { addDays, addMonths } from "@/lib/domain/dates";
 import type { RiskProfileId } from "@/lib/domain/types";
 import type { PetColor } from "@/lib/domain/companion";
+import { forgetInvestorAnalytics } from "./analytics";
 import { logEvent } from "./audit";
 import { createCompanion } from "./companion";
 import { ensureAgentPay } from "./payments";
@@ -247,18 +248,26 @@ const INVESTOR_TABLES = [
   ...PORTFOLIO_TABLES,
 ];
 
-export function deleteInvestor(db: Db, investorId: string): void {
+/**
+ * Deletes an investor and everything scoped to them. Their analytics stay only as anonymous numbers; with
+ * `forgetVisitor` (the person deleted their account) the device id is erased too.
+ */
+export function deleteInvestor(
+  db: Db,
+  investorId: string,
+  opts: { forgetVisitor?: boolean } = {},
+): void {
   db.transaction(() => {
     db.prepare("UPDATE payment_requests SET investor_id = NULL WHERE investor_id = ?").run(
       investorId,
     );
     for (const table of INVESTOR_TABLES)
       db.prepare(`DELETE FROM ${table} WHERE investor_id = ?`).run(investorId);
+    forgetInvestorAnalytics(db, investorId, opts);
     db.prepare("DELETE FROM investors WHERE id = ?").run(investorId);
   })();
 }
 
-/** Guest accounts are disposable: remove ones older than `days`. */
 /** How many guest accounts were opened in the last `ms` milliseconds. */
 export function recentGuestCount(db: Db, ms = 3_600_000): number {
   const since = new Date(Date.now() - ms).toISOString();
@@ -284,6 +293,7 @@ export function changePassword(db: Db, investorId: string, current: string, next
   return true;
 }
 
+/** Guest accounts are disposable: remove ones older than `days`. */
 export function pruneGuests(db: Db, days = 7): number {
   const cutoff = new Date(Date.now() - days * 86_400_000).toISOString();
   const stale = db

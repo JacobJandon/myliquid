@@ -14,6 +14,7 @@ import {
   type KeyIdentity,
 } from "./agentIdentity";
 import { logEvent } from "./audit";
+import { track } from "./analytics";
 
 /**
  * Connecting an outside agent, identity first. The investor creates a one-time invite that says what the agent
@@ -233,6 +234,7 @@ export function enrollAgent(
   const presented = presentPassport(db, principal, passport, { now: opts.now, wallNow: wall });
   const gate = identityGate(db, principal, wall);
   const identity = getKeyIdentity(db, investorId, result.apiKey.id)!;
+  track(db, "agent_connected", { investorId }, { tier: check.tier ?? "none" });
   logEvent(db, investorId, {
     agent: "external",
     kind: "system",

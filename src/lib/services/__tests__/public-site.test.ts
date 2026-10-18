@@ -81,6 +81,19 @@ describe("guest accounts", () => {
     expect((await open("203.0.113.8")).status).toBe(200);
   });
 
+  it("opens with a rebalance from Atlas waiting for approval", async () => {
+    const db = openDatabase(":memory:", { today: "2026-10-15" });
+    setDb(db);
+    expect((await open("203.0.113.50")).status).toBe(200);
+    const guest = db.prepare("SELECT id FROM investors WHERE kind = 'guest'").get() as {
+      id: string;
+    };
+    const pending = db
+      .prepare("SELECT agent FROM proposals WHERE investor_id = ? AND status = 'pending'")
+      .all(guest.id);
+    expect(pending).toEqual([{ agent: "atlas" }]);
+  });
+
   it("limits how many everyone opens an hour", async () => {
     const db = openDatabase(":memory:", { today: "2026-10-15" });
     setDb(db);

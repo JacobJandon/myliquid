@@ -10,6 +10,6 @@ export const dynamic = "force-dynamic";
 export const DELETE = handle(async () => {
   const investorId = await requireApiInvestor();
   await endSession();
-  deleteInvestor(getDb(), investorId);
+  deleteInvestor(getDb(), investorId, { forgetVisitor: true });
   return json({ ok: true });
 });

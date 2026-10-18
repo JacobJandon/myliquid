@@ -17,6 +17,8 @@ import { listProposals } from "@/lib/services/proposals";
 import { getProfile } from "@/lib/services/repo";
 import { getCompanionView, getQuiz } from "@/lib/services/companion";
 import { PetRoom } from "@/components/pet/PetRoom";
+import { PmfSurvey } from "@/components/research/Research";
+import { activeDays, hasResponded } from "@/lib/services/analytics";
 import { PortfolioHero } from "@/components/app/PortfolioHero";
 import { InstallBanner } from "@/components/pwa/InstallApp";
 import { AlertsList } from "@/components/app/AlertsList";
@@ -53,6 +55,9 @@ export default async function DashboardPage() {
   );
   const runs = lastRunByAgent(db, investorId);
   const today = simDate(db);
+
+  // The product-market-fit survey, once someone has come back on a second day and hasn't answered.
+  const askPmf = activeDays(db, investorId) >= 2 && !hasResponded(db, investorId, "pmf");
 
   const contributions = getNetContributions(db, investorId);
   const week = ladder.find((b) => b.id === "week");
@@ -92,6 +97,8 @@ export default async function DashboardPage() {
         cashCents={snapshot.cashCents}
         totalGainCents={snapshot.totalCents - contributions}
       />
+
+      {askPmf && <PmfSurvey />}
 
       <PetRoom initial={pet} initialQuiz={quiz} />
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowDown } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { AinraInspector } from "@/components/ainra/AinraInspector";
+import { AinraInterestForm } from "@/components/research/Research";
 import { buttonClass } from "@/components/ui";
 import { ainraMode, ainraModeLabel, scopesForTier } from "@/lib/ainra";
 import { TAMPERS } from "@/lib/ainra/inspect";
@@ -57,7 +58,7 @@ const USES = [
   {
     title: "Every MCP request",
     where: "/api/agent-identity → /api/mcp · identityGate",
-    text: "The agent presents its passport (the x-ainra-passport header); a pinned key then acts only while that presentation is under 5 minutes old. Its scopes narrow to what the passport declares and its tier allows.",
+    text: "The agent presents its passport (in the body, or the x-ainra-passport header); a pinned key then acts only while that presentation is under 5 minutes old. Its scopes narrow to what the passport declares and its tier allows.",
   },
   {
     title: "Trading on its own",
@@ -261,6 +262,21 @@ export default async function AinraPage() {
             <Link href="/business#try" className={buttonClass("secondary")}>
               Try Gate
             </Link>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6" aria-labelledby="interest">
+          <div className="grid gap-8 rounded-[2rem] border border-line-strong bg-surface p-6 sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <h2 id="interest" className="font-display text-3xl text-fg sm:text-4xl">
+                Want this for your agents?
+              </h2>
+              <p className="mt-3 text-fg-2">
+                Whether you build agents, run a platform they connect to, or would issue passports
+                yourself, tell us what you need. It shapes what AINRA and MyLiquid build next.
+              </p>
+            </div>
+            <AinraInterestForm />
           </div>
         </section>
 

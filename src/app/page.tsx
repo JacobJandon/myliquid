@@ -23,6 +23,9 @@ import { AGENTS, DESK_AGENTS } from "@/lib/agents/registry";
 import { STAGES, type Mood, type PetColor } from "@/lib/domain/companion";
 import { AgentAvatar, buttonClass } from "@/components/ui";
 import { GuestButton } from "@/components/auth/forms";
+import { TrackView, WaitlistForm } from "@/components/research/Research";
+import { currentVisitor } from "@/lib/analytics/request";
+import { EXPERIMENTS, assignVariant } from "@/lib/domain/analytics";
 import { Logo } from "@/components/brand/Logo";
 import { PixelPet } from "@/components/pet/PixelPet";
 import { TamaDevice } from "@/components/pet/TamaDevice";
@@ -167,7 +170,32 @@ function Chip({
   );
 }
 
-export default function LandingPage() {
+/** The landing headline experiment (EXPERIMENTS.landing_headline): the pet (control) or safety first. */
+const HEADLINES = {
+  pet: {
+    title: (
+      <>
+        Hatch an agent that invests, pays and <span className="highlight">grows with you.</span>
+      </>
+    ),
+    text: "Every MyLiquid account comes with a living agent. It runs a desk of specialists across index funds, trading, bitcoin, business interests and private equity, taps to pay at shop terminals with its own card, and levels up when you build good money habits.",
+  },
+  safety: {
+    title: (
+      <>
+        Let an AI agent run your money, <span className="highlight">on your rules.</span>
+      </>
+    ),
+    text: "You set the limits; your agent invests, rebalances and pays inside them, asks before anything bigger, and shows you every decision. Only agents with a verified identity may act on their own, and one switch stops them all.",
+  },
+} as const;
+
+export default async function LandingPage() {
+  const visitor = await currentVisitor();
+  const variant = (
+    visitor.id ? assignVariant(visitor.id, EXPERIMENTS.landing_headline) : "pet"
+  ) as keyof typeof HEADLINES;
+  const headline = HEADLINES[variant];
   return (
     <div className="bg-glow min-h-screen overflow-x-clip">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
@@ -208,6 +236,9 @@ export default function LandingPage() {
       </header>
 
       <main>
+        {visitor.tracked && (
+          <TrackView name="landing_viewed" props={{ landing_headline: variant }} />
+        )}
         {/* Hero */}
         <section className="mx-auto grid max-w-6xl items-center gap-14 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:pt-16">
           <div className="min-w-0">
@@ -215,15 +246,13 @@ export default function LandingPage() {
               <span className="h-2 w-2 rounded-full bg-accent-2 ring-2 ring-fg" /> Agentic wealth ·
               Agent Pay · MCP
             </div>
-            <h1 className="mt-6 font-display text-5xl leading-[1.02] text-fg sm:text-6xl lg:text-[4.4rem]">
-              Hatch an agent that invests, pays and{" "}
-              <span className="highlight">grows with you.</span>
+            <h1
+              className="mt-6 font-display text-5xl leading-[1.02] text-fg sm:text-6xl lg:text-[4.4rem]"
+              data-variant={variant}
+            >
+              {headline.title}
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-fg-2">
-              Every MyLiquid account comes with a living agent. It runs a desk of specialists across
-              index funds, trading, bitcoin, business interests and private equity, taps to pay at
-              shop terminals with its own card, and levels up when you build good money habits.
-            </p>
+            <p className="mt-6 max-w-xl text-lg text-fg-2">{headline.text}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <GuestButton label="Try the live demo" variant="primary" />
               <Link href="/signup" className={buttonClass("secondary")}>
@@ -621,6 +650,21 @@ GET /api/x402/research/DL-NORDHAVN
           </div>
         </section>
 
+        {/* Early access: the waitlist doubles as audience research (docs/discovery). */}
+        <section id="early-access" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6">
+          <div className="grid gap-10 rounded-[2rem] border border-line-strong bg-surface p-6 sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <h2 className="font-display text-4xl text-fg sm:text-5xl">Get early access.</h2>
+              <p className="mt-3 text-fg-2">
+                MyLiquid runs on demo money today. Tell us what you&apos;d trust an agent with, and
+                you help decide what we build first. Real-money accounts come later, through
+                licensed partners.
+              </p>
+            </div>
+            <WaitlistForm />
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="mx-auto max-w-6xl px-4 pb-24 pt-8 sm:px-6">
           <div className="grid items-center gap-10 rounded-[2rem] border-2 border-fg bg-accent-2 p-8 shadow-[6px_6px_0_#111] sm:p-12 lg:grid-cols-[1fr_auto]">
@@ -675,6 +719,9 @@ GET /api/x402/research/DL-NORDHAVN
             </Link>
             <Link href="/terminal" className="hover:text-fg">
               Merchant terminal
+            </Link>
+            <Link href="/privacy" className="hover:text-fg">
+              Privacy
             </Link>
             <Plug className="h-3 w-3" aria-hidden />
             <span>Agents powered by Claude</span>

@@ -4,6 +4,7 @@ import { handle, json, parseBody } from "@/lib/api";
 import { requireApiInvestor } from "@/lib/auth/current";
 import { awardXp } from "@/lib/services/companion";
 import { approveProposal, rejectProposal } from "@/lib/services/proposals";
+import { trackRequest } from "@/lib/analytics/request";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,6 +23,7 @@ export const POST = handle(
         : rejectProposal(db, investorId, id);
     // Deciding (either way) is the habit the pet rewards, not trading.
     awardXp(db, investorId, "decide_proposal");
+    trackRequest(req, "proposal_decided", investorId, { decision: action });
     return json({ proposal });
   },
 );
