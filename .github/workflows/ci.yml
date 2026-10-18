@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/myliquid-fintech-ai-agents-1svwct]
   pull_request:
 
 jobs:
@@ -19,3 +19,27 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+
+  # The whole suite again through the hosted-database wrapper (lib/db/remote.ts), against a real libSQL server,
+  # as production runs on Turso.
+  libsql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      sqld:
+        image: ghcr.io/tursodatabase/libsql-server:latest
+        ports: ["8080:8080"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Wait for the libSQL server
+        run: |
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:8080/health && exit 0; sleep 2; done
+          echo "libSQL server didn't start"; exit 1
+      - run: npm run test:libsql
+        env:
+          LIBSQL_TEST_URL: http://127.0.0.1:8080

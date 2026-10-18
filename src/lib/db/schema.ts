@@ -208,7 +208,9 @@ CREATE TABLE IF NOT EXISTS agent_events (
   title TEXT NOT NULL,
   payload TEXT,
   sim_date TEXT NOT NULL,
-  created_at TEXT NOT NULL
+  created_at TEXT NOT NULL,
+  prev_hash TEXT,
+  hash TEXT
 );
 CREATE INDEX IF NOT EXISTS agent_events_investor ON agent_events(investor_id, id);
 CREATE INDEX IF NOT EXISTS agent_runs_investor ON agent_runs(investor_id, started_at);
@@ -450,6 +452,8 @@ export const ADDED_COLUMNS: [table: string, column: string, definition: string][
   ["api_key_identities", "daily_limit_cents", "INTEGER NOT NULL DEFAULT 0"],
   ["hosted_traders", "ainra_sub", "TEXT"],
   ["prices", "feed", "TEXT"],
+  ["agent_events", "prev_hash", "TEXT"],
+  ["agent_events", "hash", "TEXT"],
 ];
 
 /** Indexes on added columns, created after the columns exist. */

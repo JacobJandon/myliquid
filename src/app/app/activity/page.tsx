@@ -3,8 +3,9 @@ import { requireInvestor } from "@/lib/auth/current";
 import { requireProduct } from "@/lib/domain/catalog";
 import { formatUsd } from "@/lib/domain/money";
 import { listEvents } from "@/lib/services/audit";
+import { evidenceStatus } from "@/lib/services/evidence";
 import { listCashMovements, listOrders } from "@/lib/services/orders";
-import { Download } from "lucide-react";
+import { Download, ShieldAlert, ShieldCheck } from "lucide-react";
 import { AgentAvatar, Badge, Card, agentLabel, buttonClass, type Tone } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,7 @@ export default async function ActivityPage() {
   const db = getDb();
   const orders = listOrders(db, investorId, 60);
   const cash = listCashMovements(db, investorId, 20);
+  const evidence = evidenceStatus(db, investorId);
   const events = listEvents(db, investorId, { limit: 120 });
 
   return (
@@ -40,6 +42,47 @@ export default async function ActivityPage() {
           <Download className="h-3.5 w-3.5" /> Download statement (CSV)
         </a>
       </div>
+
+      <section
+        aria-label="Evidence"
+        data-evidence={evidence.verdict.ok ? "intact" : "broken"}
+        className={
+          evidence.verdict.ok
+            ? "flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-good/40 bg-good/10 px-5 py-4"
+            : "flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-critical bg-critical/10 px-5 py-4"
+        }
+      >
+        <div className="flex min-w-0 items-start gap-3">
+          {evidence.verdict.ok ? (
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-good" aria-hidden />
+          ) : (
+            <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-critical" aria-hidden />
+          )}
+          <div className="min-w-0 text-sm">
+            <div className="font-semibold text-fg">
+              {evidence.verdict.ok
+                ? `Tamper-evident: ${evidence.verdict.entries.toLocaleString("en-US")} entries, every link verified`
+                : `The record was changed: the chain breaks at entry ${evidence.verdict.brokenAt}`}
+            </div>
+            <div className="text-xs text-fg-2">
+              {evidence.verdict.ok ? (
+                <>
+                  Each entry is hashed with the one before it{evidence.keyed ? " (keyed)" : ""}, so
+                  editing or removing any of them shows. Latest link:{" "}
+                  <code className="break-all font-mono">{evidence.verdict.head.slice(0, 16)}…</code>
+                </>
+              ) : evidence.verdict.reason === "content_changed" ? (
+                "That entry was edited after it was sealed."
+              ) : (
+                "An entry before it was removed, or one was inserted."
+              )}
+            </div>
+          </div>
+        </div>
+        <a href="/api/evidence" download className={buttonClass("secondary", "sm")}>
+          <Download className="h-3.5 w-3.5" /> Download evidence (JSON)
+        </a>
+      </section>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
         <div className="min-w-0 space-y-6 xl:col-span-3">

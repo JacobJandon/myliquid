@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { getDb } from "@/lib/db";
 import { runAllDueTraders } from "@/lib/services/hostedTraders";
 import { ensureMarketCurrent } from "@/lib/services/sim";
+import { sealAllActivity } from "@/lib/services/evidence";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,5 +26,11 @@ export async function GET(req: Request): Promise<Response> {
   const db = getDb();
   const days = await ensureMarketCurrent(db);
   const ran = await runAllDueTraders(db);
-  return Response.json({ ok: true, marketDaysAdvanced: days, tradersRan: ran });
+  const sealed = sealAllActivity(db);
+  return Response.json({
+    ok: true,
+    marketDaysAdvanced: days,
+    tradersRan: ran,
+    activitySealed: sealed,
+  });
 }
