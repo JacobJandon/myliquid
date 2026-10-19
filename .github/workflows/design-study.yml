@@ -1,0 +1,54 @@
+name: Design study
+
+# Measures reference websites (type, colour, layout, components, motion) in a real browser, for MyLiquid's design
+# work: scripts/design-study/measure.mjs. Each site's numbers are annotations on its job; screenshots are an
+# artifact on the run (kept 14 days).
+
+on:
+  push:
+    branches: [claude/myliquid-fintech-ai-agents-1svwct]
+    paths: [".github/workflows/design-study.yml", "scripts/design-study/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        site:
+          - https://graphify.com/
+          - https://mercury.com/
+          - https://ramp.com/
+          - https://stripe.com/
+          - https://linear.app/
+          - https://www.brex.com/
+          - https://www.moderntreasury.com/
+          - https://increase.com/
+          - https://www.wealthfront.com/
+          - https://robinhood.com/us/en/
+          - https://public.com/
+          - https://plaid.com/
+          - https://resend.com/
+          - https://www.browserbase.com/
+          - https://posthog.com/
+          - https://www.ycombinator.com/
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save --no-fund --no-audit playwright@1 > /dev/null && npx playwright install --with-deps chromium > /dev/null
+      - run: node scripts/design-study/measure.mjs "${{ matrix.site }}" out
+      - name: Name the artifact
+        id: name
+        run: echo "n=$(echo '${{ matrix.site }}' | sed -E 's#https?://(www\.)?##; s#[/.]+#-#g; s#-$##')" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: design-study-${{ steps.name.outputs.n }}
+          path: out/
+          retention-days: 14
