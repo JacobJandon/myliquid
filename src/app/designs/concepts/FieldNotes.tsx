@@ -44,7 +44,7 @@ const Btn = ({ primary, children }: { primary?: boolean; children: React.ReactNo
 function SystemFigure() {
   const nodes = [
     { x: 10, y: 14, w: 170, t: "Your rules", s: "limits · approvals" },
-    { x: 10, y: 136, w: 170, t: "Agents", s: "Atlas · Quant · L2 trader" },
+    { x: 10, y: 136, w: 170, t: "Agents", s: "yours · outside" },
     { x: 225, y: 75, w: 160, t: "Gate", s: "6 checks · identity" },
     { x: 430, y: 14, w: 170, t: "Your account", s: "orders executed" },
     { x: 430, y: 136, w: 170, t: "You decide", s: "anything bigger" },
@@ -211,13 +211,13 @@ function AppDesktop() {
                 <tbody>
                   {S.holdings.slice(0, 5).map((h) => (
                     <tr key={h.id} className="border-b" style={{ borderColor: C.rule }}>
-                      <td className="py-1.5 font-mono" style={{ color: C.ink2 }}>
+                      <td className="py-1.5 pr-3 font-mono" style={{ color: C.ink2 }}>
                         {h.id}
                       </td>
                       <td className="py-1.5">{h.name}</td>
-                      <td className="py-1.5 pl-2 text-right font-mono">{usd(h.value)}</td>
+                      <td className="py-1.5 pl-3 text-right font-mono whitespace-nowrap">{usd(h.value)}</td>
                       <td
-                        className="py-1.5 text-right font-mono"
+                        className="py-1.5 pl-3 text-right font-mono whitespace-nowrap"
                         style={{ color: h.day < 0 ? C.rust : h.day > 0 ? C.green : C.ink2 }}
                       >
                         {h.day > 0 ? "+" : ""}

@@ -83,21 +83,21 @@ function Allocation() {
   );
 }
 
-function Proposal({ compact = false }: { compact?: boolean }) {
+function Proposal({ compact = false, phone = false }: { compact?: boolean; phone?: boolean }) {
   return (
-    <Card>
-      <div className="flex items-center justify-between">
+    <Card className={phone ? "!p-4" : ""}>
+      <div className="flex items-center justify-between gap-2">
         <span
-          className="rounded-full px-2.5 py-1 text-[12px] font-medium"
+          className="shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-[12px] font-medium"
           style={{ background: C.blueSoft, color: C.blue }}
         >
           For your approval
         </span>
-        <span className="text-[12px]" style={{ color: C.ink2 }}>
-          from Atlas · 09:14
+        <span className="whitespace-nowrap text-[12px]" style={{ color: C.ink2 }}>
+          {phone ? "Atlas" : "from Atlas · 09:14"}
         </span>
       </div>
-      <Serif className="mt-3 block text-[22px] leading-snug">
+      <Serif className={`mt-3 block leading-snug ${phone ? "text-[19px]" : "text-[22px]"}`}>
         Bring your portfolio back to balance.
       </Serif>
       <div className="mt-3 space-y-2">
@@ -124,7 +124,7 @@ function Proposal({ compact = false }: { compact?: boolean }) {
         ))}
       </div>
       <ul className="mt-3 space-y-1 text-[12px]" style={{ color: C.ink2 }}>
-        {S.proposal.checks.map((c) => (
+        {(phone ? [`${S.proposal.checks.length} checks passed`] : S.proposal.checks).map((c) => (
           <li key={c}>
             <span style={{ color: C.green }}>●</span> {c}
           </li>
@@ -141,7 +141,7 @@ function Proposal({ compact = false }: { compact?: boolean }) {
 function AppDesktop() {
   return (
     <BrowserFrame className="rounded-[22px]" bar="#eceef5" url="app.myliquid.com">
-      <div className="grid grid-cols-[200px_1fr] p-6" style={{ background: C.bg, color: C.ink }}>
+      <div className="grid grid-cols-[160px_1fr] p-6" style={{ background: C.bg, color: C.ink }}>
         <aside className="pr-6 text-[14px]">
           <div className="flex items-center gap-2 font-semibold">
             <LogoMark size={20} animate={false} /> MyLiquid
@@ -158,13 +158,13 @@ function AppDesktop() {
             ))}
           </nav>
         </aside>
-        <main className="grid grid-cols-[minmax(0,1fr)_330px] gap-5">
+        <main className="grid grid-cols-[minmax(0,1fr)_300px] gap-5">
           <div className="space-y-5">
             <Card>
               <div className="text-[13px]" style={{ color: C.ink2 }}>
                 Total wealth
               </div>
-              <Serif className="mt-1 block text-[44px] leading-none tracking-[-0.01em]">
+              <Serif className="mt-1 block text-[40px] leading-none tracking-[-0.01em]">
                 {usd(S.total)}
               </Serif>
               <div className="mt-2 text-[13px]" style={{ color: C.green }}>
@@ -242,18 +242,18 @@ export function QuietWealth() {
           </div>
         </div>
         <div
-          className="relative rounded-[32px] p-6 sm:p-8"
+          className="relative rounded-[32px] p-4 sm:p-8"
           style={{
             background:
               "radial-gradient(120% 90% at 80% 10%, #dfe6ff 0%, #f6f7fb 60%), radial-gradient(80% 70% at 0% 100%, #efe7ff, transparent)",
           }}
         >
-          <div className="grid grid-cols-[minmax(0,1fr)_150px] gap-4">
-            <Card>
+          <div className="grid grid-cols-[minmax(0,1fr)_104px] gap-3 sm:grid-cols-[minmax(0,1fr)_150px] sm:gap-4">
+            <Card className="max-sm:!p-4">
               <div className="text-[12px]" style={{ color: C.ink2 }}>
                 Total wealth
               </div>
-              <Serif className="block text-[34px] leading-none">{usd(S.total)}</Serif>
+              <Serif className="block text-[30px] leading-none sm:text-[34px]">{usd(S.total)}</Serif>
               <LineChart
                 values={S.series}
                 height={56}
@@ -264,9 +264,9 @@ export function QuietWealth() {
             </Card>
             <Card className="!p-4">
               <div className="text-[12px]" style={{ color: C.ink2 }}>
-                Reachable in 7 days
+                Reachable <span className="whitespace-nowrap">in 7 days</span>
               </div>
-              <div className="mt-1 text-[28px] font-medium leading-none">75%</div>
+              <div className="mt-1 text-[24px] font-medium leading-none sm:text-[28px]">75%</div>
               <div className="mt-2 h-1.5 rounded-full" style={{ background: C.blueSoft }}>
                 <div className="h-1.5 w-3/4 rounded-full" style={{ background: C.blue }} />
               </div>
@@ -322,7 +322,7 @@ export function QuietWealth() {
                   className="mt-2 h-[70px]"
                 />
               </Card>
-              <Proposal compact />
+              <Proposal compact phone />
             </div>
           </PhoneFrame>
         </div>

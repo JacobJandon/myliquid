@@ -101,7 +101,7 @@ function Companion() {
           </span>
         </div>
         <div className="truncate text-[12px]" style={{ color: C.ink2 }}>
-          1 quest left today
+          1 quest left
         </div>
       </div>
       <Btn>Feed</Btn>
@@ -232,7 +232,7 @@ export function PaperPixels() {
           </Mono>
         </div>
         <div className="relative mx-auto">
-          <TamaDevice name={S.pet} stage="splash" mood="happy" color="blue" level={5} size={230} />
+          <TamaDevice name={S.pet} stage="splash" mood="happy" color="blue" level={5} size={260} />
           <div
             className="absolute -right-24 top-4 hidden whitespace-nowrap rounded-full border bg-white px-3 py-1.5 text-[12px] shadow-sm sm:block"
             style={{ borderColor: C.line }}
