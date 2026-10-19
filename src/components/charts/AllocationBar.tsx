@@ -25,7 +25,7 @@ export function AllocationBar({
   return (
     <div>
       <div
-        className="flex h-3 w-full gap-[2px] overflow-hidden rounded-full"
+        className="reveal-wipe flex h-3 w-full gap-[2px] overflow-hidden rounded-full"
         role="img"
         aria-label="Allocation by sleeve"
       >

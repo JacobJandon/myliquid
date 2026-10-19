@@ -533,7 +533,7 @@ const proposeRebalance = defineTool({
     if (plan.trades.length === 0) return { outcome: "nothing_to_do", notes: plan.notes };
     const created = createProposal(db, investorId, {
       agent: agent === "copilot" ? "atlas" : agent,
-      title: `Rebalance to ${profile.label} targets (${plan.trades.length} orders)`,
+      title: `Rebalance to ${profile.label} targets (${plan.trades.length} order${plan.trades.length === 1 ? "" : "s"})`,
       rationale: [
         rationale,
         ...plan.trades.map(

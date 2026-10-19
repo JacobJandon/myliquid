@@ -412,7 +412,7 @@ export function offlineCopilot(
     }).result;
     if (res.outcome === "proposed") {
       return [
-        `**Atlas** proposed a rebalance (${(res.orders as string[]).length} orders). Review and approve it in your inbox:`,
+        `**Atlas** proposed a rebalance (${(res.orders as string[]).length} order${(res.orders as string[]).length === 1 ? "" : "s"}). Review and approve it in your inbox:`,
         "",
         ...(res.orders as string[]).map((o) => `- ${o}`),
         ...((res.notes as string[]) ?? []).map((n) => `- ${n}`),

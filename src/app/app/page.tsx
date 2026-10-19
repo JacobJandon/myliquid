@@ -27,7 +27,8 @@ import { ProposalInbox } from "@/components/app/ProposalInbox";
 import { listHostedTraders, traderRecord } from "@/lib/services/hostedTraders";
 import { AllocationBar } from "@/components/charts/AllocationBar";
 import { LiquidityLadder } from "@/components/charts/LiquidityLadder";
-import { AgentAvatar, Badge, Card, LinkButton, Stat } from "@/components/ui";
+import clsx from "clsx";
+import { AgentAvatar, Badge, Card, LinkButton, SLEEVE_COLORS, Stat } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -83,8 +84,8 @@ export default async function DashboardPage() {
 
       <div className="hidden flex-wrap items-end justify-between gap-4 lg:flex">
         <div>
-          <p className="text-sm text-muted">Welcome back, {investor.name.split(" ")[0]}</p>
-          <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">Home</h1>
+          <p className="kicker text-muted">Welcome back, {investor.name.split(" ")[0]}</p>
+          <h1 className="type-h1 mt-2 text-fg">Home</h1>
         </div>
         <div className="flex items-center gap-2">
           <Badge tone="accent">{profile.label} profile</Badge>
@@ -94,61 +95,64 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <PortfolioHero
-        points={heroPoints}
-        cashCents={snapshot.cashCents}
-        totalGainCents={snapshot.totalCents - contributions}
-      />
+      {/* The core loop: when an agent is waiting on a decision, it sits beside the money (rules.md §3). */}
+      <div
+        className={clsx(
+          "grid gap-6",
+          (proposals.length > 0 || justDecided) &&
+            "xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] xl:items-start",
+        )}
+      >
+        <PortfolioHero
+          points={heroPoints}
+          cashCents={snapshot.cashCents}
+          totalGainCents={snapshot.totalCents - contributions}
+        />
 
-      {/* The core loop: when an agent is waiting on a decision, that comes first. */}
-      {proposals.length > 0 && (
-        <Card
-          id="inbox"
-          title={`Waiting for you · ${proposals.length}`}
-          subtitle="An agent proposed this. Nothing happens until you approve."
-          className="border-2! border-fg! shadow-[4px_4px_0_#111]!"
-        >
-          <ProposalInbox proposals={proposals} />
-        </Card>
-      )}
+        {proposals.length > 0 && (
+          <section id="inbox" aria-label="Waiting for you" className="scroll-mt-24">
+            <ProposalInbox proposals={proposals} />
+          </section>
+        )}
 
-      {justDecided && (
-        <Card
-          id="inbox"
-          title={
-            justDecided.status === "rejected"
-              ? "You rejected it. Nothing was traded."
-              : justDecided.status === "executed"
-                ? "Done. Your approval went through."
-                : justDecided.status === "partially_executed"
-                  ? "Partly done. Some orders were blocked."
-                  : "Nothing went through. The checks blocked it."
-          }
-          subtitle={justDecided.title}
-        >
-          {justDecided.result && justDecided.status !== "rejected" && (
-            <ul className="space-y-1 text-sm" data-decided={justDecided.status}>
-              {justDecided.orders.map((o, i) => (
-                <li key={i} className="text-fg-2">
-                  <span className="text-fg">
-                    {o.side === "buy" ? "Buy" : "Sell"} {formatUsd(o.amountCents)} of{" "}
-                    {requireProduct(o.productId).name}
-                  </span>
-                  : {justDecided.result!.messages[i] ?? "—"}
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="mt-3 flex flex-wrap gap-2">
-            <LinkButton href="/app/activity" size="sm" variant="secondary">
-              See it in Activity
-            </LinkButton>
-            <LinkButton href="/app/settings" size="sm" variant="ghost">
-              Change what agents may do
-            </LinkButton>
-          </div>
-        </Card>
-      )}
+        {justDecided && (
+          <Card
+            id="inbox"
+            title={
+              justDecided.status === "rejected"
+                ? "You rejected it. Nothing was traded."
+                : justDecided.status === "executed"
+                  ? "Done. Your approval went through."
+                  : justDecided.status === "partially_executed"
+                    ? "Partly done. Some orders were blocked."
+                    : "Nothing went through. The checks blocked it."
+            }
+            subtitle={justDecided.title}
+          >
+            {justDecided.result && justDecided.status !== "rejected" && (
+              <ul className="space-y-1 text-sm" data-decided={justDecided.status}>
+                {justDecided.orders.map((o, i) => (
+                  <li key={i} className="text-fg-2">
+                    <span className="text-fg">
+                      {o.side === "buy" ? "Buy" : "Sell"} {formatUsd(o.amountCents)} of{" "}
+                      {requireProduct(o.productId).name}
+                    </span>
+                    : {justDecided.result!.messages[i] ?? "—"}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mt-3 flex flex-wrap gap-2">
+              <LinkButton href="/app/activity" size="sm" variant="secondary">
+                See it in Activity
+              </LinkButton>
+              <LinkButton href="/app/settings" size="sm" variant="ghost">
+                Change what agents may do
+              </LinkButton>
+            </div>
+          </Card>
+        )}
+      </div>
 
       {askPmf && <PmfSurvey />}
 
@@ -172,7 +176,7 @@ export default async function DashboardPage() {
       </div>
 
       {(snapshot.holdings.length === 0 || runs.size === 0) && (
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border-2 border-fg bg-accent-2 p-5 shadow-[4px_4px_0_#111]">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-card border border-fg/15 bg-accent-2 p-5">
           <div>
             <div className="font-medium text-fg">
               {snapshot.holdings.length === 0
@@ -223,19 +227,30 @@ export default async function DashboardPage() {
                   {snapshot.holdings.map((h) => (
                     <tr key={h.product.id} className="border-t border-line hover:bg-surface-2/50">
                       <td className="px-5 py-3">
-                        <Link
-                          href={`/app/invest/${h.product.id}`}
-                          className="text-fg hover:text-accent"
-                        >
-                          {h.product.name}
-                        </Link>
-                        <div className="text-[11px] text-muted">
-                          {SLEEVE_LABELS[h.product.sleeve]}
+                        <div className="flex items-start gap-2.5">
+                          <span
+                            className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-[3px]"
+                            style={{ background: SLEEVE_COLORS[h.product.sleeve] }}
+                            aria-hidden
+                          />
+                          <div className="min-w-0">
+                            <Link
+                              href={`/app/invest/${h.product.id}`}
+                              className="text-fg hover:text-accent"
+                            >
+                              {h.product.name}
+                            </Link>
+                            <div className="text-[11px] text-muted">
+                              {SLEEVE_LABELS[h.product.sleeve]}
+                            </div>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3 text-right text-fg">{formatUsd(h.valueCents)}</td>
-                      <td className="px-3 py-3 text-right text-fg-2">{formatPct(h.weight)}</td>
-                      <td className="px-3 py-3 text-right text-fg-2">
+                      <td className="num px-3 py-3 text-right text-fg">
+                        {formatUsd(h.valueCents)}
+                      </td>
+                      <td className="num px-3 py-3 text-right text-fg-2">{formatPct(h.weight)}</td>
+                      <td className="num px-3 py-3 text-right text-fg-2">
                         {formatPct(h.costCents ? h.valueCents / h.costCents - 1 : 0, 1, true)}
                       </td>
                       <td className="px-5 py-3 text-xs text-fg-2">

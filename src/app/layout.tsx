@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Inter_Tight, Silkscreen } from "next/font/google";
+import { Geist_Mono, Inter, Inter_Tight, Silkscreen } from "next/font/google";
 import "./globals.css";
 import { PwaRegister } from "@/components/pwa/InstallApp";
 
@@ -9,6 +9,8 @@ const display = Inter_Tight({
   weight: ["600", "700", "800"],
   variable: "--font-display-face",
 });
+/** The mono voice for numbers and labels (docs/design/rules.md). */
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono-face" });
 const pixel = Silkscreen({
   subsets: ["latin"],
   weight: ["400", "700"],
@@ -36,7 +38,7 @@ const INSTALL_PROMPT_SCRIPT =
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${display.variable} ${pixel.variable}`}>
+    <html lang="en" className={`${inter.variable} ${display.variable} ${mono.variable} ${pixel.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: INSTALL_PROMPT_SCRIPT }} />
       </head>

@@ -62,19 +62,22 @@ export function PortfolioHero({
   const change = value - first;
   const up = (hover !== null ? change : current - first) >= 0;
 
-  const { path, baseY, x } = useMemo(() => {
+  const { path, area, baseY, x, y } = useMemo(() => {
     const values = shown.map((p) => p.value);
     const min = Math.min(...values);
     const max = Math.max(...values);
     const span = max - min || 1;
     const xAt = (i: number) => (shown.length > 1 ? (i / (shown.length - 1)) * W : W / 2);
     const yAt = (v: number) => 8 + (1 - (v - min) / span) * (H - 16);
+    const line = shown
+      .map((p, i) => `${i ? "L" : "M"}${xAt(i).toFixed(1)},${yAt(p.value).toFixed(1)}`)
+      .join("");
     return {
-      path: shown
-        .map((p, i) => `${i ? "L" : "M"}${xAt(i).toFixed(1)},${yAt(p.value).toFixed(1)}`)
-        .join(""),
+      path: line,
+      area: shown.length ? `${line}L${W},${H}L0,${H}Z` : "",
       baseY: yAt(shown[0]?.value ?? min),
       x: xAt,
+      y: yAt,
     };
   }, [shown]);
 
@@ -84,62 +87,86 @@ export function PortfolioHero({
     setHover(Math.round(t * (shown.length - 1)));
   };
 
+  // The dot sits on the day being read: today, or wherever the finger is.
+  const dotI = hover ?? shown.length - 1;
+  const dot = shown[dotI];
+
   return (
     <section
       aria-label="Portfolio"
-      className="lg:rounded-2xl lg:border lg:border-line lg:bg-surface lg:px-6 lg:pt-5"
+      className="lg:rounded-card lg:border lg:border-line lg:bg-surface lg:px-6 lg:pt-5"
     >
-      <div className="text-xs font-medium text-muted">Portfolio</div>
-      <div className="font-display text-[2.25rem] leading-tight text-fg tabular-nums lg:text-[2.75rem]">
-        {formatUsd(value)}
-      </div>
-      <div className={clsx("text-sm font-medium tabular-nums", up ? "text-good" : "text-critical")}>
-        {formatUsd(change, { sign: true })} ({formatPct(first ? change / first : 0, 2, true)}){" "}
-        <span className="font-normal text-muted">
-          {hover !== null && at ? formatDate(at.date) : r.label}
-        </span>
+      <div className="kicker text-muted">Portfolio</div>
+      <div className="num-xl mt-1.5 text-fg">{formatUsd(value)}</div>
+      <div className="mt-1.5 text-[13px]">
+        <span className={clsx("num font-medium", up ? "text-good" : "text-critical")}>
+          {formatUsd(change, { sign: true })} ({formatPct(first ? change / first : 0, 2, true)})
+        </span>{" "}
+        <span className="text-muted">{hover !== null && at ? formatDate(at.date) : r.label}</span>
       </div>
 
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        preserveAspectRatio="none"
-        className="mt-3 h-36 w-full touch-none select-none lg:h-44"
-        role="img"
-        aria-label={`Portfolio value, ${r.label.toLowerCase()}: ${formatUsd(first)} to ${formatUsd(current)}`}
-        onPointerDown={scrub}
-        onPointerMove={scrub}
-        onPointerLeave={() => setHover(null)}
-        onPointerUp={(e) => e.pointerType !== "mouse" && setHover(null)}
-      >
-        <line
-          x1={0}
-          x2={W}
-          y1={baseY}
-          y2={baseY}
-          stroke="var(--axis)"
-          strokeDasharray="2 4"
-          vectorEffect="non-scaling-stroke"
-        />
-        <path
-          d={path}
-          fill="none"
-          stroke={up ? "var(--good)" : "var(--critical)"}
-          strokeWidth={2}
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-        />
-        {hover !== null && (
+      {/* Keyed by range: a new range draws in from the left, the way time runs (rules.md §4). */}
+      <div key={range} className="anim-wipe relative mt-3 h-36 lg:h-44">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          preserveAspectRatio="none"
+          className="h-full w-full touch-none select-none"
+          role="img"
+          aria-label={`Portfolio value, ${r.label.toLowerCase()}: ${formatUsd(first)} to ${formatUsd(current)}`}
+          onPointerDown={scrub}
+          onPointerMove={scrub}
+          onPointerLeave={() => setHover(null)}
+          onPointerUp={(e) => e.pointerType !== "mouse" && setHover(null)}
+        >
+          <defs>
+            <linearGradient id="hero-fill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.16" />
+              <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={area} fill="url(#hero-fill)" />
           <line
-            x1={x(hover)}
-            x2={x(hover)}
-            y1={0}
-            y2={H}
-            stroke="var(--fg)"
-            strokeOpacity={0.35}
+            x1={0}
+            x2={W}
+            y1={baseY}
+            y2={baseY}
+            stroke="var(--axis)"
+            strokeDasharray="2 4"
             vectorEffect="non-scaling-stroke"
           />
+          <path
+            d={path}
+            fill="none"
+            stroke="var(--accent)"
+            strokeWidth={2}
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+          {hover !== null && (
+            <line
+              x1={x(hover)}
+              x2={x(hover)}
+              y1={0}
+              y2={H}
+              stroke="var(--fg)"
+              strokeOpacity={0.35}
+              vectorEffect="non-scaling-stroke"
+            />
+          )}
+        </svg>
+        {dot && (
+          <span
+            className="pointer-events-none absolute h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2"
+            style={{ left: `${(x(dotI) / W) * 100}%`, top: `${(y(dot.value) / H) * 100}%` }}
+            aria-hidden
+          >
+            {hover === null && (
+              <span className="anim-ping absolute inset-0 rounded-full bg-accent" />
+            )}
+            <span className="absolute inset-0 rounded-full border-2 border-surface bg-accent" />
+          </span>
         )}
-      </svg>
+      </div>
 
       <div
         className="mt-2 flex justify-between border-b border-line pb-3 lg:justify-start lg:gap-2"
@@ -156,12 +183,8 @@ export function PortfolioHero({
               setHover(null);
             }}
             className={clsx(
-              "rounded-full px-3 py-1 text-xs font-semibold",
-              range === x.id
-                ? up
-                  ? "bg-good/15 text-good"
-                  : "bg-critical/15 text-critical"
-                : "text-muted",
+              "num rounded-full px-3 py-1 text-xs font-medium transition-colors duration-[180ms]",
+              range === x.id ? "bg-fg text-bg" : "text-muted hover:text-fg",
             )}
           >
             {x.id}
@@ -172,10 +195,7 @@ export function PortfolioHero({
       <div className="flex items-center justify-between border-b border-line py-3 text-sm">
         <span className="text-fg">Total gain</span>
         <span
-          className={clsx(
-            "font-medium tabular-nums",
-            totalGainCents >= 0 ? "text-good" : "text-critical",
-          )}
+          className={clsx("num font-medium", totalGainCents >= 0 ? "text-good" : "text-critical")}
         >
           {formatUsd(totalGainCents, { sign: true })}
         </span>
@@ -185,7 +205,7 @@ export function PortfolioHero({
         className="flex items-center justify-between border-b border-line py-3 text-sm lg:border-b-0"
       >
         <span className="text-fg">Cash to invest</span>
-        <span className="flex items-center gap-1 font-medium text-fg tabular-nums">
+        <span className="num flex items-center gap-1 font-medium text-fg">
           {formatUsd(cashCents)} <ChevronRight className="h-4 w-4 text-muted" aria-hidden />
         </span>
       </Link>

@@ -164,7 +164,7 @@ export function PetRoom({
   const nextStage = STAGES.find((s) => s.fromLevel > pet.level);
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-line bg-surface">
+    <section className="relative overflow-hidden rounded-card border border-line bg-surface">
       <div className="grid gap-5 p-4 sm:gap-6 sm:p-6 lg:grid-cols-[300px_1fr_280px]">
         {/* The device: drawn at a fixed size, so it's zoomed down on phones rather than redrawn. */}
         <div className="relative flex flex-col items-center max-sm:[zoom:0.78]">
@@ -285,7 +285,7 @@ export function PetRoom({
 
           {customizing && (
             <form
-              className="flex flex-wrap items-center gap-2 rounded-2xl border border-line bg-surface-2 p-3"
+              className="flex flex-wrap items-center gap-2 rounded-[10px] border border-line bg-surface-2 p-3"
               onSubmit={(e) => {
                 e.preventDefault();
                 void act({ action: "customize", name }).then(() => setCustomizing(false));
@@ -316,7 +316,7 @@ export function PetRoom({
           )}
 
           {/* Speech bubble or quiz */}
-          <div className="relative rounded-2xl border-2 border-fg bg-surface px-4 py-3 text-sm text-fg shadow-[3px_3px_0_#111]">
+          <div className="relative rounded-[10px] border-2 border-fg bg-surface px-4 py-3 text-sm text-fg">
             {playing ? (
               <div>
                 <div className="font-medium">{quiz.question}</div>
@@ -407,7 +407,7 @@ export function PetRoom({
 
         {/* Quests + care */}
         <div className="flex flex-col gap-3 sm:gap-4">
-          <div className="rounded-2xl bg-surface-2 p-3 sm:p-4">
+          <div className="rounded-[10px] bg-surface-2 p-3 sm:p-4">
             <div className="mb-2 flex items-center justify-between">
               <span className="font-pixel text-[11px] uppercase">Today&apos;s quests</span>
               <span className="text-[11px] text-muted">+{pet.xpToday} XP today</span>

@@ -88,7 +88,7 @@ export function Sidebar({
         </Link>
         <Link
           href="/app"
-          className="mb-4 rounded-2xl border border-line bg-surface p-2.5 hover:border-line-strong"
+          className="mb-4 rounded-card border border-line bg-surface p-2.5 hover:border-line-strong"
         >
           <MiniPet
             name={pet.name}
@@ -271,7 +271,7 @@ export function MobileTabBar({
                     onClick={() => setOpen(false)}
                     aria-current={active ? "page" : undefined}
                     className={clsx(
-                      "flex flex-col items-center gap-1.5 rounded-2xl border px-2 py-3 text-xs",
+                      "flex flex-col items-center gap-1.5 rounded-[10px] border px-2 py-3 text-xs",
                       active ? "border-fg bg-fg text-bg" : "border-line text-fg",
                     )}
                   >

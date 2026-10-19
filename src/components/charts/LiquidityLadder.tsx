@@ -21,7 +21,7 @@ export function LiquidityLadder({
 
   return (
     <div>
-      <div className="grid grid-cols-6 items-end gap-2" style={{ height: 170 }}>
+      <div className="bars-timeline grid grid-cols-6 items-end gap-2" style={{ height: 170 }}>
         {buckets.map((b, i) => (
           <button
             key={b.id}
@@ -33,12 +33,12 @@ export function LiquidityLadder({
             onBlur={() => setActive(null)}
             aria-label={`${b.label}: ${formatPct(b.cumulativePct)} (${formatUsd(b.cumulativeCents)}) available`}
           >
-            <span className="text-xs font-medium text-fg tabular">
+            <span className="num text-xs font-medium text-fg">
               {formatPct(b.cumulativePct, 0)}
             </span>
             <span className="relative w-full max-w-14 flex-1">
               <span
-                className="absolute inset-x-0 bottom-0 rounded-t-[4px] transition-opacity"
+                className="reveal-grow-y absolute inset-x-0 bottom-0 rounded-t-[4px] transition-opacity"
                 style={{
                   height: `${Math.max(b.cumulativePct * 100, 1.5)}%`,
                   background: "var(--accent)",

@@ -73,20 +73,25 @@ const LESSONS = [
   },
 ];
 
-/** A card in the bento grid. */
+/** A card in the bento grid. Only the featured one gets the hard shadow (docs/design/rules.md §3). */
 function Tile({
   className,
   children,
   tone = "surface",
+  featured = false,
 }: {
   className?: string;
   children: React.ReactNode;
   tone?: "surface" | "ink" | "lime" | "blue";
+  featured?: boolean;
 }) {
   return (
     <div
       className={clsx(
-        "relative min-w-0 overflow-hidden rounded-3xl border-2 border-fg p-5 shadow-[4px_4px_0_#111] sm:p-6 sm:shadow-[5px_5px_0_#111]",
+        "reveal relative min-w-0 overflow-hidden rounded-card p-5 sm:p-6",
+        featured
+          ? "border-2 border-fg shadow-[4px_4px_0_var(--fg)]"
+          : tone === "surface" && "border border-line-strong",
         tone === "surface" && "bg-surface text-fg",
         tone === "ink" && "bg-fg text-bg",
         tone === "lime" && "bg-accent-2 text-accent-2-ink",
@@ -123,11 +128,24 @@ const APP_FEATURES = [
 ];
 
 /** A phone-shaped frame around a screenshot of the app (`public/screenshots`). */
-function PhoneFrame({ src, alt, className }: { src: string; alt: string; className?: string }) {
+function PhoneFrame({
+  src,
+  alt,
+  className,
+  featured = false,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  featured?: boolean;
+}) {
   return (
     <div
       className={clsx(
-        "overflow-hidden rounded-[2rem] border-[6px] border-fg bg-fg shadow-[6px_6px_0_#111]",
+        "overflow-hidden rounded-[2rem] border-[6px] border-fg bg-fg",
+        featured
+          ? "shadow-[6px_6px_0_var(--accent)]"
+          : "shadow-[0_18px_40px_-18px_rgba(17,17,17,0.45)]",
         className,
       )}
     >
@@ -144,38 +162,93 @@ function PhoneFrame({ src, alt, className }: { src: string; alt: string; classNa
 }
 
 function Kicker({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={clsx("font-pixel text-[11px] uppercase", className)}>{children}</div>;
+  return <div className={clsx("kicker", className)}>{children}</div>;
 }
 
-/** Floating event chip around the hero device. */
+/** Kicker → heading → lede on one left edge (rules.md §2). */
+function SectionHead({
+  kicker,
+  kickerClass = "text-accent",
+  title,
+  children,
+  className,
+}: {
+  kicker?: string;
+  kickerClass?: string;
+  title: React.ReactNode;
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={clsx("reveal max-w-3xl", className)}>
+      {kicker && <Kicker className={kickerClass}>{kicker}</Kicker>}
+      <h2 className={clsx("type-h2 text-fg", kicker && "mt-2")}>{title}</h2>
+      {children && <p className="type-lede mt-4">{children}</p>}
+    </div>
+  );
+}
+
+/** An event around the hero device: it pops in once (an event happened), then floats. */
 function Chip({
   className,
   icon,
   children,
+  i,
+  slow = false,
+  lime = false,
 }: {
   className?: string;
   icon: React.ReactNode;
   children: React.ReactNode;
+  i: number;
+  slow?: boolean;
+  lime?: boolean;
 }) {
   return (
     <div
-      className={clsx(
-        "absolute flex items-center gap-2 rounded-full border-2 border-fg bg-surface px-3 py-1.5 text-xs font-medium text-fg shadow-[3px_3px_0_#111]",
-        className,
-      )}
+      className={clsx("anim-pop absolute", className)}
+      style={{ ["--i" as string]: i, ["--d" as string]: "650ms" }}
     >
-      {icon}
-      <span className="whitespace-nowrap">{children}</span>
+      <div
+        className={clsx(
+          slow ? "drift-slow" : "drift",
+          "flex items-center gap-2 rounded-full border border-line-strong px-3 py-1.5 text-xs font-medium text-fg shadow-[0_8px_20px_-10px_rgba(17,17,17,0.35)]",
+          lime ? "bg-accent-2" : "bg-surface",
+        )}
+      >
+        {icon}
+        <span className="whitespace-nowrap">{children}</span>
+      </div>
     </div>
   );
 }
+
+/** What makes it safe to say yes, right under the hero. Each line is something the code enforces. */
+const PROOF = [
+  {
+    kicker: "01 · Bounded",
+    title: "It never sets its own limits.",
+    text: "You set the caps, the approvals and what it may never do. No agent can change them or withdraw a cent.",
+  },
+  {
+    kicker: "02 · Provable",
+    title: "It proves what it did.",
+    text: "Every action lands in a hash-chained record you can verify and download.",
+  },
+  {
+    kicker: "03 · Identified",
+    title: "It knows who's knocking.",
+    text: "Outside agents act alone only with a verified AINRA passport. Everyone else just proposes.",
+  },
+];
 
 /** The landing headline experiment (EXPERIMENTS.landing_headline): the pet (control) or safety first. */
 const HEADLINES = {
   pet: {
     title: (
       <>
-        Hatch an agent that invests, pays and <span className="highlight">grows with you.</span>
+        Hatch an agent that invests, pays and{" "}
+        <span className="highlight highlight-sweep">grows with you.</span>
       </>
     ),
     text: "Every MyLiquid account comes with a living agent. It runs a desk of specialists across index funds, trading, bitcoin, business interests and private equity, taps to pay at shop terminals with its own card, and levels up when you build good money habits.",
@@ -183,7 +256,8 @@ const HEADLINES = {
   safety: {
     title: (
       <>
-        Let an AI agent run your money, <span className="highlight">on your rules.</span>
+        Let an AI agent run your money,{" "}
+        <span className="highlight highlight-sweep">on your rules.</span>
       </>
     ),
     text: "You set the limits; your agent invests, rebalances and pays inside them, asks before anything bigger, and shows you every decision. Only agents with a verified identity may act on their own, and one switch stops them all.",
@@ -212,12 +286,6 @@ export default async function LandingPage() {
           <a href="#app" className="hover:text-fg">
             The app
           </a>
-          <a href="#desk" className="hover:text-fg">
-            The desk
-          </a>
-          <a href="#why" className="hover:text-fg">
-            Why
-          </a>
           <Link href="/ainra" className="hover:text-fg">
             Agent identity
           </Link>
@@ -240,52 +308,66 @@ export default async function LandingPage() {
           <TrackView name="landing_viewed" props={{ landing_headline: variant }} />
         )}
         {/* Hero */}
-        <section className="mx-auto grid max-w-6xl items-center gap-14 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:pt-16">
+        {/* Hero: it arrives in reading order (rules.md §4), the highlighter sweeps last. */}
+        <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-[1.25fr_0.9fr] lg:gap-14 lg:pb-20 lg:pt-16">
           <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full border-2 border-fg bg-surface px-3 py-1 text-xs font-medium text-fg shadow-[2px_2px_0_#111]">
+            <div className="anim-rise inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3 py-1 text-xs font-medium text-fg">
               <span className="h-2 w-2 rounded-full bg-accent-2 ring-2 ring-fg" /> Agentic wealth ·
-              Agent Pay · MCP
+              Agent Pay · AINRA
             </div>
             <h1
-              className="mt-5 font-display text-[2.5rem] leading-[1.05] text-fg sm:text-6xl lg:text-[4.2rem]"
+              className="anim-rise type-hero mt-5 text-fg"
+              style={{ ["--i" as string]: 1 }}
               data-variant={variant}
             >
               {headline.title}
             </h1>
-            <p className="mt-6 max-w-xl text-base text-fg-2 sm:text-lg">{headline.text}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <p className="anim-rise type-lede mt-6" style={{ ["--i" as string]: 2 }}>
+              {headline.text}
+            </p>
+            <div className="anim-rise mt-8 flex flex-wrap gap-3" style={{ ["--i" as string]: 3 }}>
               <GuestButton label="Try the live demo" variant="primary" />
               <Link href="/signup" className={buttonClass("secondary")}>
                 Hatch your agent
               </Link>
             </div>
-            <p className="mt-4 text-xs text-muted">
+            <p className="anim-rise mt-5 text-xs text-muted" style={{ ["--i" as string]: 4 }}>
               One click opens a private guest account with its own pet. {marketsNote()}.
             </p>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[420px] py-6 max-sm:[zoom:0.8]">
+          <div
+            className="anim-rise relative mx-auto w-full max-w-[420px] py-6 max-sm:[zoom:0.8]"
+            style={{ ["--i" as string]: 2 }}
+          >
             <TamaDevice name="Drip" stage="splash" mood="happy" color="blue" level={5} size={260} />
             <Chip
-              className="drift -left-2 top-0 sm:-left-10"
+              i={0}
+              className="-left-2 top-0 sm:-left-10"
               icon={<Check className="h-3.5 w-3.5 text-good" aria-hidden />}
             >
               Paid Brew Lab $5.75
             </Chip>
             <Chip
-              className="drift-slow right-0 top-[38%] sm:-right-8"
+              i={1}
+              slow
+              className="right-0 top-[38%] sm:-right-8"
               icon={<X className="h-3.5 w-3.5 text-critical" aria-hidden />}
             >
               Blocked Nordhavn bond
             </Chip>
             <Chip
-              className="drift -left-1 bottom-24 sm:-left-12"
+              i={2}
+              className="-left-1 bottom-24 sm:-left-12"
               icon={<span className="h-2 w-2 rounded-full bg-accent" aria-hidden />}
             >
               75% liquid in 7 days
             </Chip>
             <Chip
-              className="drift-slow -bottom-3 right-2 bg-accent-2 sm:-right-4"
+              i={3}
+              slow
+              lime
+              className="-bottom-3 right-2 sm:-right-4"
               icon={<span aria-hidden>★</span>}
             >
               +10 XP · 6-day streak
@@ -293,10 +375,26 @@ export default async function LandingPage() {
           </div>
         </section>
 
+        {/* Why it's safe to say yes */}
+        <section className="mx-auto max-w-6xl px-4 sm:px-6" aria-label="Why it's safe">
+          <div className="grid gap-4 sm:grid-cols-3">
+            {PROOF.map((p) => (
+              <div
+                key={p.kicker}
+                className="reveal rounded-card border border-line-strong bg-surface p-5"
+              >
+                <Kicker className="text-accent">{p.kicker}</Kicker>
+                <h2 className="type-title mt-2 text-[16px] text-fg">{p.title}</h2>
+                <p className="mt-1.5 text-sm leading-relaxed text-fg-2">{p.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Sleeves strip */}
-        <section className="mx-auto max-w-6xl px-4 sm:px-6" aria-label="What it invests in">
-          <div className="flex flex-wrap items-center gap-2 border-y-2 border-fg py-4">
-            <span className="mr-2 font-pixel text-[11px] uppercase text-muted">Invests in</span>
+        <section className="mx-auto mt-10 max-w-6xl px-4 sm:px-6" aria-label="What it invests in">
+          <div className="flex flex-wrap items-center gap-2 border-y border-line-strong py-4">
+            <span className="kicker mr-2 text-muted">Invests in</span>
             {SLEEVES.map((s) => (
               <span
                 key={s.name}
@@ -311,20 +409,17 @@ export default async function LandingPage() {
         </section>
 
         {/* Bento */}
-        <section id="alive" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
-          <h2 className="max-w-3xl font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
-            Not a chatbot. A pet with a job.
-          </h2>
-          <p className="mt-3 max-w-2xl text-fg-2">
+        <section id="alive" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6 sm:py-24">
+          <SectionHead kicker="Your agent" title="Not a chatbot. A pet with a job.">
             Your agent has moods, hunger and energy that change in real time, and it feels your
             portfolio: concentration or locked-up money makes it anxious. Look after it and it looks
             after you.
-          </p>
+          </SectionHead>
 
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:mt-10 sm:gap-5 lg:grid-cols-6">
-            <Tile className="lg:col-span-4">
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-10 sm:gap-5 lg:grid-cols-6">
+            <Tile className="lg:col-span-4" featured>
               <Kicker className="text-muted">Evolves with your habits</Kicker>
-              <h3 className="mt-2 font-display text-2xl">From Drop to Tide in ten levels.</h3>
+              <h3 className="type-h3 mt-2">From Drop to Tide in ten levels.</h3>
               <p className="mt-2 max-w-lg text-sm text-fg-2">
                 XP comes from checking in, deciding proposals, reviewing alerts and daily quests.
                 Never from trading more, so the incentives point the right way.
@@ -332,7 +427,7 @@ export default async function LandingPage() {
               <div className="mt-6 grid grid-cols-5 items-end gap-2 sm:gap-4">
                 {STAGES.map((stage, i) => (
                   <div key={stage.id} className="flex min-w-0 flex-col items-center gap-2">
-                    <div className="flex aspect-square w-full max-w-[96px] items-end justify-center rounded-2xl border-2 border-fg bg-lcd p-1">
+                    <div className="flex aspect-square w-full max-w-[96px] items-end justify-center rounded-[10px] border-2 border-fg bg-lcd p-1">
                       <PixelPet
                         stage={stage.id}
                         mood={EVOLUTION[i]!.mood}
@@ -344,9 +439,7 @@ export default async function LandingPage() {
                     </div>
                     <div className="text-center leading-tight">
                       <div className="text-xs font-semibold text-fg">{stage.name}</div>
-                      <div className="font-pixel text-[9px] uppercase text-muted">
-                        LV {stage.fromLevel}
-                      </div>
+                      <div className="kicker text-muted">LV {stage.fromLevel}</div>
                     </div>
                   </div>
                 ))}
@@ -376,7 +469,7 @@ export default async function LandingPage() {
 
             <Tile className="lg:col-span-2">
               <Kicker className="text-muted">Liquidity on the label</Kicker>
-              <div className="mt-4 grid h-32 grid-cols-5 items-end gap-2" aria-hidden>
+              <div className="bars-timeline mt-4 grid h-32 grid-cols-5 items-end gap-2" aria-hidden>
                 {(
                   [
                     ["Now", 18],
@@ -387,9 +480,9 @@ export default async function LandingPage() {
                   ] as const
                 ).map(([label, pct]) => (
                   <div key={label} className="flex h-full flex-col items-center justify-end gap-1">
-                    <span className="text-[10px] tabular text-fg">{pct}%</span>
+                    <span className="num text-[10px] text-fg">{pct}%</span>
                     <span
-                      className="w-full rounded-t-md border-2 border-fg bg-accent"
+                      className="reveal-grow-y w-full rounded-t-md border-2 border-fg bg-accent"
                       style={{ height: `${pct}%` }}
                     />
                     <span className="text-[10px] text-muted">{label}</span>
@@ -421,7 +514,7 @@ export default async function LandingPage() {
                 same approvals. Pin the key to the agent&apos;s AINRA passport to know who is behind
                 it, and cut it off the moment its passport is revoked.
               </p>
-              <pre className="mt-4 overflow-x-auto rounded-xl bg-surface-2 p-3 text-[11px] leading-relaxed text-fg-2">
+              <pre className="num mt-4 overflow-x-auto rounded-[10px] bg-surface-2 p-3 text-[11px] leading-relaxed text-fg-2">
                 <code>{`claude mcp add --transport http \\
   myliquid /api/mcp \\
   --header "Authorization: Bearer mlk_…"`}</code>
@@ -431,19 +524,15 @@ export default async function LandingPage() {
         </section>
 
         {/* Agent Pay */}
-        <section id="pay" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
+        <section id="pay" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6 sm:py-24">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="min-w-0">
-              <Kicker className="text-accent">Agent Pay</Kicker>
-              <h2 className="mt-3 font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
-                Your agent taps to pay. You set the rules.
-              </h2>
-              <p className="mt-4 text-fg-2">
+              <SectionHead kicker="Agent Pay" title="Your agent taps to pay. You set the rules.">
                 A shop rings you up on a terminal. Your agent pays with its tokenized agent card
                 from a wallet you fund, so it never sees a card number and can never spend more than
                 you put in.
-              </p>
-              <ol className="mt-6 space-y-3">
+              </SectionHead>
+              <ol className="reveal mt-8 space-y-3">
                 {[
                   [
                     "Hard rules decline",
@@ -459,7 +548,7 @@ export default async function LandingPage() {
                   ],
                 ].map(([title, text], i) => (
                   <li key={title} className="flex gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 border-fg bg-surface font-pixel text-[11px]">
+                    <span className="kicker flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 border-fg bg-surface">
                       {i + 1}
                     </span>
                     <div>
@@ -487,10 +576,10 @@ export default async function LandingPage() {
                 stage="splash"
                 frozen={false}
               />
-              <div className="relative -mt-10 ml-auto w-[88%] rounded-3xl border-2 border-fg bg-surface p-4 shadow-[5px_5px_0_#111] sm:w-[78%]">
+              <div className="reveal relative -mt-10 ml-auto w-[88%] rounded-card border-2 border-fg bg-surface p-4 shadow-[4px_4px_0_var(--fg)] sm:w-[78%]">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold text-fg">☕ Brew Lab Coffee</span>
-                  <span className="font-display text-xl tabular text-fg">$5.75</span>
+                  <span className="num text-xl font-medium text-fg">$5.75</span>
                 </div>
                 <div className="mt-3 space-y-1.5 text-xs">
                   {[
@@ -504,7 +593,7 @@ export default async function LandingPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 rounded-xl bg-good/10 px-3 py-2 text-xs font-medium text-fg">
+                <div className="mt-3 rounded-[10px] bg-good/10 px-3 py-2 text-xs font-medium text-fg">
                   Approved · paid by Drip, agent of Alex
                 </div>
               </div>
@@ -516,16 +605,14 @@ export default async function LandingPage() {
               <div className="grid items-center gap-8 lg:grid-cols-2">
                 <div>
                   <Kicker className="text-accent-2">HTTP 402 · x402-style</Kicker>
-                  <h3 className="mt-2 font-display text-2xl sm:text-3xl">
-                    Agents that buy what they need.
-                  </h3>
+                  <h3 className="type-h3 mt-2">Agents that buy what they need.</h3>
                   <p className="mt-3 text-sm text-bg/75">
                     Premium diligence data answers <code>402 Payment Required</code> with a price.
                     Scout pays 50¢ from the wallet, retries and gets the report, all under the same
                     card policy. Any MCP client with a pay-scoped key can do the same.
                   </p>
                 </div>
-                <pre className="overflow-x-auto rounded-2xl bg-bg/10 p-4 text-[11.5px] leading-relaxed text-bg/85">
+                <pre className="num overflow-x-auto rounded-[10px] bg-bg/10 p-4 text-[11.5px] leading-relaxed text-bg/85">
                   <code>{`GET /api/x402/research/DL-NORDHAVN
 ← 402 Payment Required
   { "accepts": [{ "maxAmountRequired": "0.50",
@@ -543,21 +630,17 @@ GET /api/x402/research/DL-NORDHAVN
         </section>
 
         {/* The app */}
-        <section id="app" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
+        <section id="app" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6 sm:py-24">
           <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr]">
             <div className="min-w-0">
-              <Kicker className="text-accent">The app</Kicker>
-              <h2 className="mt-3 font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
-                MyLiquid in your pocket.
-              </h2>
-              <p className="mt-3 max-w-xl text-fg-2">
+              <SectionHead kicker="The app" title="MyLiquid in your pocket.">
                 Your portfolio, your pet and your agent&apos;s card on your home screen. Free on
                 Android and iPhone, straight from the browser: no app store, nothing to update.
-              </p>
-              <ul className="mt-6 space-y-4">
+              </SectionHead>
+              <ul className="reveal mt-8 space-y-4">
                 {APP_FEATURES.map(({ icon: Icon, title, text }) => (
                   <li key={title} className="flex gap-3">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border-2 border-fg bg-accent-2 text-accent-2-ink">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] border-2 border-fg bg-accent-2 text-accent-2-ink">
                       <Icon className="h-4 w-4" aria-hidden />
                     </span>
                     <div className="text-sm">
@@ -573,7 +656,7 @@ GET /api/x402/research/DL-NORDHAVN
                   <Smartphone className="h-4 w-4" aria-hidden /> Android app (.apk)
                 </a>
               </div>
-              <div className="mt-6 hidden max-w-md items-center gap-4 rounded-2xl border-2 border-fg bg-surface p-4 shadow-[3px_3px_0_#111] lg:flex">
+              <div className="mt-6 hidden max-w-md items-center gap-4 rounded-card border border-line-strong bg-surface p-4 lg:flex">
                 <PhoneQr size={104} />
                 <div className="text-sm">
                   <div className="font-medium text-fg">Scan to open it on your phone</div>
@@ -594,6 +677,7 @@ GET /api/x402/research/DL-NORDHAVN
                 src="/screenshots/home.png"
                 alt="MyLiquid's Home on a phone: portfolio value, chart and the pet"
                 className="relative z-10 w-[62%] sm:w-[44%]"
+                featured
               />
               <PhoneFrame
                 src="/screenshots/traders.png"
@@ -605,24 +689,21 @@ GET /api/x402/research/DL-NORDHAVN
         </section>
 
         {/* The desk */}
-        <section id="desk" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
-          <h2 className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
-            Your agent runs a desk.
-          </h2>
-          <p className="mt-3 max-w-2xl text-fg-2">
+        <section id="desk" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6 sm:py-24">
+          <SectionHead kicker="The desk" title="Your agent runs a desk.">
             Separated duties, like a well-run fund: the agents that propose trades never value the
             book or police risk. Powered by Claude, with a deterministic offline mode.
-          </p>
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 sm:mt-10">
+          </SectionHead>
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:mt-10 sm:grid-cols-2 lg:grid-cols-5">
             {DESK_AGENTS.map((id) => {
               const a = AGENTS[id];
               return (
                 <div
                   key={id}
-                  className="min-w-0 rounded-2xl border-2 border-fg bg-surface p-4 shadow-[3px_3px_0_#111]"
+                  className="reveal min-w-0 rounded-card border border-line-strong bg-surface p-4"
                 >
                   <AgentAvatar agent={id} size="lg" />
-                  <h3 className="mt-3 font-semibold text-fg">{a.name}</h3>
+                  <h3 className="type-title mt-3 text-fg">{a.name}</h3>
                   <div className="text-xs text-muted">{a.role}</div>
                   <p className="mt-2 text-sm text-fg-2">{a.summary}</p>
                 </div>
@@ -632,17 +713,17 @@ GET /api/x402/research/DL-NORDHAVN
         </section>
 
         {/* Why */}
-        <section id="why" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6">
-          <h2 className="max-w-3xl font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
-            Built against the shadow-banking playbook.
-          </h2>
-          <p className="mt-3 max-w-3xl text-fg-2">
+        <section id="why" className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6 sm:py-24">
+          <SectionHead kicker="Why" title="Built against the shadow&#8209;banking playbook.">
             Funds that sold &ldquo;liquid&rdquo; products, bought bespoke bonds from one originator
             and marked them themselves ended with gates and losses. MyLiquid inverts every step.
-          </p>
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:mt-10 sm:gap-4 lg:grid-cols-3">
+          </SectionHead>
+          <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 sm:gap-4 lg:grid-cols-3">
             {LESSONS.map((l) => (
-              <div key={l.bad} className="rounded-2xl border border-line-strong bg-surface p-5">
+              <div
+                key={l.bad}
+                className="reveal rounded-card border border-line-strong bg-surface p-5"
+              >
                 <Kicker className="text-muted">The trap</Kicker>
                 <p className="mt-1 text-sm text-fg-2 line-through decoration-critical/70">
                   {l.bad}
@@ -657,14 +738,13 @@ GET /api/x402/research/DL-NORDHAVN
         {/* Early access: the waitlist doubles as audience research (docs/discovery). */}
         <section
           id="early-access"
-          className="mx-auto max-w-6xl scroll-mt-6 px-4 py-12 sm:py-16 sm:px-6"
+          className="mx-auto max-w-6xl scroll-mt-6 px-4 py-16 sm:px-6 sm:py-24"
         >
-          <div className="grid gap-6 rounded-[2rem] border border-line-strong bg-surface p-5 sm:gap-10 sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="reveal grid gap-6 rounded-card border border-line-strong bg-surface p-5 sm:gap-10 sm:p-10 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <h2 className="font-display text-3xl leading-tight text-fg sm:text-4xl lg:text-5xl">
-                Get early access.
-              </h2>
-              <p className="mt-3 text-fg-2">
+              <Kicker className="text-accent">Early access</Kicker>
+              <h2 className="type-h2 mt-2 text-fg">Get early access.</h2>
+              <p className="mt-4 text-fg-2">
                 MyLiquid runs on demo money today. Tell us what you&apos;d trust an agent with, and
                 you help decide what we build first. Real-money accounts come later, through
                 licensed partners.
@@ -676,12 +756,10 @@ GET /api/x402/research/DL-NORDHAVN
 
         {/* CTA */}
         <section className="mx-auto max-w-6xl px-4 pb-24 pt-8 sm:px-6">
-          <div className="grid items-center gap-8 rounded-[2rem] border-2 border-fg bg-accent-2 p-6 shadow-[5px_5px_0_#111] sm:gap-10 sm:p-12 sm:shadow-[6px_6px_0_#111] lg:grid-cols-[1fr_auto]">
+          <div className="reveal grid items-center gap-8 rounded-card border-2 border-fg bg-accent-2 p-6 shadow-[5px_5px_0_var(--fg)] sm:gap-10 sm:p-12 lg:grid-cols-[1fr_auto]">
             <div>
-              <h2 className="font-display text-3xl leading-tight text-accent-2-ink sm:text-4xl lg:text-5xl">
-                Your agent is ready to hatch.
-              </h2>
-              <p className="mt-3 max-w-xl text-accent-2-ink/80">
+              <h2 className="type-h2 text-accent-2-ink">Your agent is ready to hatch.</h2>
+              <p className="mt-4 max-w-[52ch] text-accent-2-ink/80">
                 Name it, pick its shell, answer three questions. Then run the desk, approve a
                 rebalance and let it buy you a coffee.
               </p>
@@ -696,7 +774,7 @@ GET /api/x402/research/DL-NORDHAVN
               {(["pink", "blue", "orange"] as const).map((c, i) => (
                 <div
                   key={c}
-                  className="flex h-24 w-24 items-end justify-center rounded-2xl border-2 border-fg bg-lcd p-1"
+                  className="flex h-24 w-24 items-end justify-center rounded-[10px] border-2 border-fg bg-lcd p-1"
                 >
                   <PixelPet
                     stage={i === 1 ? "wave" : "droplet"}
@@ -712,7 +790,7 @@ GET /api/x402/research/DL-NORDHAVN
         </section>
       </main>
 
-      <footer className="border-t-2 border-fg">
+      <footer className="border-t border-line-strong">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-8 text-xs text-muted sm:px-6">
           <Logo size="sm" />
           <span>
