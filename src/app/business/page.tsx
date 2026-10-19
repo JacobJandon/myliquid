@@ -66,6 +66,16 @@ const CURL = `curl -X POST https://<your-myliquid>/api/gate/v1/decide \\
     "policy": { "mode": "auto", "perActionLimitCents": 200000, "dailyLimitCents": 500000 }
   }'`;
 
+const PROXY = `{
+  "upstream": "https://your-broker.example/mcp",
+  "policy": { "mode": "auto", "perActionLimitCents": 200000, "dailyLimitCents": 500000 },
+  "tools": [{ "tool": "place_order", "kind": "trade",
+              "amount": { "field": "notional", "unit": "dollars" },
+              "side": { "field": "side" }, "instrument": { "field": "symbol" } }]
+}
+
+npx tsx scripts/gate-proxy.ts gate-proxy.json`;
+
 /** MyLiquid Gate, the B2B product (docs/startup/plan.md, P1): what it does, a live playground, the API, pricing. */
 export default function BusinessPage() {
   return (
@@ -154,6 +164,17 @@ export default function BusinessPage() {
           </p>
           <pre className="mt-6 overflow-x-auto rounded-2xl border-2 border-fg bg-fg p-5 font-mono text-xs leading-relaxed text-bg shadow-[4px_4px_0_#111]">
             {CURL}
+          </pre>
+          <h3 className="mt-10 font-display text-2xl text-fg sm:text-3xl">
+            Or put Gate in front of your MCP server.
+          </h3>
+          <p className="mt-2 max-w-2xl text-fg-2">
+            Already letting agents in through MCP? Run the guardrail proxy in front of it. Reads
+            pass straight through; every order or payment goes through Gate first, and only allowed
+            calls reach you. No change to your server.
+          </p>
+          <pre className="mt-4 overflow-x-auto rounded-2xl border border-line-strong bg-surface p-5 font-mono text-xs leading-relaxed text-fg">
+            {PROXY}
           </pre>
         </section>
 

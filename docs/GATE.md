@@ -78,6 +78,42 @@ Gate stores nothing and moves no money. Keep the decision with your own records:
 - `decisionHash` covers the request, the decision, every check and the time;
 - `verifyEvidence` in `src/lib/gate/engine.ts` recomputes both.
 
+## The MCP guardrail proxy
+
+Gate can also sit in front of an MCP server a broker already runs, with no code change on the broker's side
+(`src/lib/gate/proxy.ts`). Everything passes through untouched except the tool calls the firm lists as moving
+money; each of those is turned into a Gate action and decided first.
+
+```json
+{
+  "upstream": "https://broker.example/mcp",
+  "policy": { "mode": "auto", "perActionLimitCents": 200000, "dailyLimitCents": 500000, "allowedInstruments": ["SPY"] },
+  "tools": [
+    { "tool": "place_order", "kind": "trade", "amount": { "field": "notional", "unit": "dollars" },
+      "side": { "field": "side" }, "instrument": { "field": "symbol" } }
+  ],
+  "decisionsLog": "gate-decisions.jsonl",
+  "reviewWebhook": "https://broker.example/hooks/agent-review"
+}
+```
+
+```sh
+npx tsx scripts/gate-proxy.ts gate-proxy.json   # PORT=8787; agents connect to the proxy instead of the broker
+```
+
+- **Identity.** The agent puts its AINRA presentation in the call's `_meta["ainra/passport"]` (presentations
+  are about 36 KB, too big for most header limits) or the `x-ainra-passport` header. The proxy verifies it, and
+  strips it before forwarding.
+- **`allow`** forwards the call; the result carries `_meta["myliquid/gate"]` (decision, summary, request and
+  decision hashes).
+- **`review` / `block`** never reach the broker. The agent gets a tool error with Gate's reasons; reviews are
+  POSTed to `reviewWebhook`; every decision is appended to `decisionsLog`.
+- An amount it can't read is refused (fail closed). Money-moving calls can't be batched.
+- **v0 limits:** usage (daily totals, hourly rate) is kept in the proxy's memory, so run one instance per firm;
+  reviews are notified, not yet resumable (the agent retries after approval).
+
+Tests run it in front of MyLiquid's own MCP server (`src/lib/gate/__tests__/proxy.test.ts`).
+
 ## Code
 
 | Piece | File |
@@ -85,6 +121,7 @@ Gate stores nothing and moves no money. Keep the decision with your own records:
 | Decision engine (pure) | `src/lib/gate/engine.ts` |
 | Identity from a passport | `src/lib/gate/identity.ts` |
 | API route | `src/app/api/gate/v1/decide/route.ts` |
+| MCP guardrail proxy, and its runner | `src/lib/gate/proxy.ts`, `scripts/gate-proxy.ts` |
 | Playground and business page | `src/components/gate/GatePlayground.tsx`, `src/app/business/page.tsx` |
 | Tests | `src/lib/gate/__tests__/gate.test.ts` |
 
@@ -94,6 +131,7 @@ From the plan:
 
 - tenancy (firm → customer → agent), with firm API keys and stored usage;
 - signed webhooks for reviews;
-- a hash-chained decision log with SAFR/FINRA-mapped export;
-- the MCP guardrail proxy in front of a broker's MCP server;
+- SAFR/FINRA-mapped evidence export (MyLiquid's own Activity log is already hash-chained: `lib/domain/evidence.ts`);
+- shared usage storage for the proxy (several instances), and resumable reviews;
+- the proxy against Alpaca's paper-trading MCP server;
 - more identity standards (Visa Trusted Agent Protocol, Skyfire).

@@ -138,12 +138,12 @@ The engine exists; the work is turning a single-app feature into a product other
 
 | Piece | Today | Work to do |
 |---|---|---|
-| **Decision engine** | Spread across `agentTrading.ts`, Sentinel checks, `evaluatePayment` | Extract into `src/lib/gate/`: one pure `decide(action, context)` returning allow / propose / block, reasons and an evidence record. Unit-tested like `lib/domain`. |
+| **Decision engine** | **Done:** `src/lib/gate/engine.ts`, pure `decide()` with reasons and evidence hashes, tested | Keep it consistent with `autonomyDecision` as rules grow |
 | **Tenancy** | Everything is scoped by `investor_id` | Add firms above investors: firm → end customer → agent. Firm API keys, firm-level policies and kill switch. The biggest single piece of work. |
-| **Decision API** | Internal calls only | `POST /api/gate/v1/decide`, `/evidence`, `/halt`; signed webhooks for proposals. Target p99 under 50 ms. |
-| **MCP guardrail proxy** | Our own MCP server | A proxy that forwards to any broker's MCP server and sends trade-class tool calls through `decide` first. Alpaca's paper-trading MCP server first. Open-source it. |
+| **Decision API** | **Done:** `POST /api/gate/v1/decide` (public, stateless) | `/evidence`, `/halt` once there is tenancy; signed webhooks for proposals. Target p99 under 50 ms. |
+| **MCP guardrail proxy** | **v0 done:** `src/lib/gate/proxy.ts` + `scripts/gate-proxy.ts`, tested in front of MyLiquid's own MCP server | Shared usage store, resumable reviews, Alpaca's paper-trading MCP server; publish it as an open-source package |
 | **KYA adapters** | AINRA only | A `KyaVerifier` interface; AINRA stays the reference. Add Visa TAP (verifying signed HTTP headers against Visa's published keys) and Skyfire tokens; Mastercard when its registration API is open. |
-| **Evidence export** | `agent_events`, CSV statements | Hash-chain the log so tampering shows. Export JSON/CSV/PDF mapped to SAFR's four safeguard classes and FINRA's expectations. |
+| **Evidence export** | **Hash chain done:** the Activity log is tamper-evident with a JSON export (`lib/domain/evidence.ts`) | Map the export to SAFR's four safeguard classes and FINRA's expectations; CSV/PDF |
 | **Console** | Settings and Traders pages | A firm console: agents, decisions, proposals queue, kill switch, evidence download. Reuse the UI kit. |
 | **Arena** | Simulated market, hosted traders | Alpaca paper adapter per agent account, leaderboard and track-record pages, conformance suite. The hosted traders become our adversarial test agents. |
 | **Security** | Fail-closed identity, scoped queries | Threat model, dependency and secret scanning, external pen test before the first production customer, then SOC 2. |
@@ -309,6 +309,14 @@ AINRA), with the bars set in advance and the dashboard that measures them: [`../
 | **2** | Run interviews. Book a fintech lawyer for the vendor-path opinion. Start the co-founder and CCO search. | Decision API (`/api/gate/v1/decide`, `/halt`, `/evidence`). MCP guardrail proxy v0 in front of Alpaca's paper-trading MCP server. |
 | **3** | More interviews. Ask the warmest prospects for LOIs. Reach out to AIUC and Alpaca partnerships. | Visa TAP adapter behind a `KyaVerifier` interface. Hash-chained evidence log and SAFR/FINRA-mapped export. |
 | **4** | Phase 0 review against its gate. Pre-seed deck first draft. Design-partner agreement template, reviewed by the lawyer. | Arena v0: Alpaca paper accounts for identified agents, a leaderboard, record pages. Demo script and recording plan. |
+
+**Status on 19 October 2026.** Done in the repo: the phone app (installable, Android APK, iPhone shell), the Gate
+engine and decision API with the `/business` playground, the MCP guardrail proxy v0, the tamper-evident Activity
+log, real prices for the index funds and bitcoin, live AINRA identities (registrar integration) and the `/ainra`
+lab, and the discovery toolkit (`../discovery/`: analytics, surveys, waitlist, design-partner form, experiments,
+the `/admin` dashboard). Still open on Claude's side: the Visa TAP adapter, SAFR/FINRA-mapped evidence export,
+tenancy, and Arena v0 (needs Alpaca paper keys). Still open on yours: making the site public (Vercel
+Authentication), the 20 interviews, incorporation and the decisions below.
 
 ## 12. Decisions only you can make
 

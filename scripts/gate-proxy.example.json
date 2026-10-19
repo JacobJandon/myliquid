@@ -1,0 +1,20 @@
+{
+  "upstream": "http://localhost:3000/api/mcp",
+  "policy": {
+    "mode": "auto",
+    "perActionLimitCents": 200000,
+    "dailyLimitCents": 500000,
+    "allowedInstruments": ["MLUS", "MLWX", "MLBD"],
+    "maxActionsPerHour": 30
+  },
+  "tools": [
+    {
+      "tool": "propose_trade",
+      "kind": "trade",
+      "amount": { "field": "amountUsd", "unit": "dollars" },
+      "side": { "field": "side" },
+      "instrument": { "field": "productId" }
+    }
+  ],
+  "decisionsLog": "gate-decisions.jsonl"
+}
