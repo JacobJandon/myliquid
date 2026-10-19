@@ -146,6 +146,11 @@ cron. `verifyChain` re-derives the chain: an edited entry fails its own hash (`c
 inserted one breaks the next link (`link_broken`). Truncating the newest entries is caught by comparing with a
 head someone kept (the export, a statement).
 
+The evidence report (`/app/activity/report`, `GET /api/evidence/report`) lays one account's controls and what
+they did under MAS SAFR's four safeguard classes and FINRA's 2026 expectations. `buildEvidenceReport`
+(`lib/domain/evidenceReport.ts`) is pure; `evidenceFacts` (`lib/services/evidenceReport.ts`) counts everything from
+the account's own records. It prints to PDF from the browser (the app's chrome is hidden in print).
+
 ## Layers
 
 **`lib/domain`: pure functions, no I/O.**

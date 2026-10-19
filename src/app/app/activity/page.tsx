@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getDb } from "@/lib/db";
 import { requireInvestor } from "@/lib/auth/current";
 import { requireProduct } from "@/lib/domain/catalog";
@@ -81,9 +82,14 @@ export default async function ActivityPage() {
             </div>
           </div>
         </div>
-        <a href="/api/evidence" download className={buttonClass("secondary", "sm")}>
-          <Download className="h-3.5 w-3.5" /> Download evidence (JSON)
-        </a>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/app/activity/report" className={buttonClass("secondary", "sm")}>
+            Evidence report (SAFR, FINRA)
+          </Link>
+          <a href="/api/evidence" download className={buttonClass("ghost", "sm")}>
+            <Download className="h-3.5 w-3.5" /> JSON
+          </a>
+        </div>
       </section>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">

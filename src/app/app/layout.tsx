@@ -41,7 +41,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="bg-glow min-h-screen">
       <div className="mx-auto flex max-w-[1440px]">
-        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line px-3 py-6 lg:flex">
+        <aside className="sticky top-0 hidden h-screen print:hidden w-60 shrink-0 flex-col border-r border-line px-3 py-6 lg:flex">
           <Sidebar
             pendingCount={pending}
             alertCount={alerts}
@@ -58,7 +58,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           />
         </aside>
         <div className="min-w-0 flex-1">
-          <header className="sticky top-0 z-20 border-b border-line bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur">
+          <header className="sticky top-0 z-20 border-b print:hidden border-line bg-bg/90 pt-[env(safe-area-inset-top)] backdrop-blur">
             <div className="flex items-center justify-between gap-3 px-4 py-2.5 sm:px-8 sm:py-3">
               <div className="flex min-w-0 items-center gap-2 text-xs">
                 <Link
@@ -93,7 +93,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </div>
           </header>
           {investor.kind === "guest" && (
-            <div className="border-b border-fg/10 bg-accent-2 px-4 py-2 text-xs text-accent-2-ink sm:px-8">
+            <div className="border-b border-fg/10 bg-accent-2 px-4 py-2 print:hidden text-xs text-accent-2-ink sm:px-8">
               You&apos;re exploring a private guest account.{" "}
               <Link href="/signup" className="font-semibold underline underline-offset-2">
                 Create an account

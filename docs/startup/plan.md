@@ -143,7 +143,7 @@ The engine exists; the work is turning a single-app feature into a product other
 | **Decision API** | **Done:** `POST /api/gate/v1/decide` (public, stateless) | `/evidence`, `/halt` once there is tenancy; signed webhooks for proposals. Target p99 under 50 ms. |
 | **MCP guardrail proxy** | **v0 done:** `src/lib/gate/proxy.ts` + `scripts/gate-proxy.ts`, tested in front of MyLiquid's own MCP server | Shared usage store, resumable reviews, Alpaca's paper-trading MCP server; publish it as an open-source package |
 | **KYA adapters** | AINRA only | A `KyaVerifier` interface; AINRA stays the reference. Add Visa TAP (verifying signed HTTP headers against Visa's published keys) and Skyfire tokens; Mastercard when its registration API is open. |
-| **Evidence export** | **Hash chain done:** the Activity log is tamper-evident with a JSON export (`lib/domain/evidence.ts`) | Map the export to SAFR's four safeguard classes and FINRA's expectations; CSV/PDF |
+| **Evidence export** | **Done for the app:** the tamper-evident Activity log (JSON export) and an evidence report under SAFR's four safeguard classes and FINRA's expectations, printable to PDF | The same report per firm once Gate has tenancy |
 | **Console** | Settings and Traders pages | A firm console: agents, decisions, proposals queue, kill switch, evidence download. Reuse the UI kit. |
 | **Arena** | Simulated market, hosted traders | Alpaca paper adapter per agent account, leaderboard and track-record pages, conformance suite. The hosted traders become our adversarial test agents. |
 | **Security** | Fail-closed identity, scoped queries | Threat model, dependency and secret scanning, external pen test before the first production customer, then SOC 2. |
@@ -312,10 +312,10 @@ AINRA), with the bars set in advance and the dashboard that measures them: [`../
 
 **Status on 19 October 2026.** Done in the repo: the phone app (installable, Android APK, iPhone shell), the Gate
 engine and decision API with the `/business` playground, the MCP guardrail proxy v0, the tamper-evident Activity
-log, real prices for the index funds and bitcoin, live AINRA identities (registrar integration) and the `/ainra`
+log and its SAFR/FINRA evidence report, real prices for the index funds and bitcoin, live AINRA identities (registrar integration) and the `/ainra`
 lab, and the discovery toolkit (`../discovery/`: analytics, surveys, waitlist, design-partner form, experiments,
-the `/admin` dashboard). Still open on Claude's side: the Visa TAP adapter, SAFR/FINRA-mapped evidence export,
-tenancy, and Arena v0 (needs Alpaca paper keys). Still open on yours: making the site public (Vercel
+the `/admin` dashboard). Still open on Claude's side: the Visa TAP adapter, tenancy, and Arena v0 (needs Alpaca paper
+keys). Still open on yours: making the site public (Vercel
 Authentication), the 20 interviews, incorporation and the decisions below.
 
 ## 12. Decisions only you can make
