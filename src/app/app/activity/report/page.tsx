@@ -35,10 +35,8 @@ export default async function EvidenceReportPage() {
           <Link href="/app/activity" className="text-xs text-muted hover:text-fg print:hidden">
             ← Activity
           </Link>
-          <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">
-            Evidence report
-          </h1>
-          <p className="mt-1 text-sm text-fg-2">
+          <h1 className="type-h1 text-fg">Evidence report</h1>
+          <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-fg-2">
             {investor.name} · {facts.period.from?.slice(0, 10) ?? "—"} to{" "}
             {facts.period.to?.slice(0, 10) ?? "—"} · generated{" "}
             {new Date().toISOString().slice(0, 10)}

@@ -43,8 +43,9 @@ export default async function InvestPage() {
   return (
     <div className="space-y-8 sm:space-y-10">
       <div>
-        <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">Invest</h1>
-        <p className="mt-1 max-w-2xl text-sm text-fg-2">
+        <p className="kicker text-muted">Money</p>
+        <h1 className="type-h1 mt-2 text-fg">Invest</h1>
+        <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-fg-2">
           Every product shows its real liquidity terms and who values it. Private deals only appear
           after Scout&apos;s diligence, and rejected deals can&apos;t be bought.
         </p>

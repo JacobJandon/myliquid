@@ -19,10 +19,9 @@ export default async function SettingsPage() {
   return (
     <div className="max-w-5xl space-y-6">
       <div>
-        <h1 className="font-display text-[1.75rem] leading-tight text-fg sm:text-[2rem]">
-          Guardrails
-        </h1>
-        <p className="mt-1 text-sm text-fg-2">
+        <p className="kicker text-muted">Account</p>
+        <h1 className="type-h1 mt-2 text-fg">Guardrails</h1>
+        <p className="mt-2 max-w-[60ch] text-sm leading-relaxed text-fg-2">
           You set the rules, and Sentinel enforces them on every order from you, an agent, an
           autopilot rule or a connected agent. Only you can change them: no agent has a tool for it.
         </p>
