@@ -42,6 +42,8 @@ export interface ProxyCall {
   agentId: string;
   action: GateAction | null;
   decision: GateDecision;
+  /** Why the action couldn't be read from the call's arguments (Gate then blocks it: fail closed). */
+  unreadable?: string;
 }
 
 export interface ProxyOptions {
@@ -125,6 +127,48 @@ export function actionFromCall(
         ? { side: side === "sell" ? "sell" : "buy", instrument: str(rule.instrument) }
         : { merchant: str(rule.merchant), category: str(rule.category) }),
     },
+  };
+}
+
+/**
+ * Gate's decision on one money-moving tool call, before anything is forwarded. The proxy runs it on live calls and
+ * the shadow replay (`./shadow.ts`) on logged ones, so the two can't disagree. An action it can't read is decided
+ * as nothing (zero cents), which Gate blocks.
+ */
+export function decideToolCall(
+  policy: GatePolicy,
+  rule: ToolRule,
+  call: {
+    args: Record<string, unknown>;
+    /** The AINRA presentation, as the agent sent it (or undefined). */
+    passport: unknown;
+    at: Date;
+    usage: UsageStore;
+    /** The time the passport is verified at (unix seconds); AINRA's clock by default. */
+    passportNow?: number;
+  },
+): ProxyCall {
+  const identity = identityFromPassport(call.passport ?? undefined, { now: call.passportNow });
+  const agentId = identity.verified && identity.number ? identity.number : "unidentified";
+  const parsed = actionFromCall(rule, call.args);
+  const action: GateAction =
+    "action" in parsed ? parsed.action : { kind: rule.kind, amountCents: 0 };
+  const decision = decide(
+    {
+      action,
+      agent: { id: agentId, identity },
+      policy,
+      usage: call.usage.get(agentId, call.at),
+    },
+    { now: call.at },
+  );
+  if (decision.decision === "allow") call.usage.add(agentId, call.at, action.amountCents);
+  return {
+    tool: rule.tool,
+    agentId,
+    action: "action" in parsed ? action : null,
+    decision,
+    ...("error" in parsed ? { unreadable: parsed.error } : {}),
   };
 }
 
@@ -213,35 +257,14 @@ export function createGateProxy(config: ProxyConfig, opts: ProxyOptions = {}) {
     const args = call.params?.arguments ?? {};
     const passport =
       call.params?._meta?.["ainra/passport"] ?? req.headers.get("x-ainra-passport") ?? undefined;
-    const identity = identityFromPassport(passport ?? undefined);
-    const agentId = identity.verified && identity.number ? identity.number : "unidentified";
-    const at = now();
-    const used = usage.get(agentId, at);
-    const parsed = actionFromCall(rule, args);
-    const action: GateAction =
-      "action" in parsed ? parsed.action : { kind: rule.kind, amountCents: 0 };
-    const decision = decide(
-      {
-        action,
-        agent: { id: agentId, identity },
-        policy: config.policy,
-        usage: used,
-      },
-      { now: at },
-    );
-    const record: ProxyCall = {
-      tool: rule.tool,
-      agentId,
-      action: "action" in parsed ? action : null,
-      decision,
-    };
+    const record = decideToolCall(config.policy, rule, { args, passport, at: now(), usage });
+    const { decision } = record;
     await opts.onDecision?.(record);
     if (decision.decision !== "allow") {
       if (decision.decision === "review") await opts.onReview?.(record);
       return refusal(call.id, decision);
     }
 
-    usage.add(agentId, at, action.amountCents);
     // Forward without the passport (tens of KB the upstream doesn't need).
     const { _meta, ...params } = call.params ?? {};
     const rest = Object.fromEntries(

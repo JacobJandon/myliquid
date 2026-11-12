@@ -54,7 +54,7 @@ function HireForm({ agents, hired }: { agents: HireableAgent[]; hired: string[] 
   const [picked, setPicked] = useState(available[0]?.id ?? "");
   const agentId = available.some((a) => a.id === picked) ? picked : (available[0]?.id ?? "");
   const agent = available.find((a) => a.id === agentId);
-  const [auto, setAuto] = useState(true);
+  const [auto, setAuto] = useState(false); // propose-only until the investor opts in
   const [perTrade, setPerTrade] = useState("1000");
   const [daily, setDaily] = useState("3000");
 

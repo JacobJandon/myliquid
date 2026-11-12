@@ -114,6 +114,42 @@ npx tsx scripts/gate-proxy.ts gate-proxy.json   # PORT=8787; agents connect to t
 
 Tests run it in front of MyLiquid's own MCP server (`src/lib/gate/__tests__/proxy.test.ts`).
 
+## Shadow mode: the pilot that stays out of the order path
+
+Before a firm puts anything between its agents and its customers' money, Gate can replay a copy of that traffic
+out of band and report what it *would* have done (`src/lib/gate/shadow.ts`). This is the Shadow Pilot in
+[`../founder/pitch.md`](../founder/pitch.md): the buyers in the founder pack's panel passed mostly on trust and on
+"not in my order path yet", and this is the answer to both.
+
+It uses the proxy's config (`upstream` is ignored), so the rules a firm tries in shadow are the rules it later
+enforces, and the same per-call decision as the proxy (`decideToolCall`), so the two can't disagree: a test checks
+that they produce the same evidence hash.
+
+```sh
+npx tsx scripts/gate-shadow.ts gate-proxy.json calls.jsonl --out shadow/
+# try it: npx tsx scripts/gate-shadow.ts scripts/gate-proxy.example.json scripts/gate-shadow.example.jsonl
+```
+
+The log is one JSON object per line, the MCP request as the agent sent it, with the time it was sent:
+
+```json
+{ "at": "2026-12-08T14:01:30Z", "request": { "jsonrpc": "2.0", "id": 3, "method": "tools/call",
+  "params": { "name": "place_order", "arguments": { "symbol": "SPY", "side": "buy", "notional": 500 },
+              "_meta": { "ainra/passport": { "...": "..." } } } },
+  "headers": { "x-ainra-passport": "optional, instead of _meta" } }
+```
+
+It writes `shadow/report.md` (allowed, sent to a person and blocked, with amounts; by tool and by agent; the top
+reasons) and `shadow/decisions.jsonl` (the proxy's decisions-log format, with the log line and evidence hashes).
+
+- **Never guessed.** A line that isn't JSON, has no time, or holds no JSON-RPC message is listed with the reason
+  and not decided. A batch with money-moving calls is listed too (the proxy refuses those whole). A money-moving
+  call whose amount it can't read is blocked, as the proxy would, and listed separately.
+- **Time order.** Calls are replayed by `at`, with usage counted as if Gate had been enforcing: only allowed calls
+  use up the daily limit and the hourly rate.
+- **Identity.** A passport is verified as of the call's time (testbed passports keep their pinned clock).
+- **Nothing leaves the machine.** The replay reads two files and writes two; it makes no network calls.
+
 ## Code
 
 | Piece | File |
@@ -122,8 +158,9 @@ Tests run it in front of MyLiquid's own MCP server (`src/lib/gate/__tests__/prox
 | Identity from a passport | `src/lib/gate/identity.ts` |
 | API route | `src/app/api/gate/v1/decide/route.ts` |
 | MCP guardrail proxy, and its runner | `src/lib/gate/proxy.ts`, `scripts/gate-proxy.ts` |
+| Shadow replay (out of band), and its runner | `src/lib/gate/shadow.ts`, `scripts/gate-shadow.ts` |
 | Playground and business page | `src/components/gate/GatePlayground.tsx`, `src/app/business/page.tsx` |
-| Tests | `src/lib/gate/__tests__/gate.test.ts` |
+| Tests | `src/lib/gate/__tests__/` (`gate`, `proxy`, `shadow`) |
 
 ## Next
 

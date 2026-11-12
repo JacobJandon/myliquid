@@ -318,6 +318,17 @@ the `/admin` dashboard). Still open on Claude's side: the Visa TAP adapter, tena
 keys). Still open on yours: making the site public (Vercel
 Authentication), the 20 interviews, incorporation and the decisions below.
 
+**Founder pack, 12 November 2026** ([`../../founder/business-plan.md`](../../founder/business-plan.md), one page:
+[`one-pager.md`](../../founder/one-pager.md)). The plan was run through the founder-skill pack: a three-lens board,
+competitor research with sources, two 100-buyer simulated panels, a price curve, an offer rework and re-test, unit
+economics, marketing, brand, operations and a launch plan. **Verdict: Not yet**, computed from the numbers: year 1
+loses $570,249 (break-even 38 paying Growth customers against 13 planned), and 4% of simulated Gate buyers would take
+the original free pilot against a 25% bar (10% for the reworked paid Shadow Pilot). Trust, not price, is why buyers
+pass; 0 of 100 simulated investors would pay for the consumer app. What changed because of it: Gate's out-of-band
+shadow replay (`scripts/gate-shadow.ts`, `../GATE.md`), propose-only as the default for hired and connected traders,
+and a dated test: **3 paid Shadow Pilots at $1,500 by 18 January 2027** (`../../founder/launch.md`). Simulated buyers
+and projections, not customers.
+
 ## 12. Decisions only you can make
 
 1. **The wedge.** B2B Gate first (recommended), Arena first, or the consumer app first.

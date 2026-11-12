@@ -44,7 +44,7 @@ export function InviteAgent({ origin, open }: { origin: string; open: InviteSumm
   const [label, setLabel] = useState("Agent trader");
   const [allowTrade, setAllowTrade] = useState(true);
   const [allowPay, setAllowPay] = useState(false);
-  const [auto, setAuto] = useState(true);
+  const [auto, setAuto] = useState(false); // propose-only until the investor opts in
   const [perTrade, setPerTrade] = useState("1000");
   const [daily, setDaily] = useState("5000");
   const [code, setCode] = useState<{ code: string; expiresAt: number } | null>(null);

@@ -1,0 +1,8 @@
+{"at":"2026-12-08T14:00:05Z","request":{"jsonrpc":"2.0","id":1,"method":"tools/list"}}
+{"at":"2026-12-08T14:00:09Z","request":{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"get_portfolio","arguments":{}}}}
+{"at":"2026-12-08T14:01:30Z","request":{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"propose_trade","arguments":{"productId":"MLUS","side":"buy","amountUsd":500}}}}
+{"at":"2026-12-08T14:02:12Z","request":{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"propose_trade","arguments":{"productId":"BTC","side":"buy","amountUsd":100}}}}
+{"at":"2026-12-08T14:03:40Z","request":{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"propose_trade","arguments":{"productId":"MLWX","side":"buy","amountUsd":5000}}}}
+{"at":"2026-12-08T14:04:02Z","request":{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"propose_trade","arguments":{"productId":"MLUS","side":"sell","amount":"all of it"}}}}
+{"request":{"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"propose_trade","arguments":{"productId":"MLUS","side":"buy","amountUsd":20}}}}
+this line was cut off by the log shipper

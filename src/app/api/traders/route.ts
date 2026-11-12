@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 const HireBody = z.object({
   agent: z.enum(["momentum-trader", "treasury-agent", "research-analyst"]),
-  mode: z.enum(["propose", "auto"]).default("auto"),
+  mode: z.enum(["propose", "auto"]).default("propose"),
   perTradeLimitUsd: z.number().min(0).max(1_000_000).default(1000),
   dailyLimitUsd: z.number().min(0).max(10_000_000).default(3000),
 });
