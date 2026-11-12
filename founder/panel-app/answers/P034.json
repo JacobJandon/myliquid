@@ -1,0 +1,13 @@
+{
+  "id": "P034",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already put the same amount into index funds every month and don't look at it, so I don't need an agent to invest or rebalance for me. Paying another monthly subscription to automate something that's already automatic doesn't make sense.",
+  "objection": "My broker already has free AI tools and auto-invest. I don't see why I'd pay extra, at a price nobody has even set yet, to hand my money to a Tamagotchi pet run by a company that doesn't have a real-money broker partner yet.",
+  "would_change_my_mind": "If it ran at a known licensed broker and cost less than what I'd pay a robo-adviser, while doing something my free broker tools can't, like handling my bills and investing in one place without me checking on it.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

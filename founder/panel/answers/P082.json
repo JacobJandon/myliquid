@@ -1,0 +1,13 @@
+{
+  "id": "P082",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Our agent volume is tiny today, and I'm not putting an inline proxy from a startup with no customers and no SOC 2 in front of our order path just because a competitor made an announcement. I'll watch what Robinhood and Coinbase pick for agent controls and follow within a couple of quarters.",
+  "objection": "This sits in the trade path. If an unaudited vendor with zero customers goes down or gets breached, it's my outage and my exam finding, and our vendor risk team won't clear it without a finished SOC 2. Free for six months doesn't help when the pilot comes with a letter of intent naming a price.",
+  "would_change_my_mind": "A finished SOC 2 Type II plus a peer broker or one of the big names live on it in production, especially if FINRA starts asking about agent controls.",
+  "price_too_cheap": 500,
+  "price_cheap": 2000,
+  "price_expensive": 10000,
+  "price_too_expensive": 25000
+}

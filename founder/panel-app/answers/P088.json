@@ -1,0 +1,13 @@
+{
+  "id": "P088",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like the idea of an agent investing on payday within limits, but this is a brand-new app with no reviews and no named broker behind it, and I'm not handing my real money or my data to a cartoon pet I've never heard of. I'll keep investing myself in my broker app for now.",
+  "objection": "Is my data and my money actually safe with a new app nobody has reviewed yet, and who exactly is the licensed broker that would hold my account?",
+  "would_change_my_mind": "A well-known, licensed broker named as the partner holding the money, plus a solid track record of real user reviews.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

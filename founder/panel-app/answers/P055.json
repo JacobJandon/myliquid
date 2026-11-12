@@ -1,0 +1,13 @@
+{
+  "id": "P055",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't trust an AI with my money, cute pet or not. I already put the same amount into index funds every month for free and barely look at it, so I don't see what I'd be paying for.",
+  "objection": "Handing my savings to an AI agent that buys and pays for things on its own. Limits and an off switch sound nice, but I'd still be paying a monthly fee to worry about what it did, when my plain auto-invest works fine.",
+  "would_change_my_mind": "Years of real-money results from other regular people, with the money held at a licensed broker I already know, and a price that costs less than a cheap streaming subscription.",
+  "price_too_cheap": 1,
+  "price_cheap": 2,
+  "price_expensive": 5,
+  "price_too_expensive": 8
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Shadow mode or not, it's an inline proxy in front of the MCP server our customers' agents trade through, and I won't put a startup with no customers and no SOC 2 work started in our order path. Limits, a kill switch and decision logging are things my team can build in a quarter, and with a competitor already live that's what we'll do.",
+  "objection": "No SOC 2 report and no customers. If the proxy falls over or adds latency, it's my order flow that breaks, and an exam pack from a vendor that hasn't been audited itself won't carry much weight with our regulators.",
+  "would_change_my_mind": "A finished SOC 2 report in hand, or a version that reads a mirrored copy of the traffic so it can never sit inline on orders during the pilot.",
+  "price_too_cheap": 500,
+  "price_cheap": 1500,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

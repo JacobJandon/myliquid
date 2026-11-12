@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already ask Claude what to do and then place the trades myself, and that works because I'm the one pushing the button. A cartoon pet moving my real money, with an unnamed broker and no price yet, isn't something I'd sign up for, even a waitlist.",
+  "objection": "If the agent makes a bad trade inside the limits I set, who eats the loss? Me, MyLiquid, or the broker partner nobody has named yet? A record I can download doesn't help me get my money back.",
+  "would_change_my_mind": "A named, licensed broker that holds my account with SIPC coverage, plus a written plain-English answer on who is liable when the agent loses money, and a few months of me watching it on the demo account before any real money goes in.",
+  "price_too_cheap": 3,
+  "price_cheap": 7,
+  "price_expensive": 20,
+  "price_too_expensive": 35
+}

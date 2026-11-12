@@ -1,0 +1,13 @@
+{
+  "id": "P097",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I use AI at work all day, but I'm not letting a cartoon pet invest and pay for things with my actual money. My broker already has free AI stuff, and I'm not adding another monthly subscription to babysit a bot.",
+  "objection": "An AI moving my real money on its own, even inside limits, run by a company that doesn't even have its broker partner or a price yet. One bad decision on a small account like mine actually hurts.",
+  "would_change_my_mind": "Years of a public track record with real money, from a known licensed broker that guarantees it, and the AI only suggests while I tap every single trade myself, for basically free.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

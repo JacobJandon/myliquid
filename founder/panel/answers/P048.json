@@ -1,0 +1,13 @@
+{
+  "id": "P048",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Our agent volume is tiny today and my engineers already rate-limit every API key, so there's nothing for me to pay to govern yet. I might put it in a sandbox on the free tier, but I'm not signing an LOI with a price on it for a problem I don't have at scale.",
+  "objection": "No customers and no SOC 2 yet, and it sits inline in front of trades and payments. My compliance team won't let an unaudited startup proxy touch order flow, and if it goes down, so do my agent customers.",
+  "would_change_my_mind": "Agent-originated order volume actually ramping, or FINRA asking us how we control agent access, with a finished SOC 2 Type II to show the auditors.",
+  "price_too_cheap": 100,
+  "price_cheap": 400,
+  "price_expensive": 2000,
+  "price_too_expensive": 5000
+}

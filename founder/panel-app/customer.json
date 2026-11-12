@@ -1,0 +1,37 @@
+{
+  "business": "MyLiquid app (an AI agent with a Tamagotchi-style pet that invests and pays within your limits)",
+  "target": "US self-directed investors who invest monthly in a broker app, already ask ChatGPT or Claude about money, and have $5,000 to $250,000 invested",
+  "where": "United States, phones (installable web app, Android)",
+  "_sources": "Segments A and B from docs/discovery/1-problem-and-audience.md; objections from its assumptions A1-A5, founder/board.md and founder/competitors.md (free agents at Robinhood and Public). Shares and income ranges are estimates, not data; no interviews have been done yet.",
+  "age": [22, 55],
+  "segments": [
+    {"name": "Agent-curious self-directed investor", "share": 0.55, "income": [55000, 160000]},
+    {"name": "Busy delegator (uses a robo-adviser or nothing)", "share": 0.25, "income": [70000, 220000]},
+    {"name": "Young starter (under $20k invested)", "share": 0.20, "income": [35000, 80000]}
+  ],
+  "behaviours": [
+    {"name": "Broker-app power user", "share": 0.18, "how": "Checks Robinhood or Public daily and trades a few times a month."},
+    {"name": "Monthly autopilot investor", "share": 0.18, "how": "Puts the same amount into index funds every month and rarely looks."},
+    {"name": "Asks AI before acting", "share": 0.16, "how": "Pastes portfolio questions into ChatGPT or Claude, then trades by hand."},
+    {"name": "Sceptic of AI with money", "share": 0.14, "how": "Uses AI at work but will not let it touch money."},
+    {"name": "Fee minimiser", "share": 0.12, "how": "Picks the cheapest option and dislikes subscriptions."},
+    {"name": "Reads every review", "share": 0.12, "how": "Will not try a finance app without reviews and a known name behind it."},
+    {"name": "Likes games and streaks", "share": 0.10, "how": "Tries new apps and keeps streaks going in a few of them."}
+  ],
+  "objections": [
+    "I don't trust an AI with my money",
+    "My broker already has free AI agents",
+    "A Tamagotchi feels unserious for money",
+    "Who is liable if the agent loses money?",
+    "I'm not paying a subscription to invest",
+    "Demo money isn't worth my time",
+    "Is my data safe with a new app?"
+  ],
+  "habits": [
+    "you invest every payday",
+    "you check your portfolio on the commute",
+    "you asked ChatGPT about your retirement account last month",
+    "you already pay for two or three subscriptions",
+    "you follow a few finance creators"
+  ]
+}

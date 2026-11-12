@@ -1,0 +1,13 @@
+{
+  "id": "P060",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "A startup with no customers and no SOC 2 report can't sit inline in our order path. It would fail vendor review at the risk committee before anyone asked about price, and even a free pilot means a reference and an LOI I'm not putting my name on yet.",
+  "objection": "It's another hop in front of every agent trade, so more latency and a new point of failure, run by a company that can't yet show me an audit, references or uptime history. If the proxy goes down or fails closed at the open, that's my incident, not theirs.",
+  "would_change_my_mind": "A completed SOC 2 Type II plus two referenceable regulated brokers running it inline in production with published latency and failover numbers. Until then, at most a shadow-mode trial off the trade path.",
+  "price_too_cheap": 1000,
+  "price_cheap": 4000,
+  "price_expensive": 12000,
+  "price_too_expensive": 25000
+}

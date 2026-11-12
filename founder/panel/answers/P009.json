@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "A policy check in front of our MCP server, an approval queue, a kill switch and a hash-chained log are things my team can build in a quarter, and we'd rather own anything that sits in the trade path. I'm not putting a startup with no customers and no SOC 2 in front of order execution, and I'm not signing an LOI with a price on it just to get six free months.",
+  "objection": "It's an unaudited third-party proxy sitting inline on every agent trade and payment. If it goes down or gets something wrong, that's my outage and my regulator conversation, and the hard parts (our caps, our customer permissions) are ours to define anyway.",
+  "would_change_my_mind": "If our regulators or exchange partners started requiring a verified Know-Your-Agent check like AINRA passports that we couldn't realistically build and maintain ourselves, and the vendor had a finished SOC 2 Type II plus a broker already running it in production.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

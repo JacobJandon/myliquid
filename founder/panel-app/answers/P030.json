@@ -1,0 +1,13 @@
+{
+  "id": "P030",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't trust an AI with my money, and I really don't trust one from a name I've never heard of with zero reviews. A cartoon pet spending my money doesn't make me feel better about it. It makes me feel worse.",
+  "objection": "Nobody knows who these people are. There are no reviews, the broker partner isn't even named, and the price isn't set. I'd be signing up for something I can't look up.",
+  "would_change_my_mind": "If a big, known broker I already recognize put its name on it and there were a couple of years of real user reviews saying it never did anything stupid with their money.",
+  "price_too_cheap": 2,
+  "price_cheap": 4,
+  "price_expensive": 9,
+  "price_too_expensive": 15
+}

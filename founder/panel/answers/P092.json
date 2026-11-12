@@ -1,0 +1,13 @@
+{
+  "id": "P092",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "Our last exam asked how we use AI, and I don't have a clean answer for agents trading on customer accounts. A free six-month design-partner slot that gives me exportable evidence and a kill switch is worth signing, but only in shadow mode first. No money moves this month, and the LOI price is where I'll push back.",
+  "objection": "My engineers will say we can build caps, an approval queue and a kill switch ourselves in a quarter. I'm also not putting an unaudited startup with no SOC 2 and no customers inline on my live order path, and I don't know how many of our customers' agents even carry an AINRA passport.",
+  "would_change_my_mind": "If they insisted on sitting inline on live orders before a SOC 2 report or an independent pen test, I'd walk.",
+  "price_too_cheap": 150,
+  "price_cheap": 1000,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

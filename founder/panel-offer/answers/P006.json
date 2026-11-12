@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The $1,500 is nothing. What costs me is putting a vendor with zero customers and no SOC 2 inline in front of our MCP server, even in shadow mode, and our vendor-risk review would take more effort than the pilot is worth. No examiner has asked me about agent controls yet, so I can't justify spending that political capital this quarter just because a competitor made an announcement.",
+  "objection": "A startup with no customers and no audit is asking to sit in my production path for order flow. If it's wrong, slow or gone in a year, my name is on the vendor approval, and a self-made 'exam pack' isn't evidence an examiner already accepts.",
+  "would_change_my_mind": "FINRA or an exam team asking us in writing how we supervise and stop AI agents trading in customer accounts, and us having no good answer.",
+  "price_too_cheap": 300,
+  "price_cheap": 1200,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

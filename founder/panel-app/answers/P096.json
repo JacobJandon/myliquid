@@ -1,0 +1,13 @@
+{
+  "id": "P096",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't hand real money to a finance app nobody's heard of, and this one has zero reviews and a broker partner they won't even name. The pet thing is cute, but I'd poke at the demo, not sign up for a paid real-money plan.",
+  "objection": "If the agent makes a bad trade or a bad payment inside the limits I set, who eats the loss? Me, MyLiquid, or the broker nobody's named? Nothing here tells me.",
+  "would_change_my_mind": "A named, licensed broker I already know holding the money (SIPC-covered), clear written terms on who's liable when the agent screws up, and a few months of real user reviews.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 25
+}

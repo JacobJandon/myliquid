@@ -1,0 +1,233 @@
+{
+ "business": "MyLiquid app (an AI agent with a Tamagotchi-style pet that invests and pays within your limits)",
+ "seed": 7,
+ "dealt": 100,
+ "answered": 100,
+ "skipped": [],
+ "buys": 0,
+ "passes": 100,
+ "buy_rate": 0.0,
+ "by_segment": [
+  [
+   "Agent-curious self-directed investor",
+   55,
+   0.0
+  ],
+  [
+   "Young starter (under $20k invested)",
+   20,
+   0.0
+  ],
+  [
+   "Busy delegator (uses a robo-adviser or nothing)",
+   25,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Monthly autopilot investor",
+   18,
+   0.0
+  ],
+  [
+   "Broker-app power user",
+   18,
+   0.0
+  ],
+  [
+   "Asks AI before acting",
+   16,
+   0.0
+  ],
+  [
+   "Likes games and streaks",
+   10,
+   0.0
+  ],
+  [
+   "Sceptic of AI with money",
+   14,
+   0.0
+  ],
+  [
+   "Reads every review",
+   12,
+   0.0
+  ],
+  [
+   "Fee minimiser",
+   12,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "under $82,000",
+   33,
+   0.0
+  ],
+  [
+   "$82,000 to $121,000",
+   33,
+   0.0
+  ],
+  [
+   "$121,000 and up",
+   34,
+   0.0
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   60,
+   [
+    "Right now it's demo money, and the real version has no named broker and no price, so there's nothing real to sign up for. I'm not putting my paycheck behind an AI pet from an app I've never heard of.",
+    "I'd probably play with the free demo pet on my commute because I love keeping a streak going, but signing up to pay for an AI to move my real money is different. I've got less than $20k saved and nobody is telling me who covers it if the agent messes up."
+   ],
+   [
+    "P002",
+    "P006"
+   ]
+  ],
+  [
+   "price",
+   20,
+   [
+    "I already put the same amount into index funds every month for free in my broker app and barely look at it, so paying a monthly fee for an agent to do roughly the same thing just eats into my returns. The pet is cute, but I'm not paying a subscription to invest.",
+    "The pet is cute and I'd probably keep a streak going on the free demo, but I'm not paying a monthly subscription on top of my investments when my robo-adviser already does the rebalancing for me. A waitlist for a paid plan with no price yet isn't something I'd sign up for on my commute."
+   ],
+   [
+    "P001",
+    "P005"
+   ]
+  ],
+  [
+   "need",
+   19,
+   [
+    "I already ask ChatGPT what to do and then make the trades myself, and my broker is rolling out its own AI for free. I don't see why I'd pay another monthly fee for a cartoon pet to do something I can already do without paying.",
+    "I already paste my questions into ChatGPT for free and my broker is rolling out its own AI stuff, so I don't see why I'd pay a monthly fee and move my money to some partner broker I've never heard of. Putting in a few hundred every payday by hand takes me five minutes."
+   ],
+   [
+    "P003",
+    "P004"
+   ]
+  ],
+  [
+   "values",
+   1,
+   [
+    "I put the same amount into index funds every month and don't look, and that already works fine. A cartoon pet that trades and rebalances for me is the opposite of what I want from my money: boring, set-and-forget, and nothing to babysit."
+   ],
+   [
+    "P019"
+   ]
+  ]
+ ],
+ "why_yes": [],
+ "flip": [
+  "A free or near-free real-money tier with a named, licensed broker holding my account, plus proof over a year of demo use that the agent actually beats my plain monthly index buys after the fee.",
+  "Naming the actual licensed broker (one I recognize, SIPC-covered) along with a real monthly price.",
+  "If it worked inside the broker account I already have and cost nothing extra, with a few months of demo results showing it actually did better than what I do by hand.",
+  "If it plugged into the broker I already use and cost a couple of bucks a month, and after a few months of demo money it clearly did better than my own payday routine.",
+  "If it cost the same as or less than what my robo-adviser takes now, with no separate subscription, and the broker partner was a name I already trust.",
+  "A named, licensed broker with my account insured, plus a plain written answer on who pays if the agent makes a bad trade, and a few months on the free demo where the pet actually beat my own monthly investing.",
+  "A named, licensed broker holding my account with real insurance, and a mode where the agent only suggests trades and never executes without my tap.",
+  "If it were free or cost nothing beyond what my broker already charges, and it clearly did better than my plain monthly index fund buys.",
+  "Knowing which licensed, SIPC-covered broker actually holds the money, plus a few months of the demo agent's record clearly beating what I do on my own.",
+  "A named, regulated broker holding the account with SIPC coverage, plus a mode where the agent only suggests and nothing moves without my tap, with a public track record.",
+  "If the real-money version were free or close to it at the base level, ran through a broker I already know, and the agent showed it could actually beat my plain monthly index buys after fees.",
+  "A well-known, licensed broker named as the partner plus a pile of solid reviews from people and finance creators I follow who used it with real money for a while.",
+  "A named, licensed broker holding the money with SIPC coverage, plus a year or more of real-money results I could check, from a source I trust and not from the app itself.",
+  "If the real-money plan cost less than my robo-adviser's fee on my balance, or was free with no subscription, and the broker partner was a name I already trust.",
+  "A free real-money tier or a tiny flat fee under about $3 a month, with the licensed broker named and proof the agent actually saves me more than it costs.",
+  "A few months of demo results showing the agent actually beats what I do on my own, plus a named, licensed broker and a price around what Robinhood Gold costs.",
+  "A few months of the demo agent behaving well inside my limits, and then a named, regulated broker holding the money with SIPC coverage, at a set price under about $10 a month.",
+  "A named, licensed broker that holds my account with SIPC coverage, plus a written plain-English answer on who is liable when the agent loses money, and a few months of me watching it on the demo account before any real money goes in.",
+  "If it were with a broker I already recognize and cost clearly less than my robo-adviser for the same hands-off index investing, with the pet something I could switch off.",
+  "A named, licensed broker partner with SIPC coverage, and a track record showing the agent actually beat what I do myself after fees.",
+  "A named, licensed broker holding the money with SIPC coverage, plus a mode where the agent only suggests and nothing moves until I tap. And a serious look with the pet turned off.",
+  "The licensed broker named, plus proof it does something my current broker's free tools can't, like cutting my taxes or fees by more than the plan costs.",
+  "If it connected to the brokerage account I already have so I didn't have to move money, and the price came in around what Robinhood Gold costs.",
+  "If it hooked into my existing broker account instead of making me move my money, and a few months of the demo showed the agent actually doing better than my own trades.",
+  "A big, known licensed broker actually holding the account with SIPC protection, plus a year of other people's real-money track record showing it doesn't do anything my plain monthly autopilot wouldn't.",
+  "Real money with no subscription, or a fee so small it costs less than what the rebalancing actually saves me, shown in dollars.",
+  "If it were free or cost about what my broker charges, with a named, regulated broker holding the money, and it showed me it actually beat my set-and-forget plan after fees.",
+  "A named, licensed, insured broker holding the money, plus a few years of the agent's record showing it actually beats my plain monthly index buys after the fee.",
+  "Naming a real licensed broker I recognize, with SIPC coverage, and letting me run it in propose-only mode on my real account for a few months before it trades anything on its own.",
+  "If a big, known broker I already recognize put its name on it and there were a couple of years of real user reviews saying it never did anything stupid with their money.",
+  "A named, established licensed broker holding the money with SIPC coverage, and a mode where the agent only suggests and I approve every move, with a year of track record I can check.",
+  "A named, regulated broker holding the money with SIPC coverage, plus a mode where the AI only suggests and nothing moves without my tap, and a clear explanation of what data they keep and who sees it.",
+  "If it ran inside a licensed broker I already trust, let me turn the pet off, and cost a couple of dollars a month while clearly beating what my free recurring buy does.",
+  "If it ran at a known licensed broker and cost less than what I'd pay a robo-adviser, while doing something my free broker tools can't, like handling my bills and investing in one place without me checking on it.",
+  "If it only suggested trades and I had to approve every single one, through a big licensed broker I already know, with my account insured, and a year of watching it on the demo money do better than I do on my own.",
+  "A named, well-known licensed broker holding the money, plus a solid stack of real user reviews after the real-money version has been running a while.",
+  "Seeing it run on demo money for months without doing anything dumb, plus a real-money account held at a licensed broker I've heard of, at a price that's tiny next to what I invest.",
+  "A real-money version with no monthly fee, or one that costs less than my robo-adviser all-in, through a named, SIPC-insured broker.",
+  "If they named a real licensed broker with SIPC coverage, and the demo showed months of sensible decisions where nothing ran without my tap, I'd consider it.",
+  "A free real-money tier, or a price under about $5 a month, plus a few months of the demo showing the agent actually did better than what I do on my own.",
+  "A long public track record on real money with a named, licensed broker, plus a flat price of a couple of dollars a month or less, cheaper than what I'd pay a robo-advisor on my balance.",
+  "If it ran on real money with a broker I recognize and showed, over a few months, that the agent's rebalancing actually beat what I do on my own after the subscription cost.",
+  "A long, public track record on real money with a named, licensed broker holding the account and insuring it, with no surprise trades, before I'd even consider it.",
+  "A named, licensed broker holding the money with SIPC coverage, plus a few months of seeing its demo decisions beat or match what I'd have done myself, with a serious no-pet view.",
+  "If the real-money account had no monthly fee at all, so I'd only pay the normal costs of a broker.",
+  "The licensed broker partner being a name I already know, plus a solid pile of independent reviews from people using it with real money for a while.",
+  "A real-money tier that's free or just a few bucks a month, with the broker named, after I've kept a streak going in the demo for a few weeks and seen the agent not do anything dumb.",
+  "A named, licensed broker holding the money with SIPC coverage, plus a clear written statement of who pays if the agent breaks my limits or makes a bad trade.",
+  "If the real-money plan were free or tied to my account size, like a tiny percentage with no flat monthly fee, I'd at least try it.",
+  "If the real-money plan were free or a flat fee of a couple of dollars a month, with no extra trading or fund costs, and it clearly did something my current broker doesn't.",
+  "A real-money account at a licensed broker that clearly costs less than what I pay now in total, and shows it beats my plain monthly index buy after fees.",
+  "A named, licensed broker holding the money, plus a mode where every single trade waits for my tap, and a few months of watching it make sensible calls on the demo first.",
+  "If it were live with a licensed broker I recognize, and it showed it saved me real money in fees or taxes compared with my current auto-invest, for a few dollars a month.",
+  "Years of real-money results from other regular people, with the money held at a licensed broker I already know, and a price that costs less than a cheap streaming subscription.",
+  "A well-known licensed broker named as the partner, plus a year of solid reviews from real-money users, including a couple of finance creators I follow vetting it.",
+  "A named, regulated broker holding my account with SIPC coverage, plus a few months of the agent's demo track record that I can see actually beats what I do myself.",
+  "A named licensed broker holding my money with SIPC coverage, clear written terms on who covers losses the agent causes, and a flat price under about $5 a month that comes out cheaper than what my robo-adviser charges.",
+  "A big, known, regulated broker holding the account and standing behind it, plus a year or two of real-money results from people I trust, with the pet as an option I can turn off.",
+  "If it were free or a flat few bucks a year with no extra trading fees, and the demo showed it actually beating my plain index fund habit after costs.",
+  "A named, regulated broker holding the money, plus a mode where the AI only suggests and never acts without my tap, with a track record from other people running it on real money for a year.",
+  "If the demo showed me, with my own streak and record, that the agent actually beat what I do by more than the fee, and the price was a few bucks a month like Robinhood Gold, I'd think about it.",
+  "A real licensed, insured broker behind it, plus a long public track record where people can show the agent never went past their limits or lost money through its own mistakes.",
+  "If it ran on my existing brokerage account and cost nothing extra, or showed clearly that it beats my plain monthly index autopilot after fees.",
+  "A named, licensed broker holding the account with SIPC coverage, plus a few months of the demo showing it beats or matches my robo-adviser after fees.",
+  "A named, well-known licensed broker holding the money, plus a solid stack of real user reviews after a year of real-money accounts.",
+  "A well-known licensed broker I already recognize, named as the partner, plus a pile of real user reviews after it has run with real money for a while.",
+  "If the demo agent clearly beat what I do on my own for a few months, and the real-money plan came in around Robinhood Gold's price with a named, licensed broker holding my money.",
+  "A real-money version that's free, or a small flat fee clearly lower than what it saves me, with the broker partner named and no hidden trading fees.",
+  "A very low price, a few dollars a month, that's clearly cheaper than a robo-advisor fee, plus a well-known licensed broker actually holding the money and a plain statement of what data they keep.",
+  "Naming a big, known broker that actually holds the money (SIPC-insured, my account in my name) plus a few months of the demo showing it beats what I already do, at a price under about $5 a month.",
+  "If it were free or a flat fee that's tiny next to my balance, and it clearly beat what my broker's free recurring buys already do.",
+  "If it cost basically nothing (like under $5 a month) and the demo showed it actually beat what I do on my own over a few months.",
+  "Naming the licensed broker partner, saying plainly that my account is insured and protected the same way, and spelling out who is responsible when the agent loses money.",
+  "A named, licensed broker partner with insured accounts, plus proof the agent actually beats my plain monthly index buy after fees.",
+  "A named, licensed broker holding the money, plus a couple of months of my own demo record showing the agent stayed inside my limits and didn't do anything I'd regret.",
+  "A long, public track record on real money with a named, licensed broker holding the accounts, plus a free tier with no subscription.",
+  "Seeing months of its real-money track record, run through a named licensed broker I already know, with SIPC coverage, and friends who've used it without getting burned.",
+  "A named, well-known licensed broker holding the accounts (SIPC-covered), plus a real track record of solid independent reviews from people using it with real money.",
+  "If it ran inside my existing broker account for free or close to it, and showed me in plain numbers that it actually beats my autopilot after fees.",
+  "A named, licensed broker with SIPC coverage holding the money, plus clear written terms on who pays if the agent makes a mistake, and a few months of me watching it on the demo account beat what I do by hand.",
+  "A long, public, audited track record with real money through a licensed broker I already know, where the agent only suggests and nothing moves unless I tap to approve each trade.",
+  "If after a couple of months on demo money it clearly beat what I'd do myself, and the real-money side was with a broker I already know, I'd consider a cheap plan.",
+  "A named, SIPC-covered broker holding the account plus a few months of a real-money track record from other users, with a set price.",
+  "A named, licensed broker holding the money with SIPC coverage, plus a few months of watching it run on demo money where it only suggests and I approve every trade.",
+  "Naming the licensed broker, with SIPC protection on the account, and a mode where the agent only suggests trades and I approve every one, so I could try it on a small slice for a few months.",
+  "Years of a real track record with real money, through an established licensed broker I already know, where the AI only suggests and never acts without my tap.",
+  "A well-known, licensed broker named as the partner holding the money, plus a solid track record of real user reviews.",
+  "A named, regulated broker holding my money with insurance, a flat monthly fee clearly below what my robo-adviser costs me, and a long, public track record showing it didn't do anything stupid.",
+  "A known, named broker holding the money, plus real reviews from people I follow who have actually used it with real money for a few months.",
+  "A named, licensed broker holding the account, with a plain written answer on who covers losses if the agent breaks my own limits.",
+  "Months of the demo agent doing sensible things with my demo portfolio, plus a named, licensed broker that I recognize holding the real money.",
+  "Naming the licensed broker partner with SIPC protection and a clear monthly price, plus a few months of the demo agent's track record I could check against just holding the index fund myself.",
+  "Knowing the licensed broker partner by name, with my account insured like it is at my robo-adviser, plus a few months of watching the demo agent behave sensibly before any real money is involved.",
+  "A named, known licensed broker holding the accounts with SIPC coverage, written terms on who covers agent errors, and a solid stack of independent reviews from real-money users.",
+  "A named, licensed broker I already know holding the money (SIPC-covered), clear written terms on who's liable when the agent screws up, and a few months of real user reviews.",
+  "Years of a public track record with real money, from a known licensed broker that guarantees it, and the AI only suggests while I tap every single trade myself, for basically free.",
+  "A big, named, licensed broker holding the account with SIPC coverage, plus a year of other people's real-money track record showing it doesn't do anything dumb.",
+  "A named, licensed broker actually holding the money with SIPC coverage, plus a few months of the demo agent visibly beating or matching my own index buys after fees.",
+  "A named, regulated broker partner with SIPC coverage and a flat price under about $5 a month, plus an agent that clearly beats what my current broker's free AI does, shown with my own numbers in the demo first."
+ ],
+ "purchases_first_month_per_buyer": null,
+ "price_answers": 100
+}

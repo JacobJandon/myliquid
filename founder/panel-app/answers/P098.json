@@ -1,0 +1,13 @@
+{
+  "id": "P098",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "My broker already puts the same amount into index funds every month without me touching it, so I don't need a pet AI to do that. I don't trust an AI with my money, and right now there's no named broker and no price.",
+  "objection": "An AI that can trade and pay for things with my real money, run by an app that so far only has demo money and no licensed broker lined up yet. If something goes wrong, who's on the hook?",
+  "would_change_my_mind": "A big, named, licensed broker holding the account with SIPC coverage, plus a year of other people's real-money track record showing it doesn't do anything dumb.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

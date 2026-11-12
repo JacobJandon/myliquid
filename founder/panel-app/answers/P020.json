@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already check Public every day and my broker is rolling out its own AI stuff for free, so I don't see why I'd pay another monthly fee for a cartoon pet to do what I already do in two taps. It's demo money today and the price isn't even set, so there's nothing concrete to sign up for.",
+  "objection": "My broker already has free AI agents, and I'm not handing real money to a new app that doesn't have its broker partner or price nailed down yet.",
+  "would_change_my_mind": "A named, licensed broker partner with SIPC coverage, and a track record showing the agent actually beat what I do myself after fees.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

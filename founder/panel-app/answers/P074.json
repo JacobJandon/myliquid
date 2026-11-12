@@ -1,0 +1,13 @@
+{
+  "id": "P074",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The pet and streaks honestly sound fun, so I might play with the free demo money version, but I'm not signing up to give an app's agent my real money when there's no named broker and no price yet. My robo-adviser already handles things and I know who's on the hook there.",
+  "objection": "If the agent makes a bad call with my real money, who pays for it? Limits and a downloadable log are nice, but they don't tell me who's liable or whether my account is protected like at a normal broker.",
+  "would_change_my_mind": "Naming the licensed broker partner, saying plainly that my account is insured and protected the same way, and spelling out who is responsible when the agent loses money.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 15,
+  "price_too_expensive": 25
+}

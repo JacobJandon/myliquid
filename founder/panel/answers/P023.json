@@ -1,0 +1,13 @@
+{
+  "id": "P023",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like being early and I'd take the call, but I won't put an unaudited proxy from a company with zero customers inline on our order path. At most I'd run the free design-partner pilot in shadow mode, and that isn't a purchase.",
+  "objection": "It's another hop between the agent and execution. That means added latency and a new single point of failure, and if it goes down or fails closed at the wrong moment, my risk committee owns the outage. No SOC 2 makes that worse.",
+  "would_change_my_mind": "A shadow-mode pilot on our real agent traffic that shows p99 added latency in the low single-digit milliseconds, a fail mode we choose and can test, and at least a SOC 2 Type I in hand.",
+  "price_too_cheap": 500,
+  "price_cheap": 2500,
+  "price_expensive": 10000,
+  "price_too_expensive": 20000
+}

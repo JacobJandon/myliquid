@@ -1,0 +1,13 @@
+{
+  "id": "P053",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already ask Claude about my portfolio and then make the trades myself, and that last step is the part I'm not handing over. A cartoon pet moving my real money with no price and no named broker yet isn't something I'd sign up to pay for.",
+  "objection": "I don't trust an AI with my money. Limits and a kill switch sound nice, but I'd still be finding out after the fact what it bought, and I don't know who actually holds the account.",
+  "would_change_my_mind": "A named, licensed broker holding the money, plus a mode where every single trade waits for my tap, and a few months of watching it make sensible calls on the demo first.",
+  "price_too_cheap": 3,
+  "price_cheap": 8,
+  "price_expensive": 20,
+  "price_too_expensive": 40
+}

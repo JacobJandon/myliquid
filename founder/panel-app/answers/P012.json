@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I've never heard of MyLiquid, there are zero reviews, and the broker partner isn't even named, so I'm not putting real money behind an AI pet from an unknown app. On top of that, I'm not paying a subscription to invest when my broker app already lets me buy index funds for free.",
+  "objection": "An unknown company's AI moving my real money, with no reviews, no named licensed broker, and a monthly fee for something I already do myself in five minutes a month.",
+  "would_change_my_mind": "A well-known, licensed broker named as the partner plus a pile of solid reviews from people and finance creators I follow who used it with real money for a while.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

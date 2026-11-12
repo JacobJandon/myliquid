@@ -1,0 +1,13 @@
+{
+  "id": "P036",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I ask ChatGPT questions, but I make the trades myself, and that's on purpose. I'm 53 with less than $20k put away, so I'm not handing an AI pet the keys to real money, even with limits.",
+  "objection": "If the AI makes a bad call on its own, it's my retirement money that's gone, and a downloadable record of what went wrong doesn't give it back. Plus it's a new app, the broker isn't even named yet, and they want a monthly fee for it.",
+  "would_change_my_mind": "If it only suggested trades and I had to approve every single one, through a big licensed broker I already know, with my account insured, and a year of watching it on the demo money do better than I do on my own.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

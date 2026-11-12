@@ -1,0 +1,13 @@
+{
+  "id": "P041",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I already get free advice by pasting my portfolio into ChatGPT or Claude and then placing the trades myself in my broker app, which is free. I'm not adding a monthly subscription just to have an agent press the buttons for me, especially when you won't even tell me the price.",
+  "objection": "Paying every month to invest feels like a fee eating my returns, and on top of that I'd be letting an AI pet move real money through a broker partner I can't name yet. I like asking AI first and then deciding myself.",
+  "would_change_my_mind": "A free real-money tier, or a price under about $5 a month, plus a few months of the demo showing the agent actually did better than what I do on my own.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

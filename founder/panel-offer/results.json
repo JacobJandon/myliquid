@@ -1,0 +1,177 @@
+{
+ "business": "MyLiquid Gate (runtime controls for AI agents at brokers, crypto venues and neobanks)",
+ "seed": 7,
+ "dealt": 20,
+ "answered": 20,
+ "skipped": [],
+ "buys": 2,
+ "passes": 18,
+ "buy_rate": 0.1,
+ "by_segment": [
+  [
+   "Trading-platform vendor",
+   2,
+   0.5
+  ],
+  [
+   "Neobank or fintech with investing",
+   4,
+   0.25
+  ],
+  [
+   "Crypto venue",
+   5,
+   0.0
+  ],
+  [
+   "Agentic trading startup",
+   2,
+   0.0
+  ],
+  [
+   "Mid-size retail broker",
+   7,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Early adopter",
+   2,
+   1.0
+  ],
+  [
+   "Compliance-led",
+   4,
+   0.0
+  ],
+  [
+   "Vendor-risk cautious",
+   2,
+   0.0
+  ],
+  [
+   "Waits for regulation",
+   3,
+   0.0
+  ],
+  [
+   "Budget-squeezed",
+   2,
+   0.0
+  ],
+  [
+   "Fast follower",
+   3,
+   0.0
+  ],
+  [
+   "Builds in-house by default",
+   4,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "under $232,000",
+   6,
+   0.3333333333333333
+  ],
+  [
+   "$232,000 to $306,000",
+   7,
+   0.0
+  ],
+  [
+   "$306,000 and up",
+   7,
+   0.0
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   10,
+   [
+    "The exam question about AI is real and the exam pack is exactly what I'd want to hand an examiner, but shadow mode is still an inline proxy sitting in front of the MCP server our customers' agents trade through. A startup with no customers and a SOC 2 audit that hasn't even started won't get past our vendor risk review, and $1,500 or a refund doesn't change that.",
+    "No SOC 2, no customers, no references: that doesn't get through our vendor review, and our committee won't put an unreviewed proxy inline in front of the order path, even in shadow mode. It's still another hop and a new point of failure, whatever it does or doesn't block."
+   ],
+   [
+    "P001",
+    "P003"
+   ]
+  ],
+  [
+   "timing",
+   3,
+   [
+    "No regulator requires this yet, and $18k a year is a real chunk of a hire for us. I can log agent calls and set caps in front of our MCP server with open-source tooling and our own engineers until FINRA actually asks for it.",
+    "Nobody has written a rule or brought an enforcement case on AI agents trading customer accounts yet, so I'm not putting a new vendor in my order path for next year's budget on the back of FINRA reports and speeches. Shadow mode is a cheap way to look, but it still means a pre-SOC 2 startup with zero customers going through my vendor review."
+   ],
+   [
+    "P007",
+    "P012"
+   ]
+  ],
+  [
+   "habit",
+   3,
+   [
+    "A proxy that checks keys, enforces caps, routes big orders to a person and has a kill switch is a quarter's work for my team, and we'd own it instead of putting a startup's code in front of customer order flow. The price isn't the problem; we just build this kind of thing ourselves.",
+    "A proxy that logs MCP calls, checks caps per key and has a kill switch is something my team can build in a quarter. We already rate-limit every key, so we'd extend what we have instead of putting a vendor in the order path."
+   ],
+   [
+    "P016",
+    "P017"
+   ]
+  ],
+  [
+   "need",
+   2,
+   [
+    "No regulator has written a rule or brought an enforcement case that says I need a separate gate in front of agent MCP calls. Until one does, caps, a kill switch and a decision log are things my team can build ourselves on the API keys we already issue. The price is fine, but I'm not putting a line in next year's budget for a vendor with no customers and no SOC 2 to fix a problem the rules don't make me fix yet.",
+    "No regulator requires agent-specific controls yet, and neither Robinhood nor Coinbase has shown me they run something like this, so I'm not going to be the design partner. The $1,500 isn't the issue; pushing a startup with no customers and no SOC 2 through vendor risk to sit in front of our MCP server is weeks of work for something nobody is asking us for."
+   ],
+   [
+    "P004",
+    "P018"
+   ]
+  ]
+ ],
+ "why_yes": [
+  [
+   "need",
+   2,
+   [
+    "We're opening accounts to agents and rate limits don't get me per-customer mandates, a person-in-the-loop over limits, or a kill switch, and they certainly don't get me something I can hand an examiner. $1,500, refundable, shadow-only, and I can run it on our own API keys without touching their passport registry. That's a cheap pilot and I like being first.",
+    "We're opening accounts to agents and I need a control story before the regulators ask. A $1,500 shadow pilot that runs inside our network, blocks nothing and is refunded if compliance rejects the exam pack is an easy yes. The flat monthly price also fixes my usual worry about budgeting per-action fees while I'm setting next year's numbers."
+   ],
+   [
+    "P002",
+    "P013"
+   ]
+  ]
+ ],
+ "flip": [
+  "A completed SOC 2 report, even Type I, or a way to run shadow mode out of band on a copy of the traffic so nothing sits in the live order path until it's audited.",
+  "A finished SOC 2 report plus a reference from a regulated broker or venue running it in production. Failing that, a shadow mode that reads a mirrored copy of the traffic instead of sitting inline.",
+  "A written FINRA rule, an exam finding or an enforcement action that specifically requires pre-trade controls and audit evidence for customer AI agents, plus a finished SOC 2 report from the vendor.",
+  "An examiner or auditor asking us how we control customers' AI agents, plus at least a SOC 2 Type I report in hand. Then I'd run the shadow pilot with API keys only and leave the passport registry out.",
+  "FINRA or an exam team asking us in writing how we supervise and stop AI agents trading in customer accounts, and us having no good answer.",
+  "A regulator, or our exam team, formally asking how we control customer AI agents, with the Growth tier priced closer to $500 a month.",
+  "Seeing Robinhood, Coinbase or a broker our size run it in production in front of their agent endpoints, with published latency numbers and a SOC 2 Type II report.",
+  "A regulator or our auditor asking how we supervise and can halt customer AI agents, plus a completed SOC 2 Type I (or a deployment that runs on mirrored traffic only, off the order path), would get me to sign the refundable pilot.",
+  "A broker or crypto venue we benchmark against running it in production, or a FINRA examiner accepting their exam pack at a firm our size, plus a SOC 2 Type II report.",
+  "A finished SOC 2 report in hand, or a version that reads a mirrored copy of the traffic so it can never sit inline on orders during the pilot.",
+  "FINRA issuing an actual rule or bringing an enforcement action over agent-initiated trading without supervisory controls, with a finished SOC 2 Type II behind the vendor.",
+  "A written rule or a public enforcement action against a venue over an AI agent trading on a customer account. Then I'd want this in shadow mode the same week.",
+  "A completed SOC 2 Type I (Type II underway) plus two reference customers at regulated brokers who have run it in production. Then I'd put it in next year's budget as a pilot.",
+  "My engineering lead telling me we can't ship the equivalent, exam-ready control mapping included, inside a quarter.",
+  "If our compliance team or a FINRA examiner said the exam pack's control mapping is something we couldn't credibly produce ourselves in a quarter, I'd run the refundable pilot.",
+  "FINRA putting out a notice or exam finding that expects specific controls on orders placed by AI agents, or seeing Robinhood or Coinbase put a gate like this in front of their agent trading.",
+  "A SOC 2 Type I in hand, or the proxy released as open source so my team can read and run it ourselves and only pay for the exam pack and support.",
+  "A true out-of-path shadow mode that reads a mirrored copy of our MCP traffic asynchronously, plus published p99 latency and fail-open/fail-closed behavior for when we switch on enforcement."
+ ],
+ "purchases_first_month_per_buyer": 1.0,
+ "price_answers": 20
+}

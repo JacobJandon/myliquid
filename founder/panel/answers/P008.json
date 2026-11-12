@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Nobody, no examiner, auditor or regulator, is asking me a question about agent identity that I can't answer today, and my engineers already rate-limit every key. I'm not putting a proxy with no customers and no SOC 2 in front of my order flow, where it can approve or block trades, just because the pitch sounds sensible.",
+  "objection": "Why would I trust an identity registry the vendor's founder started? If the AINRA passport is the thing that decides which agents get autonomy, then the vendor is grading its own homework. On top of that, there's no SOC 2 and no other customer, so my vendor-risk review stops it before I even see a demo.",
+  "would_change_my_mind": "An examiner or auditor asking us to show how we identify, authorize and supervise customer AI agents before their trades execute, when we can't produce that evidence ourselves.",
+  "price_too_cheap": 300,
+  "price_cheap": 1500,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

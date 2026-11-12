@@ -1,0 +1,13 @@
+{
+  "id": "P059",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I use AI all day at work, but I'm not letting it invest or pay for things with my actual money, and a cartoon pet running my portfolio makes it feel like a toy. My robo-adviser already rebalances for me and it's boring, which is exactly what I want.",
+  "objection": "An AI agent that can move my money on its own, with no broker named yet and no price, presented as a Tamagotchi. Limits and a kill switch don't fix the basic issue that I don't want an AI making money decisions for me.",
+  "would_change_my_mind": "A big, known, regulated broker holding the account and standing behind it, plus a year or two of real-money results from people I trust, with the pet as an option I can turn off.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

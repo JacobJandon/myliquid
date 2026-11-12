@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "No SOC 2, no customers, no references: that doesn't get through our vendor review, and our committee won't put an unreviewed proxy inline in front of the order path, even in shadow mode. It's still another hop and a new point of failure, whatever it does or doesn't block.",
+  "objection": "Shadow mode still means their proxy sits inline on every agent call. If it crashes or adds latency, our customers' orders take the hit, and I'd be defending a vendor with no audit and nobody to call for a reference.",
+  "would_change_my_mind": "A finished SOC 2 report plus a reference from a regulated broker or venue running it in production. Failing that, a shadow mode that reads a mirrored copy of the traffic instead of sitting inline.",
+  "price_too_cheap": 500,
+  "price_cheap": 1500,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

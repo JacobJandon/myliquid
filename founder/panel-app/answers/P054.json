@@ -1,0 +1,13 @@
+{
+  "id": "P054",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "My broker already puts the same amount into index funds every month and I barely look at it, so I don't need an AI pet rebalancing or paying for me. Right now it's demo money, and demo money isn't worth my time.",
+  "objection": "I'd be handing my actual savings to an AI agent from an app that doesn't even have a broker partner or a price yet, to do something my autopilot already does for free.",
+  "would_change_my_mind": "If it were live with a licensed broker I recognize, and it showed it saved me real money in fees or taxes compared with my current auto-invest, for a few dollars a month.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

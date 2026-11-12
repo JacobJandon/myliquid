@@ -1,0 +1,13 @@
+{
+  "id": "P064",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our last exam asked how we use AI. We answered with an inventory and a policy memo, and nobody has asked how we control customer agents' trades. No regulator requires this yet, so I can't justify an unaudited startup sitting inline on our order flow, even for free.",
+  "objection": "You have no customers and no SOC 2. If I put you in front of execution, our own vendor due diligence fails before the examiner ever looks, and the LOI that names a price after the pilot is a commitment I don't sign for an optional control.",
+  "would_change_my_mind": "An exam finding or written regulator guidance that specifically asks how we govern and stop customer AI agents trading in their accounts.",
+  "price_too_cheap": 500,
+  "price_cheap": 2000,
+  "price_expensive": 6000,
+  "price_too_expensive": 12000
+}

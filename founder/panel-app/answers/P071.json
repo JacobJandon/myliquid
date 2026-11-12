@@ -1,0 +1,13 @@
+{
+  "id": "P071",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd maybe play with the demo-money version for fun, but I'm not lining up to hand real money and my brokerage access to a brand-new app whose broker partner isn't even named yet. I already ask Claude and then place the trades myself, and that keeps me in control for free.",
+  "objection": "Is my data and my money safe with a new app? I don't know who the licensed broker is, who holds my account, or what happens to my info if this startup folds, and on top of that I'd be paying a monthly fee on a portfolio under $20k.",
+  "would_change_my_mind": "Naming a big, known broker that actually holds the money (SIPC-insured, my account in my name) plus a few months of the demo showing it beats what I already do, at a price under about $5 a month.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P024",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "My broker already gives me AI tools for free, and I can ask Claude about my portfolio whenever I want. A paid plan with no price, on a broker that hasn't been named, isn't something I'd sign up for, even just the waitlist.",
+  "objection": "I'd have to move real money off Robinhood to an unnamed broker partner and pay a monthly fee, just so an AI agent dressed up as a cartoon pet can do rebalancing I already handle myself in a few taps.",
+  "would_change_my_mind": "If it hooked into my existing broker account instead of making me move my money, and a few months of the demo showed the agent actually doing better than my own trades.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

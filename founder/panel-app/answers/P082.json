@@ -1,0 +1,13 @@
+{
+  "id": "P082",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I use AI at work all day, but I don't let it near my money. I already put money into index funds every payday in my broker app without any help, and a cartoon pet doing it for me doesn't make it feel any safer.",
+  "objection": "I'd be handing my real money to an AI agent at a company that doesn't even have a broker partner yet, and the Tamagotchi makes it feel like a game, not like something I'd trust with my savings.",
+  "would_change_my_mind": "A long, public, audited track record with real money through a licensed broker I already know, where the agent only suggests and nothing moves unless I tap to approve each trade.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 15,
+  "price_too_expensive": 25
+}

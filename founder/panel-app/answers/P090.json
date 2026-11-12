@@ -1,0 +1,13 @@
+{
+  "id": "P090",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm curious about agents, but I'm not handing real money to an app I've never heard of that has zero reviews and an unnamed broker partner. Maybe I'd play with the demo, but I'm not signing up for a paid plan with no price.",
+  "objection": "I don't trust an AI with my money, especially one from a no-name company. Nobody I follow has reviewed it, and 'a licensed broker partner, later' tells me nothing about who actually holds my cash.",
+  "would_change_my_mind": "A known, named broker holding the money, plus real reviews from people I follow who have actually used it with real money for a few months.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "No written rule or enforcement action makes me govern customers' agents today. Our terms already put agent risk on the customer and my engineers rate-limit every API key, so I'm not putting a pre-SOC 2 startup in the path of every trade before a regulator tells me to.",
+  "objection": "A startup with no customers and no SOC 2 sitting inline as a proxy on our order and payment flow is a new single point of failure and a vendor-risk headache. 'Evidence under FINRA and MAS SAFR headings' is a nice label, but no examiner has asked me for it.",
+  "would_change_my_mind": "A final rule, or an enforcement action against a peer venue, that explicitly holds the venue responsible for controlling customer AI agents' trades.",
+  "price_too_cheap": 200,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 10000
+}

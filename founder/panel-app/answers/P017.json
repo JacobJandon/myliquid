@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd probably play with the free demo, because I do like a streak and I'm curious about an agent doing the boring rebalancing. But I won't sign up to pay for an AI in a cartoon pet handling my real money when there's no named broker and no price yet.",
+  "objection": "A Tamagotchi feels unserious for money. My retirement savings are in there, and I don't want my real money run by a toy from an app I can't check up on.",
+  "would_change_my_mind": "A few months of the demo agent behaving well inside my limits, and then a named, regulated broker holding the money with SIPC coverage, at a set price under about $10 a month.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

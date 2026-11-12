@@ -1,0 +1,13 @@
+{
+  "id": "P063",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Our agent volume is tiny today, so there's nothing for this to govern yet that our existing caps and manual review can't handle. I copy what Robinhood and Coinbase ship, I don't go first, and I'm not putting an unaudited proxy with zero customers in our trade path for a problem we don't have at scale.",
+  "objection": "No SOC 2 and no customers, and it sits inline in front of every agent trade on a crypto venue. If it goes down or gets it wrong, that's my name in front of the risk committee, and 'free for six months' doesn't cover the reference letter and LOI they want back.",
+  "would_change_my_mind": "Coinbase or Robinhood running it (or something like it) in production, plus a finished SOC 2 report.",
+  "price_too_cheap": 200,
+  "price_cheap": 800,
+  "price_expensive": 3000,
+  "price_too_expensive": 6000
+}

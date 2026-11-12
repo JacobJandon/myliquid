@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "You want to sit as a proxy in front of my trade path, but you have no SOC 2, no customers and no references, so you would fail my vendor review in the first week. Even free as a design partner, no regulator requires this yet, so it's not getting a line in next year's budget.",
+  "objection": "An unaudited startup with no references wants to be a single point of failure in front of every agent order. If your proxy goes down or gets breached, my customers' trades stop or go wrong and I'm the one explaining it to FINRA.",
+  "would_change_my_mind": "A completed SOC 2 Type II report plus two broker references running it in production, or FINRA guidance that actually expects agent-level controls like this.",
+  "price_too_cheap": 300,
+  "price_cheap": 1500,
+  "price_expensive": 8000,
+  "price_too_expensive": 18000
+}

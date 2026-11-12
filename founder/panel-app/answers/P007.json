@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I use AI all day at work, but I don't let it move my money, and a cartoon pet deciding my trades makes the whole thing feel like a game. I'm not joining a waitlist for a paid plan with no price and no named broker behind it.",
+  "objection": "Handing an AI agent the ability to invest and pay on my behalf, even within limits, and dressing it up as a Tamagotchi makes it feel unserious with real money.",
+  "would_change_my_mind": "A named, licensed broker holding my account with real insurance, and a mode where the agent only suggests trades and never executes without my tap.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

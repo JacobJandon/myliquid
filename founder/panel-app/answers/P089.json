@@ -1,0 +1,13 @@
+{
+  "id": "P089",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't trust an AI with my money, and a cartoon pet doesn't make that easier. My robo-adviser already does the boring part for a small fee, and I'm not signing up for a fourth subscription with no price and no broker named yet.",
+  "objection": "An AI moving and paying with my real money is exactly the thing I don't want. A demo with fake money tells me nothing about what happens when it gets something wrong with my actual savings, and 'a licensed broker partner, later' isn't a name I can check.",
+  "would_change_my_mind": "A named, regulated broker holding my money with insurance, a flat monthly fee clearly below what my robo-adviser costs me, and a long, public track record showing it didn't do anything stupid.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

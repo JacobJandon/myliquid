@@ -1,0 +1,13 @@
+{
+  "id": "P052",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Our agent volume is tiny today, and what the examiner asked was how we use AI in general, not how we govern customer agents trading. I can answer that with a policy memo and our existing controls, so I'm not putting a new proxy in the trade path this quarter.",
+  "objection": "A startup with no customers and no SOC 2 sitting in front of every trade and payment is a third-party risk problem I'd have to defend to the next examiner. Our vendor review won't pass it, and a free pilot still means signing an LOI with a price on it.",
+  "would_change_my_mind": "A regulator or examiner specifically asking us to show agent-level authorization and kill-switch evidence, together with a finished SOC 2 Type II and a peer broker I can call as a reference.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "No regulator requires agent controls yet. No written rule, no enforcement action, so this doesn't get a slot on my risk committee agenda ahead of things we're actually examined on. The pilot money isn't the issue. The issue is putting an unaudited startup's proxy in front of our MCP server before anyone makes us.",
+  "objection": "A control 'mapped to FINRA and MAS expectations' isn't the same as a rule I have to meet. I'd also be bringing in a vendor with no customers and no SOC 2, which creates its own vendor-risk finding, all to answer a question nobody has asked me yet.",
+  "would_change_my_mind": "A written rule or a public enforcement action against a venue over an AI agent trading on a customer account. Then I'd want this in shadow mode the same week.",
+  "price_too_cheap": 300,
+  "price_cheap": 750,
+  "price_expensive": 2500,
+  "price_too_expensive": 5000
+}

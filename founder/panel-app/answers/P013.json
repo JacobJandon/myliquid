@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't trust an AI with my money, and a cartoon pet running my portfolio makes it feel more like a game than an adviser. I already check my broker app every day and make my own trades, so I don't need something to do it for me, let alone pay monthly for it.",
+  "objection": "There's no broker named yet and no price, and it's all demo money today. I'd be handing real cash to an AI from a company I've never heard of, and a downloadable log doesn't help much once a bad trade has already gone through.",
+  "would_change_my_mind": "A named, licensed broker holding the money with SIPC coverage, plus a year or more of real-money results I could check, from a source I trust and not from the app itself.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 15,
+  "price_too_expensive": 30
+}

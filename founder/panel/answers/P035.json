@@ -1,0 +1,13 @@
+{
+  "id": "P035",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm not putting a proxy with no customers and no SOC 2 in front of our order flow, and the identity check runs on a registry the vendor's own founder started. I wait to see what Robinhood and Coinbase do about agent controls, and then I copy it, and I'm not going to be anyone's first reference.",
+  "objection": "The passport check, the thing that's supposed to make it safe, is a registry the seller runs himself. If that's the trust anchor, my risk committee will ask who checks the checker, and right now the answer is nobody.",
+  "would_change_my_mind": "Seeing Robinhood or Coinbase, or a regulator, accept the agent-passport standard independently, and a finished SOC 2 Type II report.",
+  "price_too_cheap": 200,
+  "price_cheap": 1000,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P066",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm not handing real money to an app with no reviews, no known name and a broker partner that isn't even named yet, and on top of that I'm not paying a subscription to invest when my broker app is free.",
+  "objection": "An AI pet moving my actual savings with nobody I've heard of behind it. A demo with fake money tells me nothing about what happens when it's my $20k.",
+  "would_change_my_mind": "A named, well-known licensed broker holding the money, plus a solid stack of real user reviews after a year of real-money accounts.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

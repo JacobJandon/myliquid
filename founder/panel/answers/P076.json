@@ -1,0 +1,13 @@
+{
+  "id": "P076",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "timing",
+  "reason": "A competitor announced agent trading last month, and a free six-month pilot with no code change gets us a governed answer in weeks instead of the quarters my own team would need. I'd sign up as a design partner in a sandbox, but that's a pilot, not a production commitment.",
+  "objection": "My engineers will say we can build this ourselves, since we already run pre-trade caps and kill switches for market access. And my CCO won't put an unaudited startup with no customers in the live order path, so the price I put in the LOI will be low and conditional.",
+  "would_change_my_mind": "If my team shows they can ship agent identity checks and per-customer limits on our own risk engine within a quarter, I'd drop the pilot and build it.",
+  "price_too_cheap": 300,
+  "price_cheap": 2000,
+  "price_expensive": 7000,
+  "price_too_expensive": 15000
+}

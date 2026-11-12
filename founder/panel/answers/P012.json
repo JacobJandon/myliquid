@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "We opened our MCP server to customers' agents this year, and I have nothing between an agent's call and an executed trade except our own caps, so I'd take the free design-partner slot and run it in shadow mode on a slice of traffic. That's a pilot, not a budget line yet. Whether we pay comes down to what the six months show.",
+  "objection": "Per-action pricing is hard to budget. If customer agents get chatty, my bill moves with their behavior, not mine. On top of that, putting an unaudited startup with no other customers inline in our trade path won't get past our vendor-risk review until SOC 2 is done, and if most of our customers' agents don't carry AINRA passports, the identity check doesn't do much for us.",
+  "would_change_my_mind": "",
+  "price_too_cheap": 250,
+  "price_cheap": 1500,
+  "price_expensive": 7000,
+  "price_too_expensive": 15000
+}

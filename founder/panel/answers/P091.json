@@ -1,0 +1,13 @@
+{
+  "id": "P091",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Our agent volume is tiny today, and no written FINRA rule or enforcement action yet says I need a separate gate in front of agent trades. My examiner asked how we use AI, and I can answer that with our existing controls. I'm not putting an unaudited startup inline in our order path, and I'm not signing an LOI that names a price, before a rule tells me I have to.",
+  "objection": "A pre-revenue vendor with no customers and no SOC 2 would sit directly in our trade and payment path. If it goes down or gets it wrong, that's my exam finding, not theirs. Vendor due diligence alone would take longer than the six-month free pilot.",
+  "would_change_my_mind": "A FINRA regulatory notice or an enforcement action that spells out supervision requirements for AI-agent-initiated trading, or an exam finding against us on it, plus a completed SOC 2 Type II.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Nobody has written a rule or brought an enforcement case on AI agents trading customer accounts yet, so I'm not putting a new vendor in my order path for next year's budget on the back of FINRA reports and speeches. Shadow mode is a cheap way to look, but it still means a pre-SOC 2 startup with zero customers going through my vendor review.",
+  "objection": "Another hop in front of the MCP server is latency and a new point of failure, even in pass-through mode, and I'd be trusting a company with no customers and no SOC 2 report to sit in the path. Mapping controls to 'expectations' doesn't help me when the expectations aren't written rules.",
+  "would_change_my_mind": "FINRA issuing an actual rule or bringing an enforcement action over agent-initiated trading without supervisory controls, with a finished SOC 2 Type II behind the vendor.",
+  "price_too_cheap": 300,
+  "price_cheap": 800,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

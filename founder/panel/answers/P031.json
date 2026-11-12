@@ -1,0 +1,13 @@
+{
+  "id": "P031",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our terms already put agent risk on the customer, and my engineers already rate-limit every API key, so I don't have a problem that's costing me money today. I'm not putting an unaudited startup's proxy in the trade path before Robinhood or Coinbase show me this is the standard.",
+  "objection": "A company with no customers and no SOC 2 sitting inline in front of every agent order. If it goes down or gets it wrong, that's my outage and my regulator conversation, and they can't absorb any of that.",
+  "would_change_my_mind": "Robinhood or Coinbase rolling out agent passport checks or a gate like this, or FINRA saying it expects firms to have controls on customer agents beyond terms of service.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 15000
+}

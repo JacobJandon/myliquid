@@ -1,0 +1,13 @@
+{
+  "id": "P051",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I pick the cheapest option every time and I don't do subscriptions, so a monthly fee at a price nobody has even set yet, on top of moving money to some broker partner I've never heard of, is a no. My broker app already does monthly auto-investing and is rolling out its own AI help for free.",
+  "objection": "Why would I pay a monthly fee for something my free broker already mostly does? A cute pet doesn't make my returns any better, and every dollar of fee comes straight out of my returns.",
+  "would_change_my_mind": "If the real-money plan were free or a flat fee of a couple of dollars a month, with no extra trading or fund costs, and it clearly did something my current broker doesn't.",
+  "price_too_cheap": 1,
+  "price_cheap": 2,
+  "price_expensive": 5,
+  "price_too_expensive": 9
+}

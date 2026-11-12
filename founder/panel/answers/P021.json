@@ -1,0 +1,13 @@
+{
+  "id": "P021",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "No regulator requires this yet, and neither Robinhood nor Coinbase has put a third-party agent gate in front of their APIs. I'm not putting a vendor with zero customers and no SOC 2 on the risk committee agenda when I can wait two quarters and copy whoever moves first.",
+  "objection": "An unaudited startup proxy sitting inline on every agent trade means a new single point of failure and a new vendor risk on the flow I care most about. Plus the passport standard it checks barely exists yet. The free pilot isn't free either: weekly calls, a public reference and an LOI with a price on it before I know whether it works.",
+  "would_change_my_mind": "Coinbase or Robinhood announcing they gate agent trading this way, or a regulator such as FINRA, the SEC or the CFTC putting out guidance that expects agent identity checks and an audit trail. Either one and I'd take a pilot meeting the same quarter.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

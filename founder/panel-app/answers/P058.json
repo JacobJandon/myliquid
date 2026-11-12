@@ -1,0 +1,13 @@
+{
+  "id": "P058",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm not handing my real money to an AI pet when nobody's said who pays if it makes a bad call, and on top of that it's a monthly subscription with no price yet. My robo-adviser is cheap, boring and works, so a waitlist for an unpriced paid plan isn't worth my email.",
+  "objection": "Who is liable if the agent loses money? A downloadable record of its decisions is nice, but it doesn't put my money back. Plus I hate subscriptions, and this one has no price on it.",
+  "would_change_my_mind": "A named licensed broker holding my money with SIPC coverage, clear written terms on who covers losses the agent causes, and a flat price under about $5 a month that comes out cheaper than what my robo-adviser charges.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

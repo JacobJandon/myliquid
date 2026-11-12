@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "No examiner has asked us about agent controls yet, and I'm not putting software from a pre-SOC 2 startup with zero customers in front of our MCP server just because the pilot is cheap. The price isn't the issue. Getting it through our own third-party risk review is, and an exam pack only counts if the vendor behind it will hold up under the same exam.",
+  "objection": "Why would I trust an identity registry the vendor's founder started? If the AINRA passport is the founder's own scheme, my examiner will ask who governs it, and 'the vendor' is the wrong answer. On top of that there's no SOC 2, no reference customer and no track record, so I'd be the one explaining to the regulator why we relied on it.",
+  "would_change_my_mind": "An examiner or auditor asking us how we control customers' AI agents, plus at least a SOC 2 Type I report in hand. Then I'd run the shadow pilot with API keys only and leave the passport registry out.",
+  "price_too_cheap": 500,
+  "price_cheap": 1500,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

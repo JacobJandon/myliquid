@@ -1,0 +1,13 @@
+{
+  "id": "P025",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "My broker already buys the same index funds for me every month for free, and I barely look at it, which is how I like it. I'm not handing real money to an AI pet from an app I just met, with a broker partner that doesn't even exist yet.",
+  "objection": "I don't trust an AI with my money. Limits and a stop switch are nice, but if it does something dumb I'm the one who eats the loss, and I can't tell who's actually holding my money.",
+  "would_change_my_mind": "A big, known licensed broker actually holding the account with SIPC protection, plus a year of other people's real-money track record showing it doesn't do anything my plain monthly autopilot wouldn't.",
+  "price_too_cheap": 2,
+  "price_cheap": 4,
+  "price_expensive": 10,
+  "price_too_expensive": 15
+}

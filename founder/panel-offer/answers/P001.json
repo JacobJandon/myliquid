@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The exam question about AI is real and the exam pack is exactly what I'd want to hand an examiner, but shadow mode is still an inline proxy sitting in front of the MCP server our customers' agents trade through. A startup with no customers and a SOC 2 audit that hasn't even started won't get past our vendor risk review, and $1,500 or a refund doesn't change that.",
+  "objection": "Passing calls through untouched still means it's in the order path. If it crashes or adds latency, customer agent orders fail, and I'd be explaining to an examiner why we put an unaudited vendor with zero references there.",
+  "would_change_my_mind": "A completed SOC 2 report, even Type I, or a way to run shadow mode out of band on a copy of the traffic so nothing sits in the live order path until it's audited.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

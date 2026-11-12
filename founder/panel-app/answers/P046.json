@@ -1,0 +1,13 @@
+{
+  "id": "P046",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "My broker app already lets me invest monthly for free, and I can ask ChatGPT a question for nothing. I'm not signing up for another monthly bill, at a price they won't even tell me yet, so a cartoon pet can make moves I can already make myself in two taps.",
+  "objection": "A Tamagotchi feels unserious for my retirement money, and I'd be paying a subscription to trust a brand-new app with real dollars when it has only ever handled demo money.",
+  "would_change_my_mind": "If the real-money account had no monthly fee at all, so I'd only pay the normal costs of a broker.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

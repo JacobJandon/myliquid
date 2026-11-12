@@ -1,0 +1,13 @@
+{
+  "id": "P062",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "The pet thing honestly sounds fun and I'd probably play with the free demo on my commute, but I'm not paying a monthly subscription just to invest when my broker app already lets me buy index funds for free. Signing up for a paid plan with no price on it is a pass.",
+  "objection": "Paying a recurring fee on top of my investments eats into returns, and I'm not sure an AI pet rebalancing an index fund portfolio does anything I couldn't do myself in five minutes a month.",
+  "would_change_my_mind": "If the demo showed me, with my own streak and record, that the agent actually beat what I do by more than the fee, and the price was a few bucks a month like Robinhood Gold, I'd think about it.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

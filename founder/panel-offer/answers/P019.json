@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Shadow mode is a smart way in and the exam pack is aimed right at the question my last exam asked, but it's still an inline proxy sitting in front of the MCP server our customers' agents hit, from a company with no customers and a SOC 2 that hasn't even started. Our vendor risk review would stall it before I could spend the $1,500, and I'm not going to burn my own credibility pushing it through.",
+  "objection": "No SOC 2 and no customers means I'd be the first firm to put an unknown vendor's code in the path of customer orders, even if it's 'just passing through' for 60 days. If it breaks or something leaks, that lands on me. And after the pilot, $18k a year competes directly with a hire I already can't get approved.",
+  "would_change_my_mind": "A SOC 2 Type I in hand, or the proxy released as open source so my team can read and run it ourselves and only pay for the exam pack and support.",
+  "price_too_cheap": 200,
+  "price_cheap": 500,
+  "price_expensive": 1200,
+  "price_too_expensive": 2500
+}

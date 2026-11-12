@@ -1,0 +1,13 @@
+{
+  "id": "P064",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I put the same amount into index funds every month and barely look, and my broker already gives me AI features for free. A pet agent rebalancing for me solves a problem I don't have, and paying monthly for it on top of my other subscriptions isn't happening.",
+  "objection": "It's a demo-money app with no broker yet and no price, asking me to sign up for a paid plan that does what my free broker tools and a monthly autopilot already do.",
+  "would_change_my_mind": "If it ran on my existing brokerage account and cost nothing extra, or showed clearly that it beats my plain monthly index autopilot after fees.",
+  "price_too_cheap": 2,
+  "price_cheap": 4,
+  "price_expensive": 9,
+  "price_too_expensive": 15
+}

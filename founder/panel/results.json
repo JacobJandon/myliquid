@@ -1,0 +1,275 @@
+{
+ "business": "MyLiquid Gate (runtime controls for AI agents at brokers, crypto venues and neobanks)",
+ "seed": 7,
+ "dealt": 100,
+ "answered": 100,
+ "skipped": [],
+ "buys": 4,
+ "passes": 96,
+ "buy_rate": 0.04,
+ "by_segment": [
+  [
+   "Crypto venue",
+   25,
+   0.08
+  ],
+  [
+   "Mid-size retail broker",
+   35,
+   0.05714285714285714
+  ],
+  [
+   "Agentic trading startup",
+   8,
+   0.0
+  ],
+  [
+   "Trading-platform vendor",
+   12,
+   0.0
+  ],
+  [
+   "Neobank or fintech with investing",
+   20,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Early adopter",
+   12,
+   0.3333333333333333
+  ],
+  [
+   "Compliance-led",
+   18,
+   0.0
+  ],
+  [
+   "Builds in-house by default",
+   18,
+   0.0
+  ],
+  [
+   "Waits for regulation",
+   14,
+   0.0
+  ],
+  [
+   "Vendor-risk cautious",
+   12,
+   0.0
+  ],
+  [
+   "Fast follower",
+   14,
+   0.0
+  ],
+  [
+   "Budget-squeezed",
+   12,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "$304,000 and up",
+   34,
+   0.058823529411764705
+  ],
+  [
+   "under $219,000",
+   33,
+   0.030303030303030304
+  ],
+  [
+   "$219,000 to $304,000",
+   33,
+   0.030303030303030304
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   47,
+   [
+    "I won't put an inline proxy from a startup with no customers and no SOC 2 report in front of our order path, even for free. If it goes down or gets breached, our trades stop and I'm the one explaining it to FINRA.",
+    "I won't put a startup without a SOC 2 report in our order path, and this one has no customers and only a planned audit. Nothing in writing from FINRA or the SEC makes me need agent-level pre-trade controls yet, so it's not going into next year's budget."
+   ],
+   [
+    "P001",
+    "P003"
+   ]
+  ],
+  [
+   "timing",
+   21,
+   [
+    "Our agent volume through the MCP server is tiny today, and no regulator has written a rule or brought an enforcement action that says I need a separate agent-identity and approval layer. I'm not putting a proxy in front of customer trades, or signing a letter of intent with a price in it, on the strength of speeches and reports.",
+    "I like being first, but our agent volume is tiny today and my engineers already rate-limit every API key, so there's nothing here I'd pay for this month. At our volume we'd sit inside the free tier anyway, and I won't sign an LOI naming a price for a problem we don't have at scale yet."
+   ],
+   [
+    "P004",
+    "P005"
+   ]
+  ],
+  [
+   "need",
+   20,
+   [
+    "My team already rate-limits every key and could build caps, an approval queue and a kill switch for agent accounts inside a quarter, and no regulator is asking me for this yet. I don't buy what I can build, especially not something that sits in my order path.",
+    "Our agent volume is tiny today, and a proxy that checks caps, routes big orders to a human and has a kill switch is something my team can build in a quarter on top of controls we already run. I'll answer the examiner's AI question with our own policy and logs, not a vendor with no customers sitting in the trade path."
+   ],
+   [
+    "P011",
+    "P013"
+   ]
+  ],
+  [
+   "habit",
+   7,
+   [
+    "Identity check, per-customer caps, a human-approval queue and a kill switch in front of our own order path is a quarter of work for my team, and with a competitor already live we'd rather own that layer than rent it. I'd take the demo call to steal the checklist, not to sign.",
+    "A policy check in front of our MCP server, an approval queue, a kill switch and a hash-chained log are things my team can build in a quarter, and we'd rather own anything that sits in the trade path. I'm not putting a startup with no customers and no SOC 2 in front of order execution, and I'm not signing an LOI with a price on it just to get six free months."
+   ],
+   [
+    "P002",
+    "P009"
+   ]
+  ],
+  [
+   "price",
+   1,
+   [
+    "I'm building next year's budget right now and this isn't in it. A metered tool from a startup with no customers loses to a headcount line every time. At most I'd let my engineers poke at the free Developer tier. That isn't buying."
+   ],
+   [
+    "P090"
+   ]
+  ]
+ ],
+ "why_yes": [
+  [
+   "need",
+   3,
+   [
+    "We opened our MCP server to customers' agents this year, and I have nothing between an agent's call and an executed trade except our own caps, so I'd take the free design-partner slot and run it in shadow mode on a slice of traffic. That's a pilot, not a budget line yet. Whether we pay comes down to what the six months show.",
+    "We're letting customer agents onto the venue and right now our controls are rate limits plus hope, so I'd take the free design-partner slot and run it in shadow mode next to the order path. I'd sign the LOI only if the price has a ceiling. Paying the Growth tier comes after it proves itself, and it goes into next year's budget as a line item conditional on the pilot."
+   ],
+   [
+    "P012",
+    "P062"
+   ]
+  ],
+  [
+   "timing",
+   1,
+   [
+    "A competitor announced agent trading last month, and a free six-month pilot with no code change gets us a governed answer in weeks instead of the quarters my own team would need. I'd sign up as a design partner in a sandbox, but that's a pilot, not a production commitment."
+   ],
+   [
+    "P076"
+   ]
+  ]
+ ],
+ "flip": [
+  "A FINRA examiner asking us how we control and evidence AI agent trading, and we can't answer. That plus a finished SOC 2 Type II report would get it onto my desk.",
+  "A comparable broker running it in production with a finished SOC 2 Type II, so I'm not the guinea pig and it beats what my team ships in a quarter.",
+  "A FINRA or SEC rule or enforcement action that requires agent-level pre-trade controls, with a finished SOC 2 Type II report from them by then.",
+  "A FINRA or SEC rule, notice with teeth, or enforcement action that specifically names AI-agent authorization and supervision for customer accounts, plus a finished SOC 2 Type II.",
+  "Agent-initiated trades becoming a real share of our order flow, or our regulator asking how we control customer agents, plus a finished SOC 2 report so the proxy can pass vendor review.",
+  "Gate checking agents against a Know-Your-Agent standard the founder doesn't control, or AINRA handed to an independent body. With that I'd run the design-partner pilot in shadow mode right away.",
+  "A completed SOC 2 Type II report plus two or three reference brokers already running it in production, with published latency numbers and a fail-open or bypass mode we control. Then I'd look at the design partner pilot for next year's budget.",
+  "An examiner or auditor asking us to show how we identify, authorize and supervise customer AI agents before their trades execute, when we can't produce that evidence ourselves.",
+  "If our regulators or exchange partners started requiring a verified Know-Your-Agent check like AINRA passports that we couldn't realistically build and maintain ourselves, and the vendor had a finished SOC 2 Type II plus a broker already running it in production.",
+  "A completed SOC 2 Type II report plus two or three named broker-dealer references running it in production. Then I'd let it through vendor review, likely in a fail-open, observe-only mode first.",
+  "FINRA or the SEC making agent identity checks and decision evidence an explicit exam expectation, so the passport verification and export formats become something I can't credibly build and keep current myself.",
+  "Agent-originated orders becoming a real share of our flow while an examiner or FINRA explicitly expects know-your-agent controls we can't stand up in a quarter, with a completed SOC 2 and a peer broker already running it in production.",
+  "A completed SOC 2 Type II report plus two or three references from regulated brokers or neobanks already running it in production, with a flat annual price instead of per-action overages.",
+  "A completed SOC 2 Type II report plus two broker references running it in production, or FINRA guidance that actually expects agent-level controls like this.",
+  "A regulator or our banking partners requiring Know-Your-Agent evidence in a standard we can't produce in-house in a quarter, once agent volume is real, with a SOC 2 report done.",
+  "Let me run it in shadow mode on staging, logging decisions without blocking anything, with no LOI or reference required up front, plus a firm date for the SOC 2 Type I report.",
+  "A final rule, or an enforcement action against a peer venue, that explicitly holds the venue responsible for controlling customer AI agents' trades.",
+  "A completed SOC 2 Type II plus an examiner or FINRA sweep letter asking us how we supervise customer AI agents, which turns this from nice-to-have into a question I have to answer.",
+  "A completed SOC 2 Type II plus a reference broker running it inline in production with published latency and uptime numbers, or an out-of-path mode (SDK or async evidence export) so a Gate outage can't block an order.",
+  "Coinbase or Robinhood announcing they gate agent trading this way, or a regulator such as FINRA, the SEC or the CFTC putting out guidance that expects agent identity checks and an audit trail. Either one and I'd take a pilot meeting the same quarter.",
+  "FINRA or the SEC putting AI agent supervision into exam priorities or a regulatory notice, or an examiner asking us directly for evidence of how agent trades are authorized and supervised.",
+  "A shadow-mode pilot on our real agent traffic that shows p99 added latency in the low single-digit milliseconds, a fail mode we choose and can test, and at least a SOC 2 Type I in hand.",
+  "A completed SOC 2 Type II plus a regulator or exchange actually requiring AINRA-style agent passports, so the value is the standard and the network rather than code we could write ourselves.",
+  "A FINRA exam letter or sweep that asks how we govern customer AI agents, together with a finished SOC 2 Type II and agent identity standards run by an independent body, not the founder.",
+  "A completed SOC 2 Type II report plus two references from regulated brokers or crypto venues already running it in production, and agent order flow on our platform that's big enough for the committee to care about.",
+  "An examiner asking us specifically how we control customers' AI agents trading, at a time when the vendor has a finished SOC 2 Type II and a peer broker running it in production.",
+  "A FINRA exam or sweep letter asking us to show how we supervise and evidence agent-initiated orders, and we can't answer it from our own records. Then a free pilot in front of a non-critical path starts to look like cheap cover.",
+  "A written FINRA rule or a real enforcement action over a broker's lack of controls on AI agents trading customer accounts, plus a finished SOC 2 report.",
+  "A regulator or our bank partner explicitly asking for third-party agent identity checks and tamper-evident evidence, so building it in-house stops being good enough.",
+  "Robinhood or Coinbase rolling out agent passport checks or a gate like this, or FINRA saying it expects firms to have controls on customer agents beyond terms of service.",
+  "Robinhood or Coinbase publicly rolling out agent-identity and approval controls (or FINRA putting out guidance that expects them), plus a finished SOC 2 Type II.",
+  "An examiner or our auditor asking how we identify and limit customers' AI agents, plus a finished SOC 2 Type II and one comparable regulated venue running it in production.",
+  "An examiner or auditor asking us how we identify and limit customer agents, with the identity check backed by an independent Know-Your-Agent standard rather than the founder's registry, and a finished SOC 2 Type II report.",
+  "Seeing Robinhood or Coinbase, or a regulator, accept the agent-passport standard independently, and a finished SOC 2 Type II report.",
+  "A written FINRA or SEC rule, or an enforcement action, that makes agent identity checks and human approval above limits an explicit requirement, plus a finished SOC 2 Type II and a flat annual price with no per-action overage.",
+  "A regulated peer broker running it in production that will get on a call with me and vouch for it.",
+  "An examiner or a FINRA notice explicitly asking us to show controls and an audit trail for customer AI agents, together with a finished SOC 2 Type II report.",
+  "A completed SOC 2 Type II plus two or three referenceable venues or brokers already running it in production, ideally combined with a regulator or our auditors starting to ask how we control customer agents.",
+  "A FINRA regulatory notice or an enforcement action that spells out supervisory controls for customer AI agents trading in accounts, plus a finished SOC 2 Type II report.",
+  "A FINRA rule, notice or enforcement action that specifically requires controls and human approval on AI-agent trading in customer accounts.",
+  "A finished SOC 2 Type II report plus two or three reference customers at brokers our size running it in production, or a regulator explicitly telling us we need agent-level controls and audit evidence beyond our terms.",
+  "Agent-driven order flow growing fast enough that a regulator or our compliance team starts asking for KYA evidence before my team could build it, with a finished SOC 2 report and a couple of peer brokers already running it in production.",
+  "A finished SOC 2 Type II report plus one of the big players, Robinhood, Coinbase or a broker our size, running it live in front of their agent traffic.",
+  "A FINRA rule, notice or enforcement action that spells out supervision requirements for AI agents trading in customer accounts.",
+  "A completed SOC 2 Type II report plus two or three reference customers at regulated brokers who already run it in production, ideally with a fail-open/fail-closed design our CISO has signed off on.",
+  "FINRA or an examiner telling us in writing that our terms aren't enough and we need per-agent authorization controls and decision records, with the gate open source or SOC 2 Type II done by then.",
+  "Agent-originated order volume actually ramping, or FINRA asking us how we control agent access, with a finished SOC 2 Type II to show the auditors.",
+  "A regulator or examiner explicitly asking for independently verified agent identity (KYA) that my team can't stand up in a quarter, plus a finished SOC 2 and a flat annual price.",
+  "If the passport check ran against an independent, multi-party Know-Your-Agent standard that no single vendor controls, I'd take a pilot to get to market faster than my competitor.",
+  "A completed SOC 2 plus support for an independent Know-Your-Agent standard that isn't controlled by MyLiquid, with the proxy available self-hosted or open source so it can't become a single point of failure.",
+  "A regulator or examiner specifically asking us to show agent-level authorization and kill-switch evidence, together with a finished SOC 2 Type II and a peer broker I can call as a reference.",
+  "A completed SOC 2 Type II report, plus a written rule or enforcement action from a regulator that makes agent identity and approval controls an explicit expectation for venues like ours.",
+  "A completed SOC 2 Type II report plus one comparable regulated broker running it in production. Failing that, a pilot in shadow mode, logging only and outside the execution path, so it can't block or alter an order.",
+  "A FINRA exam or audit finding that asks us to show how we supervise and evidence AI agent trades and we can't answer it.",
+  "Support for an open, independently governed Know-Your-Agent standard (not just AINRA), plus a finished SOC 2 and one live venue I can call as a reference.",
+  "Agent volume actually taking off and a regulator or exam asking for agent-decision evidence our own logs can't produce, with a SOC 2 report and a couple of live venues I can call.",
+  "A finished SOC 2 Type II report plus two or three regulated brokers or neobanks running it in production who will take my call. Even then I'd start in shadow mode, logging decisions without blocking anything.",
+  "Robinhood or Coinbase running something like this in production, or a FINRA exam or notice that specifically expects pre-trade agent controls, plus a completed SOC 2 Type II.",
+  "A completed SOC 2 Type II plus two referenceable regulated brokers running it inline in production with published latency and failover numbers. Until then, at most a shadow-mode trial off the trade path.",
+  "Coinbase or Robinhood running something like this in production, or a regulator saying that putting agent risk on the customer in our terms isn't enough.",
+  "Coinbase or Robinhood running it (or something like it) in production, plus a finished SOC 2 report.",
+  "An exam finding or written regulator guidance that specifically asks how we govern and stop customer AI agents trading in their accounts.",
+  "Robinhood or Coinbase, or a regulator, adopting an independent Know-Your-Agent standard that Gate supports, plus a finished SOC 2 Type II.",
+  "A completed SOC 2 report plus a peer broker already running it in production, with a FINRA examiner having actually accepted its evidence export.",
+  "A completed SOC 2 Type II report plus one live broker or exchange reference. Until then the most I'd do is run the free Developer tier in a sandbox, nowhere near production.",
+  "A finished SOC 2 Type II plus support for an identity standard the vendor doesn't control, so their registry isn't the only gate, and a couple of regulated venues already running it in production.",
+  "A completed SOC 2 Type II report plus at least one comparable regulated broker already running it in production that I can call.",
+  "A completed SOC 2 Type II report plus two or three reference brokers already running it in production.",
+  "Robinhood or Coinbase, or another broker my size, running it in production behind a finished SOC 2 Type II, with agent identity checked against a standard that a neutral body governs and not just AINRA.",
+  "A clean SOC 2 Type II report, plus an examiner or auditor asking us how we identify and limit customers' AI agents and us having no good answer.",
+  "If our clearing firm or a regulator started requiring verified agent passports and they were the only practical way to plug in quickly.",
+  "A completed SOC 2 Type II plus agent-initiated orders on our MCP server growing to the point where a regulator or our board asks how we control them.",
+  "An examiner or auditor asking us how we govern and evidence agent-initiated trades and us not having an answer, together with a finished SOC 2 Type II and published latency and failover numbers.",
+  "Robinhood or Coinbase opening customer accounts to AI agents with controls like this, or FINRA putting out guidance that expects agent-level approvals and evidence, plus a completed SOC 2.",
+  "A regulator or exam team (FINRA or the SEC) explicitly expecting third-party-verified agent identity and evidence, so that an outside standard like AINRA passports is something I can't credibly build myself, backed by a finished SOC 2 and a couple of live broker references.",
+  "A regulator or a major banking or custody partner telling us agent activity needs this kind of identity check and audit trail, plus a finished SOC 2 or an open-source core I can self-host.",
+  "A completed SOC 2 Type II report plus one regulated US broker-dealer already running it in production that I can call, and a fixed annual price with no per-action overage.",
+  "A FINRA regulatory notice, SEC rule or enforcement action that makes the broker responsible for controls on customer AI agents, plus a completed SOC 2 Type II report.",
+  "A finished SOC 2 Type II plus a peer broker or one of the big names live on it in production, especially if FINRA starts asking about agent controls.",
+  "A finished SOC 2 Type II plus a flat annual price, with examiners actually asking for agent-identity evidence in this format, so it's clearly not something we'd knock out in a quarter.",
+  "A regulator we answer to publishing a written rule, or an enforcement action, that requires venues to verify and limit customers' AI agents. Then I'd take the free pilot, but only after their SOC 2 is done.",
+  "A written rule, guidance or enforcement action from the SEC, CFTC or NYDFS that holds a venue responsible for controls on customers' AI agents, plus a finished SOC 2 Type II.",
+  "A FINRA regulatory notice, SEC rule or enforcement action that spells out supervision duties for customer AI agents, together with a completed SOC 2 Type II.",
+  "A completed SOC 2 Type II report plus a named peer like Robinhood or Coinbase running it in production for agent orders.",
+  "FINRA guidance or an exam finding saying we must supervise agent-initiated orders no matter what our customer terms say",
+  "A completed SOC 2 Type II report plus two reference customers at regulated US brokers or neobanks, and a flat annual price instead of per-action overage.",
+  "A flat annual price with a hard cap I can put on one budget line, somewhere around $10,000 a year, with no overage surprises.",
+  "A FINRA regulatory notice or an enforcement action that spells out supervision requirements for AI-agent-initiated trading, or an exam finding against us on it, plus a completed SOC 2 Type II.",
+  "A completed SOC 2 Type II plus a peer broker running it in production who an examiner has already looked at, with a flat annual price instead of per-action metering.",
+  "An examiner asking us how we control customer agents' trades. Then I'd want this in place fast and would take the design partner slot.",
+  "An exam finding or FINRA guidance saying customer terms aren't enough and we need our own pre-trade controls on agent orders.",
+  "A regulator saying our terms don't cover us, meaning FINRA or SEC guidance or an exam finding that holds the broker responsible for supervising customer agents, or a real agent incident on our MCP server.",
+  "Seeing Robinhood or Coinbase, or a broker my size, running it in production, plus a finished SOC 2 Type II and a flat annual price with no per-action overage.",
+  "An examiner or our auditor asking how we identify and limit customer AI agents, and the vendor showing a finished SOC 2 Type II plus a live reference at another regulated venue.",
+  "A FINRA or SEC exam finding, or clear regulatory guidance, saying a broker's customer terms are not enough and we need independently verified agent identity plus exportable evidence, and that AINRA or something like it is what examiners accept, backed by a finished SOC 2 Type II.",
+  "AINRA, or whatever Know-Your-Agent standard they check, being run independently of the vendor and adopted by other venues, plus a finished SOC 2 Type II. Then the registry and the exam-ready evidence export would be the parts I can't build myself."
+ ],
+ "purchases_first_month_per_buyer": 1.0,
+ "price_answers": 100
+}

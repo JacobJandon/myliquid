@@ -1,0 +1,13 @@
+{
+  "id": "P097",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't put a vendor with zero customers and no SOC 2 in the path of every customer trade, and I don't go first on anything. If Robinhood or Coinbase puts agent controls like this in front of their agents, I'll have it in next year's plan within two quarters, but today nobody I copy is doing it.",
+  "objection": "An unaudited startup sitting inline between my customers' agents and execution is a new single point of failure my compliance team has to defend. On top of that, per-action overage pricing means I can't give finance a fixed number while I'm locking next year's budget, and the design-partner deal still asks me for a reference and a letter of intent naming a price before I know whether it works.",
+  "would_change_my_mind": "Seeing Robinhood or Coinbase, or a broker my size, running it in production, plus a finished SOC 2 Type II and a flat annual price with no per-action overage.",
+  "price_too_cheap": 300,
+  "price_cheap": 1500,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

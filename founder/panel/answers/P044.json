@@ -1,0 +1,13 @@
+{
+  "id": "P044",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "This sits right in our order path. That's exactly where I won't put a startup with no SOC 2 report and no customers, and my risk committee would kill it in one meeting. Free for six months doesn't change that. The pilot is free, but the risk isn't.",
+  "objection": "If their proxy goes down or gets compromised, my customers' trades stop or go through when they shouldn't, and the vendor is a company nobody has audited and nobody else runs in production. On top of that, AINRA passports aren't a standard I see Robinhood or Coinbase using yet.",
+  "would_change_my_mind": "A finished SOC 2 Type II report plus one of the big players, Robinhood, Coinbase or a broker our size, running it live in front of their agent traffic.",
+  "price_too_cheap": 500,
+  "price_cheap": 2000,
+  "price_expensive": 10000,
+  "price_too_expensive": 25000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P056",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm not putting an unaudited proxy with no customers in front of order flow at a crypto venue, and the identity check rests on a passport registry the same founder started. We already rate-limit every key, so for now I'd tinker with the free tier at most and wouldn't pay anything.",
+  "objection": "AINRA is the vendor's own registry. If the gatekeeper and the passport issuer are the same people, the identity check isn't independent, and without SOC 2 I can't get it past my own security review anyway.",
+  "would_change_my_mind": "Support for an open, independently governed Know-Your-Agent standard (not just AINRA), plus a finished SOC 2 and one live venue I can call as a reference.",
+  "price_too_cheap": 100,
+  "price_cheap": 300,
+  "price_expensive": 1000,
+  "price_too_expensive": 2500
+}

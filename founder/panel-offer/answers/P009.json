@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Shadow mode or not, this is still a proxy sitting inline in front of the MCP server our customers' agents trade through, and I won't put a startup with no customers and an unstarted SOC 2 in that path. No examiner has asked us a question about agent controls that we can't answer yet, and our engineers already rate-limit every key, so nothing is forcing this through vendor risk this quarter.",
+  "objection": "No SOC 2 report, not even a Type I in progress, and zero customers. 'Passes every call through untouched' is a promise; if the proxy falls over or adds latency, it's my order flow and my name on the incident report, and my vendor risk team will stop it at the questionnaire.",
+  "would_change_my_mind": "A regulator or our auditor asking how we supervise and can halt customer AI agents, plus a completed SOC 2 Type I (or a deployment that runs on mirrored traffic only, off the order path), would get me to sign the refundable pilot.",
+  "price_too_cheap": 300,
+  "price_cheap": 800,
+  "price_expensive": 3500,
+  "price_too_expensive": 8000
+}

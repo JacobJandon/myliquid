@@ -1,0 +1,13 @@
+{
+  "id": "P078",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "A proxy that checks limits, routes big trades to a human and has a kill switch is something my team can build in a quarter, and we would rather own that code path than put an unaudited startup in front of every agent order. My competitor shipping agent trading pushes me to build faster, not to buy.",
+  "objection": "No regulator requires this yet, and I'm not putting a vendor with no customers and no SOC 2 inline on my order flow, where an outage or a bad decision is my problem with my customers.",
+  "would_change_my_mind": "A regulator or exam team (FINRA or the SEC) explicitly expecting third-party-verified agent identity and evidence, so that an outside standard like AINRA passports is something I can't credibly build myself, backed by a finished SOC 2 and a couple of live broker references.",
+  "price_too_cheap": 200,
+  "price_cheap": 750,
+  "price_expensive": 3000,
+  "price_too_expensive": 8000
+}

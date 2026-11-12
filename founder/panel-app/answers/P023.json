@@ -1,0 +1,13 @@
+{
+  "id": "P023",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "The pet and streaks honestly sound fun, and I'd probably play with the free demo for a week. But my broker already gives me AI agents for free, and I'm not moving my real money to some future broker partner to pay a monthly fee they haven't even named yet.",
+  "objection": "Why would I pay every month and move my account for an agent when my current broker already has one for free? A cute pet doesn't make that worth it.",
+  "would_change_my_mind": "If it connected to the brokerage account I already have so I didn't have to move money, and the price came in around what Robinhood Gold costs.",
+  "price_too_cheap": 1,
+  "price_cheap": 4,
+  "price_expensive": 10,
+  "price_too_expensive": 15
+}

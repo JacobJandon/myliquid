@@ -1,0 +1,13 @@
+{
+  "id": "P070",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I buy index funds monthly in a broker app that charges me nothing, so I don't see why I'd pay a monthly subscription for a cute pet to do roughly the same thing. I'd play with the free demo out of curiosity, but I won't sign up for a paid plan with no price on it.",
+  "objection": "It's a new app that wants to move my real money and sit between me and my broker, and I have no idea who's behind it or how safe my data and account would be. On top of that it's another subscription, and fees eat returns.",
+  "would_change_my_mind": "A very low price, a few dollars a month, that's clearly cheaper than a robo-advisor fee, plus a well-known licensed broker actually holding the money and a plain statement of what data they keep.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

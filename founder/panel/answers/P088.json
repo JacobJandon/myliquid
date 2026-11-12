@@ -1,0 +1,13 @@
+{
+  "id": "P088",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our terms already put agent risk on the customer, so I don't have a mandate to spend money on this. Every dollar I spend on tooling is a dollar I can't spend on headcount. I might have an engineer poke at the free tier, but I'm not signing anything.",
+  "objection": "This would be a proxy from a startup with no customers and no SOC 2 sitting in my order path. If it goes down or adds latency, my customers' trades stall and I take the heat. Then they want an LOI from me naming a price before I've seen it work at volume.",
+  "would_change_my_mind": "FINRA guidance or an exam finding saying we must supervise agent-initiated orders no matter what our customer terms say",
+  "price_too_cheap": 100,
+  "price_cheap": 400,
+  "price_expensive": 1500,
+  "price_too_expensive": 4000
+}

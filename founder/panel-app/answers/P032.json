@@ -1,0 +1,13 @@
+{
+  "id": "P032",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I use AI at work all day, but I'm not letting an AI agent invest and pay for things with my actual money, cute pet or not. And there's no broker named, no price, nothing real yet, so there's nothing for me to sign up for.",
+  "objection": "A brand-new app wants my brokerage and payment access and lets an AI move money on its own. Is my data safe, who is the broker actually holding my money, and what happens when the AI does something dumb inside my 'limits'?",
+  "would_change_my_mind": "A named, regulated broker holding the money with SIPC coverage, plus a mode where the AI only suggests and nothing moves without my tap, and a clear explanation of what data they keep and who sees it.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P087",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I use AI at work, fine, but I'm not letting a cartoon pet decide where my retirement money goes or pay for things on my behalf. And on top of that I'm not paying a monthly subscription to invest when my broker app already lets me buy index funds for free.",
+  "objection": "An AI moving real money by itself, even 'within limits', is the part I don't trust. If it makes a bad call, a downloadable record of what it did doesn't get my money back.",
+  "would_change_my_mind": "Years of a real track record with real money, through an established licensed broker I already know, where the AI only suggests and never acts without my tap.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I won't put a startup without a SOC 2 report in our order path, and this one has no customers and only a planned audit. Nothing in writing from FINRA or the SEC makes me need agent-level pre-trade controls yet, so it's not going into next year's budget.",
+  "objection": "A proxy that every agent trade has to pass through is now a critical vendor in our order path, and I'd be betting execution and our exam file on an unaudited company with zero references. Even the free design-partner deal costs me engineering time, a public reference and a signed letter of intent naming a price before I know the regulatory picture.",
+  "would_change_my_mind": "A FINRA or SEC rule or enforcement action that requires agent-level pre-trade controls, with a finished SOC 2 Type II report from them by then.",
+  "price_too_cheap": 300,
+  "price_cheap": 1500,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P077",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Our agent volume is tiny today, so I can't justify a line in next year's budget for governing traffic we barely have. We copy what Robinhood and Coinbase ship, and neither has made agent controls table stakes yet, so this waits until they move.",
+  "objection": "This is compliance infrastructure from a startup with no customers and no SOC 2, and it sits in the path of every agent trade and payment. If it goes down or goes under, that's my problem with the regulators. The design partner deal isn't really free for us either: weekly feedback, a reference and a price LOI is a commitment I don't want to make for a category we're not leading in.",
+  "would_change_my_mind": "Robinhood or Coinbase opening customer accounts to AI agents with controls like this, or FINRA putting out guidance that expects agent-level approvals and evidence, plus a completed SOC 2.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

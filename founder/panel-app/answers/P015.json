@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I already buy index funds every payday on a free broker app and ask Claude when I have a question, so a monthly fee just to have an agent push the same buttons eats into my returns. The pet and the demo are fun to try for free, but I'm not signing up for a paid plan with no price on it.",
+  "objection": "I'm not paying a subscription to invest. On a $20k-ish portfolio even $10 a month is a big fee drag compared to a 0.03% ETF, and I can't see what this does that my free broker plus an auto-invest rule doesn't.",
+  "would_change_my_mind": "A free real-money tier or a tiny flat fee under about $3 a month, with the licensed broker named and proof the agent actually saves me more than it costs.",
+  "price_too_cheap": 0.5,
+  "price_cheap": 2,
+  "price_expensive": 4,
+  "price_too_expensive": 7
+}

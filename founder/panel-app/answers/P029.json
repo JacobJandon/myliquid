@@ -1,0 +1,13 @@
+{
+  "id": "P029",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like asking Claude what to do, but I'm the one who presses buy. Letting an agent move my real money, even with limits and a cute pet on it, is a step I'm not ready to take for a plan with no price and no named broker yet.",
+  "objection": "I don't trust an AI with my money. Everything above a limit waits for my tap and there's a kill switch, but the stuff under that limit just happens on its own, and I don't even know which broker would hold my account or what happens if the agent gets it wrong.",
+  "would_change_my_mind": "Naming a real licensed broker I recognize, with SIPC coverage, and letting me run it in propose-only mode on my real account for a few months before it trades anything on its own.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

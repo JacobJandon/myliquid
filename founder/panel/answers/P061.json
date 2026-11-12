@@ -1,0 +1,13 @@
+{
+  "id": "P061",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our terms already put agent risk on the customer, so nobody on the risk committee is losing sleep over this yet. I don't move first anyway: if Coinbase or Robinhood put a gate like this in front of their agent flows, I'd copy it within two quarters, but no one has, and this company has zero customers.",
+  "objection": "You want me to put a pre-SOC 2 startup with no customers inline in our trade and payment path. If your proxy goes down or blocks the wrong thing, that's my outage and my name on it, all to fix a problem our terms already push onto the customer. And a design partnership means weekly meetings, a reference and an LOI with a price on it before I've seen it work.",
+  "would_change_my_mind": "Coinbase or Robinhood running something like this in production, or a regulator saying that putting agent risk on the customer in our terms isn't enough.",
+  "price_too_cheap": 300,
+  "price_cheap": 1500,
+  "price_expensive": 8000,
+  "price_too_expensive": 20000
+}

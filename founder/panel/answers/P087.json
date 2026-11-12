@@ -1,0 +1,13 @@
+{
+  "id": "P087",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "This sits inline in front of our MCP server and gates every agent trade, and there's no SOC 2 report, no customers and no track record. Free for six months doesn't help: my problem isn't cost, it's putting an unaudited startup in the order path and then explaining that to our examiners.",
+  "objection": "If their proxy goes down or makes a wrong call, our customers' orders stall or go through when they shouldn't, and I'm the one who signed for it. Without a completed SOC 2 Type II, a vendor risk review and proof that a major broker trusts them, I can't defend that to FINRA or to my board.",
+  "would_change_my_mind": "A completed SOC 2 Type II report plus a named peer like Robinhood or Coinbase running it in production for agent orders.",
+  "price_too_cheap": 500,
+  "price_cheap": 3000,
+  "price_expensive": 12000,
+  "price_too_expensive": 25000
+}

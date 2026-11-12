@@ -1,0 +1,13 @@
+{
+  "id": "P062",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "We're letting customer agents onto the venue and right now our controls are rate limits plus hope, so I'd take the free design-partner slot and run it in shadow mode next to the order path. I'd sign the LOI only if the price has a ceiling. Paying the Growth tier comes after it proves itself, and it goes into next year's budget as a line item conditional on the pilot.",
+  "objection": "It's an inline proxy from a company with no customers and no SOC 2, sitting in front of order entry on a crypto venue. Every hop adds latency and is one more thing that can go down, and if it fails closed during a volatile hour, agent trading halts and that's on me. Also, how many real agents even carry an AINRA passport today?",
+  "would_change_my_mind": "If the pilot shows p99 added latency over a few milliseconds, or they can't give me a clear fail-open/fail-closed switch and an out-of-band mode, I walk.",
+  "price_too_cheap": 300,
+  "price_cheap": 1500,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "We're opening accounts to agents and I need a control story before the regulators ask. A $1,500 shadow pilot that runs inside our network, blocks nothing and is refunded if compliance rejects the exam pack is an easy yes. The flat monthly price also fixes my usual worry about budgeting per-action fees while I'm setting next year's numbers.",
+  "objection": "They have no customers and haven't started SOC 2. Shadow mode is harmless, but before I put an unknown startup's proxy in the live order path, I need to know it won't add latency or go down. I also need to know they'll still be around in two years.",
+  "would_change_my_mind": "If our vendor-risk team says we can't install software from a vendor with no SOC 2 audit underway, even in shadow mode, I'd wait.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

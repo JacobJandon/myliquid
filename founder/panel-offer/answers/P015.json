@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Shadow mode or not, this is an inline proxy in front of our MCP server, so it sits in the trade path, and nothing gets there without a SOC 2 report, references and a security review. A vendor with no customers and a SOC 2 audit that hasn't started fails my vendor-risk review before $1,500 even comes up, and our terms already put agent risk on the customer anyway.",
+  "objection": "No SOC 2, no references, no track record. If this proxy falls over or misbehaves, every agent order runs through it, and I'm the one explaining to our examiners why we put an unaudited startup in the order path. A 'pass-through' promise doesn't change that.",
+  "would_change_my_mind": "A completed SOC 2 Type I (Type II underway) plus two reference customers at regulated brokers who have run it in production. Then I'd put it in next year's budget as a pilot.",
+  "price_too_cheap": 500,
+  "price_cheap": 2000,
+  "price_expensive": 10000,
+  "price_too_expensive": 25000
+}

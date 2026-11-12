@@ -1,0 +1,13 @@
+{
+  "id": "P079",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "No regulator is asking me for agent controls yet, and every dollar I spend on tooling is a dollar I'm not spending on an engineer. If we do open accounts to agents to keep up with the competitor, I'd start with our own caps and a kill switch, maybe poke at the free tier, but I'm not signing an LOI or a contract.",
+  "objection": "It's a pre-revenue startup with no customers and no SOC 2 asking to sit in the path of every trade and payment on my venue. That's a single point of failure and a vendor risk I'd have to defend, for a problem nobody is forcing me to solve yet.",
+  "would_change_my_mind": "A regulator or a major banking or custody partner telling us agent activity needs this kind of identity check and audit trail, plus a finished SOC 2 or an open-source core I can self-host.",
+  "price_too_cheap": 100,
+  "price_cheap": 400,
+  "price_expensive": 1500,
+  "price_too_expensive": 3500
+}

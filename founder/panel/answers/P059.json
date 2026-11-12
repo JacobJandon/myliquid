@@ -1,0 +1,13 @@
+{
+  "id": "P059",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm not putting a startup with zero customers and no SOC 2 inline in our trade and payment path. Our vendor risk team would kill it before I finished the memo. Our terms already put agent risk on the customer, and I'd rather see what Robinhood and Coinbase build for agent controls and copy it in a quarter or two.",
+  "objection": "This is a new third-party proxy sitting in front of every agent trade. If it goes down or gets breached, that's my exam finding, not theirs, and there's no audit or reference customer behind it.",
+  "would_change_my_mind": "Robinhood or Coinbase running something like this in production, or a FINRA exam or notice that specifically expects pre-trade agent controls, plus a completed SOC 2 Type II.",
+  "price_too_cheap": 500,
+  "price_cheap": 2000,
+  "price_expensive": 8000,
+  "price_too_expensive": 15000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd probably play with the free demo pet on my commute because I love keeping a streak going, but signing up to pay for an AI to move my real money is different. I've got less than $20k saved and nobody is telling me who covers it if the agent messes up.",
+  "objection": "Who is liable if the agent loses money? 'A licensed broker partner, planned later' with no name and no price doesn't tell me who I'd be dealing with or who pays me back if it goes wrong.",
+  "would_change_my_mind": "A named, licensed broker with my account insured, plus a plain written answer on who pays if the agent makes a bad trade, and a few months on the free demo where the pet actually beat my own monthly investing.",
+  "price_too_cheap": 2,
+  "price_cheap": 4,
+  "price_expensive": 9,
+  "price_too_expensive": 15
+}

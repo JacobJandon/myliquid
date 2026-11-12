@@ -1,0 +1,13 @@
+{
+  "id": "P060",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I already invest monthly in a broker app that costs me nothing, and with under $20k in there any monthly fee eats a real chunk of my returns. Paying a subscription for a cartoon pet to do what I already do on my commute doesn't add up for me.",
+  "objection": "It's another subscription with no price yet, on top of whatever the broker partner charges, and a Tamagotchi just feels unserious when it's my actual money.",
+  "would_change_my_mind": "If it were free or a flat few bucks a year with no extra trading fees, and the demo showed it actually beating my plain index fund habit after costs.",
+  "price_too_cheap": 0.5,
+  "price_cheap": 1,
+  "price_expensive": 3,
+  "price_too_expensive": 5
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like making my own trades, and Robinhood and Public already let me do that for free. I'm not paying a monthly fee, at a price they won't even name, so an AI pet can move my real money around.",
+  "objection": "I don't trust an AI with my money, especially from a new app that doesn't even have a broker yet. If it makes a dumb trade, a downloadable log doesn't get my money back.",
+  "would_change_my_mind": "Knowing which licensed, SIPC-covered broker actually holds the money, plus a few months of the demo agent's record clearly beating what I do on my own.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P086",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "No written rule or enforcement action requires agent controls yet, and our customer terms already put agent risk on the customer. One competitor's press release isn't a reason for me to sign anything, even a free pilot that comes with a letter of intent naming a price.",
+  "objection": "This is a startup with no customers and no SOC 2 that wants to sit in the execution path of every agent trade. If it goes down or gets breached, that becomes my problem with FINRA, and the evidence export only matters once a regulator actually asks for it.",
+  "would_change_my_mind": "A FINRA regulatory notice, SEC rule or enforcement action that spells out supervision duties for customer AI agents, together with a completed SOC 2 Type II.",
+  "price_too_cheap": 300,
+  "price_cheap": 1500,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

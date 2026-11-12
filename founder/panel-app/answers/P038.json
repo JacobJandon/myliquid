@@ -1,0 +1,13 @@
+{
+  "id": "P038",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't trust an AI with my money, and I don't need one: I put the same amount into index funds every payday and it already runs itself for free. A cute pet and a monthly fee don't fix a problem I don't have.",
+  "objection": "Letting an AI move my actual savings, even within limits, makes me nervous, and paying a monthly fee on top when I have under $20k invested would eat into returns that my plain index funds get almost for free.",
+  "would_change_my_mind": "Seeing it run on demo money for months without doing anything dumb, plus a real-money account held at a licensed broker I've heard of, at a price that's tiny next to what I invest.",
+  "price_too_cheap": 1,
+  "price_cheap": 2,
+  "price_expensive": 5,
+  "price_too_expensive": 9
+}

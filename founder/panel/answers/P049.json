@@ -1,0 +1,13 @@
+{
+  "id": "P049",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Caps, a human-approval queue and a kill switch in front of our own MCP server is something my team can build in well under a quarter, and we already own that code path. I'm not putting a startup with no customers and no SOC 2 inline on trade execution at a crypto venue.",
+  "objection": "It sits directly in the order path, so its outage or bug is my outage, and it's unaudited. Paying per governed action on top makes the bill grow with exactly the agent traffic I'm trying to encourage, and I can't budget that.",
+  "would_change_my_mind": "A regulator or examiner explicitly asking for independently verified agent identity (KYA) that my team can't stand up in a quarter, plus a finished SOC 2 and a flat annual price.",
+  "price_too_cheap": 200,
+  "price_cheap": 800,
+  "price_expensive": 3000,
+  "price_too_expensive": 6000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P037",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm not handing real money to an app with zero reviews and no name I recognize behind it, and the broker part is just 'planned' with a partner nobody has named. My broker already throws AI tools in for free and my robo-adviser already does the hands-off part, so a waitlist for a paid plan with no price doesn't get me to sign up.",
+  "objection": "No track record, no reviews and no known licensed broker named. If an unknown startup's agent makes a bad trade or the company folds, I don't know who's on the hook for my money.",
+  "would_change_my_mind": "A named, well-known licensed broker holding the money, plus a solid stack of real user reviews after the real-money version has been running a while.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 15,
+  "price_too_expensive": 25
+}

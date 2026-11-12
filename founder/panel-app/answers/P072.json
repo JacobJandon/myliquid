@@ -1,0 +1,13 @@
+{
+  "id": "P072",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I'm not paying a subscription to invest. My broker already auto-buys the same index funds every month for free, so a monthly fee just eats into my returns on a pretty small balance.",
+  "objection": "On under $20k, even $10 a month is a real chunk of what I'd make in a year. And I don't need an AI pet rebalancing a couple of index funds for me.",
+  "would_change_my_mind": "If it were free or a flat fee that's tiny next to my balance, and it clearly beat what my broker's free recurring buys already do.",
+  "price_too_cheap": 1,
+  "price_cheap": 2,
+  "price_expensive": 5,
+  "price_too_expensive": 8
+}

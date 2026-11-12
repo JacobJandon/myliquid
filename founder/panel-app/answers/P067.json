@@ -1,0 +1,13 @@
+{
+  "id": "P067",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I've never heard of MyLiquid, there are no reviews I can read, and the broker isn't even named yet, so I'm not letting a cartoon pet near my real money. And a demo-money version isn't worth my evenings.",
+  "objection": "An unknown company's AI moving my actual savings, with no track record, no reviews and no named licensed broker behind it. A kill switch doesn't fix that.",
+  "would_change_my_mind": "A well-known licensed broker I already recognize, named as the partner, plus a pile of real user reviews after it has run with real money for a while.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

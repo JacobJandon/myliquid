@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "The pet is cute and I'd probably keep a streak going on the free demo, but I'm not paying a monthly subscription on top of my investments when my robo-adviser already does the rebalancing for me. A waitlist for a paid plan with no price yet isn't something I'd sign up for on my commute.",
+  "objection": "A monthly fee eats into returns on a portfolio my size, and I'd be handing real money to an AI agent from an app that's only run on demo money so far, with a broker partner that isn't even named yet.",
+  "would_change_my_mind": "If it cost the same as or less than what my robo-adviser takes now, with no separate subscription, and the broker partner was a name I already trust.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

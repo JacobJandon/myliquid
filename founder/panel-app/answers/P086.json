@@ -1,0 +1,13 @@
+{
+  "id": "P086",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like asking Claude about my portfolio, but I'm the one who taps buy. Letting a cartoon pet trade and pay with my real money, through a broker partner that isn't even named yet, is a step I'm not taking for a plan with no price.",
+  "objection": "I don't trust an AI with my money. Limits and a kill switch sound nice, but if it makes a bad trade the loss is already real by the time I see the record.",
+  "would_change_my_mind": "Naming the licensed broker, with SIPC protection on the account, and a mode where the agent only suggests trades and I approve every one, so I could try it on a small slice for a few months.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

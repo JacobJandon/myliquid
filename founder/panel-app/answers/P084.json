@@ -1,0 +1,13 @@
+{
+  "id": "P084",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already ask ChatGPT about my portfolio and then place the trades myself, and I'm not handing my real retirement money to an AI shaped like a Tamagotchi when the broker isn't even named yet. A waitlist for a plan with no price and no broker is just demo money with extra steps.",
+  "objection": "Who actually holds my money, and what happens when the agent makes a dumb trade inside my limits? A cute pet and a downloadable log don't tell me who's liable.",
+  "would_change_my_mind": "A named, SIPC-covered broker holding the account plus a few months of a real-money track record from other users, with a set price.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 15,
+  "price_too_expensive": 25
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P068",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I already invest for free on Robinhood and ask Claude my money questions for nothing, so a monthly fee just to have a pet do the trades isn't something I'm signing up for, especially when they won't even say what it costs. I might mess around with the free demo money on my commute, but I'm not joining a waitlist for a paid plan.",
+  "objection": "I'm not paying a subscription to invest, and on top of that I'd be handing real money to an AI agent through a broker partner that doesn't exist yet, with no price and no track record.",
+  "would_change_my_mind": "If the demo agent clearly beat what I do on my own for a few months, and the real-money plan came in around Robinhood Gold's price with a named, licensed broker holding my money.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

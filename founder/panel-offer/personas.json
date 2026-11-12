@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Omar",
+  "age": 32,
+  "segment": "Trading-platform vendor",
+  "income": 257000,
+  "behaviour": "Compliance-led",
+  "behaviour_how": "Buys when an examiner, auditor or regulator asks a question the firm cannot answer.",
+  "objection": "I won't put a startup without a SOC 2 report in our order path",
+  "habit": "your last regulatory exam asked how the firm uses AI"
+ },
+ {
+  "id": "P002",
+  "name": "Raj",
+  "age": 41,
+  "segment": "Neobank or fintech with investing",
+  "income": 151000,
+  "behaviour": "Early adopter",
+  "behaviour_how": "Likes being first and will run a pilot with a startup if it moves fast.",
+  "objection": "Why would I trust an identity registry the vendor's founder started?",
+  "habit": "your engineers already rate-limit every API key"
+ },
+ {
+  "id": "P003",
+  "name": "Emil",
+  "age": 43,
+  "segment": "Crypto venue",
+  "income": 306000,
+  "behaviour": "Vendor-risk cautious",
+  "behaviour_how": "Every vendor in the trade path needs a SOC 2 report, references and a security review.",
+  "objection": "Another hop in the order path means latency and a new point of failure",
+  "habit": "you sit on the weekly risk committee"
+ },
+ {
+  "id": "P004",
+  "name": "Owen",
+  "age": 54,
+  "segment": "Agentic trading startup",
+  "income": 232000,
+  "behaviour": "Waits for regulation",
+  "behaviour_how": "Acts on written rules and enforcement actions, not on reports and speeches.",
+  "objection": "We can build this ourselves",
+  "habit": "you are planning next year's budget this quarter"
+ },
+ {
+  "id": "P005",
+  "name": "Sana",
+  "age": 56,
+  "segment": "Crypto venue",
+  "income": 388000,
+  "behaviour": "Compliance-led",
+  "behaviour_how": "Buys when an examiner, auditor or regulator asks a question the firm cannot answer.",
+  "objection": "Why would I trust an identity registry the vendor's founder started?",
+  "habit": "you are planning next year's budget this quarter"
+ },
+ {
+  "id": "P006",
+  "name": "Maya",
+  "age": 44,
+  "segment": "Mid-size retail broker",
+  "income": 259000,
+  "behaviour": "Compliance-led",
+  "behaviour_how": "Buys when an examiner, auditor or regulator asks a question the firm cannot answer.",
+  "objection": "Per-action pricing is hard to budget",
+  "habit": "a competitor announced agent trading last month"
+ },
+ {
+  "id": "P007",
+  "name": "Selin",
+  "age": 44,
+  "segment": "Agentic trading startup",
+  "income": 128000,
+  "behaviour": "Budget-squeezed",
+  "behaviour_how": "Every new tool competes with headcount; prefers free tiers and open source.",
+  "objection": "No regulator requires this yet",
+  "habit": "you sit on the weekly risk committee"
+ },
+ {
+  "id": "P008",
+  "name": "Ruby",
+  "age": 46,
+  "segment": "Mid-size retail broker",
+  "income": 212000,
+  "behaviour": "Fast follower",
+  "behaviour_how": "Watches what Robinhood and Coinbase do and copies it within two quarters.",
+  "objection": "Another hop in the order path means latency and a new point of failure",
+  "habit": "your engineers already rate-limit every API key"
+ },
+ {
+  "id": "P009",
+  "name": "Nora",
+  "age": 33,
+  "segment": "Neobank or fintech with investing",
+  "income": 167000,
+  "behaviour": "Compliance-led",
+  "behaviour_how": "Buys when an examiner, auditor or regulator asks a question the firm cannot answer.",
+  "objection": "I won't put a startup without a SOC 2 report in our order path",
+  "habit": "your engineers already rate-limit every API key"
+ },
+ {
+  "id": "P010",
+  "name": "Fatima",
+  "age": 35,
+  "segment": "Mid-size retail broker",
+  "income": 370000,
+  "behaviour": "Fast follower",
+  "behaviour_how": "Watches what Robinhood and Coinbase do and copies it within two quarters.",
+  "objection": "We can build this ourselves",
+  "habit": "your firm opened an MCP server for customers' agents this year"
+ },
+ {
+  "id": "P011",
+  "name": "Tariq",
+  "age": 38,
+  "segment": "Crypto venue",
+  "income": 307000,
+  "behaviour": "Builds in-house by default",
+  "behaviour_how": "Has an engineering team and buys only what it cannot build in a quarter.",
+  "objection": "I won't put a startup without a SOC 2 report in our order path",
+  "habit": "a competitor announced agent trading last month"
+ },
+ {
+  "id": "P012",
+  "name": "Felix",
+  "age": 40,
+  "segment": "Mid-size retail broker",
+  "income": 371000,
+  "behaviour": "Waits for regulation",
+  "behaviour_how": "Acts on written rules and enforcement actions, not on reports and speeches.",
+  "objection": "Another hop in the order path means latency and a new point of failure",
+  "habit": "you are planning next year's budget this quarter"
+ },
+ {
+  "id": "P013",
+  "name": "Zoe",
+  "age": 35,
+  "segment": "Trading-platform vendor",
+  "income": 191000,
+  "behaviour": "Early adopter",
+  "behaviour_how": "Likes being first and will run a pilot with a startup if it moves fast.",
+  "objection": "Per-action pricing is hard to budget",
+  "habit": "you are planning next year's budget this quarter"
+ },
+ {
+  "id": "P014",
+  "name": "Dev",
+  "age": 47,
+  "segment": "Crypto venue",
+  "income": 276000,
+  "behaviour": "Waits for regulation",
+  "behaviour_how": "Acts on written rules and enforcement actions, not on reports and speeches.",
+  "objection": "No regulator requires this yet",
+  "habit": "you sit on the weekly risk committee"
+ },
+ {
+  "id": "P015",
+  "name": "Yusuf",
+  "age": 35,
+  "segment": "Neobank or fintech with investing",
+  "income": 277000,
+  "behaviour": "Vendor-risk cautious",
+  "behaviour_how": "Every vendor in the trade path needs a SOC 2 report, references and a security review.",
+  "objection": "Our terms already put agent risk on the customer",
+  "habit": "you are planning next year's budget this quarter"
+ },
+ {
+  "id": "P016",
+  "name": "Theo",
+  "age": 58,
+  "segment": "Mid-size retail broker",
+  "income": 318000,
+  "behaviour": "Builds in-house by default",
+  "behaviour_how": "Has an engineering team and buys only what it cannot build in a quarter.",
+  "objection": "We can build this ourselves",
+  "habit": "you sit on the weekly risk committee"
+ },
+ {
+  "id": "P017",
+  "name": "Alma",
+  "age": 48,
+  "segment": "Mid-size retail broker",
+  "income": 252000,
+  "behaviour": "Builds in-house by default",
+  "behaviour_how": "Has an engineering team and buys only what it cannot build in a quarter.",
+  "objection": "We can build this ourselves",
+  "habit": "your engineers already rate-limit every API key"
+ },
+ {
+  "id": "P018",
+  "name": "Freya",
+  "age": 41,
+  "segment": "Neobank or fintech with investing",
+  "income": 316000,
+  "behaviour": "Fast follower",
+  "behaviour_how": "Watches what Robinhood and Coinbase do and copies it within two quarters.",
+  "objection": "No regulator requires this yet",
+  "habit": "a competitor announced agent trading last month"
+ },
+ {
+  "id": "P019",
+  "name": "Harper",
+  "age": 40,
+  "segment": "Mid-size retail broker",
+  "income": 284000,
+  "behaviour": "Budget-squeezed",
+  "behaviour_how": "Every new tool competes with headcount; prefers free tiers and open source.",
+  "objection": "I won't put a startup without a SOC 2 report in our order path",
+  "habit": "your last regulatory exam asked how the firm uses AI"
+ },
+ {
+  "id": "P020",
+  "name": "Emma",
+  "age": 56,
+  "segment": "Crypto venue",
+  "income": 213000,
+  "behaviour": "Builds in-house by default",
+  "behaviour_how": "Has an engineering team and buys only what it cannot build in a quarter.",
+  "objection": "Another hop in the order path means latency and a new point of failure",
+  "habit": "a competitor announced agent trading last month"
+ }
+]

@@ -1,0 +1,13 @@
+{
+  "id": "P081",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our customer terms already put agent risk on the account holder, and no written rule or enforcement action makes us gate agents yet. I'm not bringing a new vendor to the risk committee to solve a problem the regulators haven't told us we have.",
+  "objection": "This is a compliance product sold ahead of the compliance requirement, from a startup with no customers and no SOC 2. If a FINRA or SEC rule on AI agents lands, I'd want a control mapped to that exact text from a vendor that's been audited, not 'FINRA headings' on an export. Putting an unaudited proxy in the order path is a risk in itself, and I won't sign a reference and a letter of intent for a free pilot.",
+  "would_change_my_mind": "A FINRA regulatory notice, SEC rule or enforcement action that makes the broker responsible for controls on customer AI agents, plus a completed SOC 2 Type II report.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

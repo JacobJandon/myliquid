@@ -1,0 +1,13 @@
+{
+  "id": "P036",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "We haven't opened accounts to agents yet, and I won't put a control layer in front of our order flow until FINRA or the SEC writes down what agent controls have to look like. One competitor's press release isn't a rule. I'd also be putting a pre-SOC 2 startup with no customers inline on every trade and payment, and my auditors would ask me why.",
+  "objection": "You're asking me to sign a letter of intent naming a price for something whose rules don't exist yet, from a vendor with no audit and no customers, and it sits in the critical path of every order. On top of that, per-action pricing means my bill grows with agent activity I can't forecast, so I can't put a number in the budget.",
+  "would_change_my_mind": "A written FINRA or SEC rule, or an enforcement action, that makes agent identity checks and human approval above limits an explicit requirement, plus a finished SOC 2 Type II and a flat annual price with no per-action overage.",
+  "price_too_cheap": 300,
+  "price_cheap": 1500,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

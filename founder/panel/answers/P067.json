@@ -1,0 +1,13 @@
+{
+  "id": "P067",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Yes, our competitor's launch puts pressure on me, but I'm not putting a startup with no customers and no SOC 2 report in front of every order we execute. A proxy that can block or delay trades is part of our order path, and if it goes down or gets breached, that's my name on the incident.",
+  "objection": "No SOC 2, no reference customers, and it would sit inline on every trade. It's also a single point of failure from a vendor that could fold in a year, and the evidence it produces is only worth something if a regulator trusts whoever produced it.",
+  "would_change_my_mind": "A completed SOC 2 Type II report plus one live broker or exchange reference. Until then the most I'd do is run the free Developer tier in a sandbox, nowhere near production.",
+  "price_too_cheap": 150,
+  "price_cheap": 500,
+  "price_expensive": 2500,
+  "price_too_expensive": 6000
+}

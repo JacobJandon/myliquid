@@ -1,0 +1,13 @@
+{
+  "id": "P075",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "My broker already puts the same amount into index funds every month for free and I barely look at it. A pet agent rebalancing and paying for things doesn't fix anything for me, and I'm not paying a monthly fee to automate something that's already automatic.",
+  "objection": "It's a demo with no named broker and no price, and I'd be giving a brand-new app's AI permission to move my real money. That's a lot of trust for something that doesn't do much more than my auto-invest already does.",
+  "would_change_my_mind": "A named, licensed broker partner with insured accounts, plus proof the agent actually beats my plain monthly index buy after fees.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

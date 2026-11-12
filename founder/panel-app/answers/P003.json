@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already ask ChatGPT what to do and then make the trades myself, and my broker is rolling out its own AI for free. I don't see why I'd pay another monthly fee for a cartoon pet to do something I can already do without paying.",
+  "objection": "It's a new app with no real-money account yet and no price, and I'd be letting it move my actual savings. At 55 with less than $20k invested, I can't afford to experiment, and I'm not adding a fourth subscription for something my broker gives me free.",
+  "would_change_my_mind": "If it worked inside the broker account I already have and cost nothing extra, with a few months of demo results showing it actually did better than what I do by hand.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

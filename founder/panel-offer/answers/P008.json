@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The price is nothing for us, but I'm not putting a zero-customer, pre-SOC 2 startup in front of our agent order path, even in shadow mode. We already rate-limit every key, and I'd rather wait and copy whatever control layer Robinhood or Coinbase settle on.",
+  "objection": "It's another hop in the order path: more latency and a new point of failure, from a vendor with no production track record and no audit. 'Passes through untouched' still means my orders run through their proxy.",
+  "would_change_my_mind": "Seeing Robinhood, Coinbase or a broker our size run it in production in front of their agent endpoints, with published latency numbers and a SOC 2 Type II report.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

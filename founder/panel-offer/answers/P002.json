@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "We're opening accounts to agents and rate limits don't get me per-customer mandates, a person-in-the-loop over limits, or a kill switch, and they certainly don't get me something I can hand an examiner. $1,500, refundable, shadow-only, and I can run it on our own API keys without touching their passport registry. That's a cheap pilot and I like being first.",
+  "objection": "This is an inline proxy in our trading path from a company with zero customers and no SOC 2 work started. And AINRA is a registry the founder started, so I won't rely on passports until someone independent governs it. Our API keys only.",
+  "would_change_my_mind": "If infosec says an unaudited proxy can't sit inline even in shadow mode, or it adds measurable latency to order calls, I walk.",
+  "price_too_cheap": 250,
+  "price_cheap": 800,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

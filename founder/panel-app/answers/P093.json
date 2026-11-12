@@ -1,0 +1,13 @@
+{
+  "id": "P093",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm curious about letting an agent handle rebalancing, but a cartoon pet running my real money feels like a toy, and there's no named broker and no price yet. I already trade fine on Robinhood for free, so I'm not signing up for a paid plan I can't size up.",
+  "objection": "A Tamagotchi feels unserious for money. I'd want to know which licensed broker actually holds my account and what it costs before I hand an AI any say over real dollars.",
+  "would_change_my_mind": "Naming the licensed broker partner with SIPC protection and a clear monthly price, plus a few months of the demo agent's track record I could check against just holding the index fund myself.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 15,
+  "price_too_expensive": 25
+}

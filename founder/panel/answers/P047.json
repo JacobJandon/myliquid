@@ -1,0 +1,13 @@
+{
+  "id": "P047",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our terms already put agent risk on the customer, and our MCP server already has its own caps, so I can't justify a new line item that competes with a hire. If I wanted extra controls I'd look at an open-source policy layer before paying a startup.",
+  "objection": "You want me to put an unaudited proxy from a company with zero customers in the path of every customer trade and payment. If it goes down or gets breached, that's my outage and my regulator conversation, and 'SOC 2 planned' doesn't get past my vendor review.",
+  "would_change_my_mind": "FINRA or an examiner telling us in writing that our terms aren't enough and we need per-agent authorization controls and decision records, with the gate open source or SOC 2 Type II done by then.",
+  "price_too_cheap": 100,
+  "price_cheap": 400,
+  "price_expensive": 1500,
+  "price_too_expensive": 3500
+}

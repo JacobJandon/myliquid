@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "values",
+  "reason": "I put the same amount into index funds every month and don't look, and that already works fine. A cartoon pet that trades and rebalances for me is the opposite of what I want from my money: boring, set-and-forget, and nothing to babysit.",
+  "objection": "A Tamagotchi feels unserious for money, and there's no broker, no price and no track record yet, so I'd be signing up for a waitlist to hand real savings to an app whose main feature is a pet.",
+  "would_change_my_mind": "If it were with a broker I already recognize and cost clearly less than my robo-adviser for the same hands-off index investing, with the pet something I could switch off.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 9,
+  "price_too_expensive": 15
+}

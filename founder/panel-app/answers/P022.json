@@ -1,0 +1,13 @@
+{
+  "id": "P022",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I put the same amount into index funds every month and barely look at it, so an agent that rebalances and pays for me fixes a problem I don't have. If I want an AI opinion I already ask ChatGPT for free, and my broker is adding its own free agents.",
+  "objection": "Why would I pay a monthly fee and move my retirement money to some broker partner nobody has named yet, just to get what my current broker is about to give me free? The Tamagotchi pet makes it feel like a toy, not a place for real savings.",
+  "would_change_my_mind": "The licensed broker named, plus proof it does something my current broker's free tools can't, like cutting my taxes or fees by more than the plan costs.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

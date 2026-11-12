@@ -1,0 +1,13 @@
+{
+  "id": "P076",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Honestly the pet and streaks are what got me to look, and I'd install the free demo just to play with it. But putting my name on a list for a paid plan where an AI moves my real money, with no broker named and no price, is a step I'm not taking yet.",
+  "objection": "I don't trust an AI with my money. Limits and a kill switch sound nice, but I'd have to see it not do something dumb with demo money for a few months, and I'd need to know which licensed broker actually holds my cash.",
+  "would_change_my_mind": "A named, licensed broker holding the money, plus a couple of months of my own demo record showing the agent stayed inside my limits and didn't do anything I'd regret.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 15,
+  "price_too_expensive": 25
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P028",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "My broker app already buys the same index funds for me every month for free, and I barely look at it, which is how I like it. I don't see what I'd be paying a monthly fee for, and a cartoon pet handling my retirement money feels like a toy, not a tool.",
+  "objection": "A Tamagotchi feels unserious for money, and letting an AI agent invest and pay for me with real dollars through a broker partner nobody has named yet is a big ask for something I'd pay extra for.",
+  "would_change_my_mind": "A named, licensed, insured broker holding the money, plus a few years of the agent's record showing it actually beats my plain monthly index buys after the fee.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

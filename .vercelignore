@@ -2,3 +2,5 @@
 # Anchored to the root: a bare "mobile/" would also drop src/lib/mobile.
 /mobile/
 /android/
+# The founder pack (business plan, panels) is documentation; the site does not need it.
+/founder/

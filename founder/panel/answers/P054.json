@@ -1,0 +1,13 @@
+{
+  "id": "P054",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The problem is real. We opened our MCP server this year and I can't yet show an examiner a clean record of what each agent was allowed to do. But I'm not putting a proxy from a company with no customers and no SOC 2 report in front of our order flow, even for free. Vendor risk would stop it before I got to sign anything.",
+  "objection": "This sits in the order path. If it goes down or gets breached, our trades stop or go wrong, and I'm the one explaining to FINRA why we trusted an unaudited startup with zero production references. A free six-month pilot doesn't change that risk, and the letter of intent with a price is a commitment I'd have to defend.",
+  "would_change_my_mind": "A completed SOC 2 Type II report plus one comparable regulated broker running it in production. Failing that, a pilot in shadow mode, logging only and outside the execution path, so it can't block or alter an order.",
+  "price_too_cheap": 500,
+  "price_cheap": 2500,
+  "price_expensive": 9000,
+  "price_too_expensive": 20000
+}

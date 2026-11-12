@@ -1,0 +1,13 @@
+{
+  "id": "P050",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I already trade for free on Robinhood and Public, and I'm not adding another monthly bill on top of the subscriptions I have just to invest under $20k. Plus I like making my own trades, so I don't need a pet doing it for me.",
+  "objection": "Paying a monthly fee on a small account eats my returns, and the price isn't even set yet, so I'd be signing up for a waitlist to pay for something I can already do for free.",
+  "would_change_my_mind": "If the real-money plan were free or tied to my account size, like a tiny percentage with no flat monthly fee, I'd at least try it.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 10
+}

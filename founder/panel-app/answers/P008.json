@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I put the same amount into index funds every month for free and barely look at it, so I don't need an AI pet doing it for me. I'm not paying a monthly fee to invest when what I have now already works.",
+  "objection": "With under $20k invested, any monthly subscription eats into my returns, and I don't want an app making moves with my money that I'd then have to keep an eye on.",
+  "would_change_my_mind": "If it were free or cost nothing beyond what my broker already charges, and it clearly did better than my plain monthly index fund buys.",
+  "price_too_cheap": 1,
+  "price_cheap": 2,
+  "price_expensive": 5,
+  "price_too_expensive": 8
+}

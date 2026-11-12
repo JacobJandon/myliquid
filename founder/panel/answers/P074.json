@@ -1,0 +1,13 @@
+{
+  "id": "P074",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Our agent volume through the MCP server is tiny today, so your free Developer tier would cover us and I can't justify paying for a control layer that has almost nothing to govern yet. I might take the free design-partner pilot in shadow mode because I like being first, but I wouldn't sign an LOI naming a price right now.",
+  "objection": "You want to sit inline in the path of our customers' trades and payments, and you have no customers and no SOC 2. Our vendor risk team would stop it before it reached production, and if your proxy fails or slows down, that falls on me with the regulator.",
+  "would_change_my_mind": "A completed SOC 2 Type II plus agent-initiated orders on our MCP server growing to the point where a regulator or our board asks how we control them.",
+  "price_too_cheap": 200,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 10000
+}

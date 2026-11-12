@@ -1,0 +1,13 @@
+{
+  "id": "P077",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I use AI all day at work and I've seen it be confidently wrong, so I'm not handing it my money, cute pet or not. And I'm not paying a monthly subscription to invest when my robo-adviser already rebalances for me.",
+  "objection": "An AI agent making trades and payments with real money, run by a startup that doesn't even have its broker partner or price sorted yet. Limits and a kill switch don't fix the fact that it's a bot deciding what to do with my savings.",
+  "would_change_my_mind": "A long, public track record on real money with a named, licensed broker holding the accounts, plus a free tier with no subscription.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

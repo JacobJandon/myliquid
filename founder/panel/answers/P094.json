@@ -1,0 +1,13 @@
+{
+  "id": "P094",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Our agent volume is tiny today, so this solves next year's problem, not this month's. I'd take a call about the design partner slot, but I'm not signing an LOI with a price or putting anything in our order path for a few hundred agent actions a month.",
+  "objection": "An unaudited startup with no customers sitting inline in front of trades. My vendor risk team stops it at 'no SOC 2', and if their proxy goes down, our agent orders go down with it.",
+  "would_change_my_mind": "An examiner asking us how we control customer agents' trades. Then I'd want this in place fast and would take the design partner slot.",
+  "price_too_cheap": 250,
+  "price_cheap": 800,
+  "price_expensive": 2500,
+  "price_too_expensive": 5000
+}

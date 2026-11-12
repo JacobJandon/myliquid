@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I already invest every payday on Robinhood and Public for free, and I can ask Claude about my portfolio whenever I want. I'm not signing up for a monthly fee with no price on it just to have a pet do what my auto-invest already does.",
+  "objection": "It's a subscription with no price yet, for a real-money version that doesn't exist, through a broker partner nobody has named. Letting an agent move my actual money is a big trust jump, and paying monthly for that is the opposite of how I invest now.",
+  "would_change_my_mind": "If the real-money version were free or close to it at the base level, ran through a broker I already know, and the agent showed it could actually beat my plain monthly index buys after fees.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

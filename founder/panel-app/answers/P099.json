@@ -1,0 +1,13 @@
+{
+  "id": "P099",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like the idea of an agent doing the boring rebalancing, but I'm not handing real money to a cartoon pet from an app with no broker partner yet and no price. Robinhood and Public already cost me nothing, and I enjoy making my own trades.",
+  "objection": "A Tamagotchi feels like a game, not something I'd trust with my actual portfolio, and \"licensed broker partner, planned later\" with an unset price is a lot of maybes for me to sign up to pay for.",
+  "would_change_my_mind": "A named, licensed broker actually holding the money with SIPC coverage, plus a few months of the demo agent visibly beating or matching my own index buys after fees.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

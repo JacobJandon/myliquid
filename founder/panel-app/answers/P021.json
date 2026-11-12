@@ -1,0 +1,13 @@
+{
+  "id": "P021",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I use AI all day at work, but I don't let it near my money, and a cartoon pet making trades for me makes that worse, not better. I already put money in my broker app every payday and it takes two minutes, so I don't see what I'd be paying for.",
+  "objection": "An AI moving real dollars on its own, through a broker partner nobody has named, for a price nobody has set. The Tamagotchi makes it feel like a game when it's my savings.",
+  "would_change_my_mind": "A named, licensed broker holding the money with SIPC coverage, plus a mode where the agent only suggests and nothing moves until I tap. And a serious look with the pet turned off.",
+  "price_too_cheap": 2,
+  "price_cheap": 4,
+  "price_expensive": 10,
+  "price_too_expensive": 15
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P048",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "The pet thing is honestly fun and I'd probably play with the free demo on my commute, but I'm not paying a monthly subscription just to invest when my broker app already charges me nothing. Signing up for a paid plan with no price on it isn't something I'd do.",
+  "objection": "I don't want a monthly fee eating into returns on a few thousand bucks a month, and I'm not sure yet that I'd let an AI move my real money through a broker I don't even know the name of.",
+  "would_change_my_mind": "A real-money tier that's free or just a few bucks a month, with the broker named, after I've kept a streak going in the demo for a few weeks and seen the agent not do anything dumb.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

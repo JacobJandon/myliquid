@@ -1,0 +1,13 @@
+{
+  "id": "P057",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our agent volume is tiny today, and a policy-check proxy with caps, approvals and a kill switch is something my team can build in a quarter. Yes, a competitor just announced agent trading, but that's a reason to build our own controls, not to put a startup in the order path.",
+  "objection": "You'd sit in front of trade execution at a crypto venue with no customers and no SOC 2. If your proxy goes down or makes a bad call, it's my matching flow and my regulators, and a free six-month pilot that ends in a letter of intent naming the price doesn't change that.",
+  "would_change_my_mind": "Agent volume actually taking off and a regulator or exam asking for agent-decision evidence our own logs can't produce, with a SOC 2 report and a couple of live venues I can call.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 3500,
+  "price_too_expensive": 7000
+}

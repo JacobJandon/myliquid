@@ -1,0 +1,13 @@
+{
+  "id": "P058",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "A proxy that sits in front of every agent trade and payment is in our order path, and our risk committee won't approve a vendor there with no SOC 2 report, no customers and no references. Making the pilot free doesn't change that, because the risk is the same at any price.",
+  "objection": "If they go down or get breached, our customers' agent orders stop or go wrong, and I'm the one explaining to examiners why we routed trades through an unaudited startup with zero production history. I also can't sign a letter of intent naming a price for something our security review hasn't even started on.",
+  "would_change_my_mind": "A finished SOC 2 Type II report plus two or three regulated brokers or neobanks running it in production who will take my call. Even then I'd start in shadow mode, logging decisions without blocking anything.",
+  "price_too_cheap": 500,
+  "price_cheap": 2500,
+  "price_expensive": 12000,
+  "price_too_expensive": 25000
+}

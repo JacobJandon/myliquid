@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "We already run our own MCP server, and my team could put a logging and limits proxy in front of it in a quarter. I'm not putting a startup with no customers and no SOC 2 audit in the path of customer orders, even in shadow mode, before Robinhood, Coinbase or a peer broker has shown it's the way to go.",
+  "objection": "No customers, no SOC 2, and a five-person design-partner program means vendor risk will take longer to clear than it would take us to build the core of this in-house. The $1,500 is nothing. The procurement review and the exposure if they fold are what cost us.",
+  "would_change_my_mind": "A broker or crypto venue we benchmark against running it in production, or a FINRA examiner accepting their exam pack at a firm our size, plus a SOC 2 Type II report.",
+  "price_too_cheap": 400,
+  "price_cheap": 1500,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

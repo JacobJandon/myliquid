@@ -1,0 +1,13 @@
+{
+  "id": "P053",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I won't put a startup with no SOC 2 report and no customers in our order path, and a free six-month pilot doesn't change that because the proxy still sits in front of every trade. Also, no regulator has written a rule that requires agent passports yet, so I'd be budgeting for a control nobody is enforcing.",
+  "objection": "A proxy in front of our order flow is a single point of failure and a new vendor risk. With no SOC 2, no customers and AINRA as the only identity standard, I'd be the one explaining it to our examiners and our auditors.",
+  "would_change_my_mind": "A completed SOC 2 Type II report, plus a written rule or enforcement action from a regulator that makes agent identity and approval controls an explicit expectation for venues like ours.",
+  "price_too_cheap": 500,
+  "price_cheap": 2000,
+  "price_expensive": 10000,
+  "price_too_expensive": 20000
+}

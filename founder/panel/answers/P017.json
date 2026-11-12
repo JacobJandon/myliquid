@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like being early, and the identity, human-approval and kill-switch layer is something our rate limits don't give me. But I'm not putting a proxy with no SOC 2 and no customers in front of live customer trades, and I won't sign a price LOI and be a reference just to get a free pilot.",
+  "objection": "It sits inline on the order path. If it goes down or gets breached, my customers' trades stop or leak, and my vendor-risk team won't sign off on that without an audit. I'm also not sure the agents hitting our API carry AINRA passports at all, and per-action pricing is hard for me to budget.",
+  "would_change_my_mind": "Let me run it in shadow mode on staging, logging decisions without blocking anything, with no LOI or reference required up front, plus a firm date for the SOC 2 Type I report.",
+  "price_too_cheap": 250,
+  "price_cheap": 800,
+  "price_expensive": 3000,
+  "price_too_expensive": 7500
+}

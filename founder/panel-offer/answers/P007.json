@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "No regulator requires this yet, and $18k a year is a real chunk of a hire for us. I can log agent calls and set caps in front of our MCP server with open-source tooling and our own engineers until FINRA actually asks for it.",
+  "objection": "It's a startup with no customers and no SOC 2 started, so I'd be adding vendor risk I'd have to defend at risk committee to solve a problem nobody is examining us on today. The refundable pilot is cheap, but the $1,500 a month after it is the real decision, and it competes with headcount.",
+  "would_change_my_mind": "A regulator, or our exam team, formally asking how we control customer AI agents, with the Growth tier priced closer to $500 a month.",
+  "price_too_cheap": 50,
+  "price_cheap": 250,
+  "price_expensive": 750,
+  "price_too_expensive": 1500
+}

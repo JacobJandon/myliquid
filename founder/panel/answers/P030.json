@@ -1,0 +1,13 @@
+{
+  "id": "P030",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Caps, a human approval queue and a kill switch in front of our own MCP server is a few sprints for my team, and $1,500 a month competes directly with a hire I'm trying to fit into next year's budget. I might poke at the free Developer tier, but I wouldn't pay for this.",
+  "objection": "We can build the policy checks and approval flow ourselves, and I'd be putting an unaudited startup with no customers in the hot path of every trade and payment our customers' agents make.",
+  "would_change_my_mind": "A regulator or our bank partner explicitly asking for third-party agent identity checks and tamper-evident evidence, so building it in-house stops being good enough.",
+  "price_too_cheap": 50,
+  "price_cheap": 200,
+  "price_expensive": 800,
+  "price_too_expensive": 1500
+}

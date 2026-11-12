@@ -1,0 +1,13 @@
+{
+  "id": "P055",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our terms already put agent risk on the customer, and no examiner or auditor has asked us how we supervise agent-initiated orders, so this doesn't make next year's budget. I'm also not putting a vendor with no customers and no SOC 2 in the path of every trade, even for free.",
+  "objection": "It's an unaudited startup sitting inline on our order and payment flow, and I'd be signing a letter of intent naming a price for a problem our regulators haven't raised yet.",
+  "would_change_my_mind": "A FINRA exam or audit finding that asks us to show how we supervise and evidence AI agent trades and we can't answer it.",
+  "price_too_cheap": 200,
+  "price_cheap": 750,
+  "price_expensive": 3000,
+  "price_too_expensive": 6000
+}

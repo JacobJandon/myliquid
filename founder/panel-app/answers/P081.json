@@ -1,0 +1,13 @@
+{
+  "id": "P081",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already ask ChatGPT or Claude for free and then place the trades myself, so I stay in control. I don't see why I'd pay every month to let a cartoon pet move my real money, especially when there's no price yet and the broker partner isn't even named.",
+  "objection": "Who is liable if the agent loses money? A record I can download doesn't help me if my account is down, and with under $20k invested I can't afford to find out the hard way.",
+  "would_change_my_mind": "A named, licensed broker with SIPC coverage holding the money, plus clear written terms on who pays if the agent makes a mistake, and a few months of me watching it on the demo account beat what I do by hand.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

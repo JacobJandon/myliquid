@@ -1,0 +1,13 @@
+{
+  "id": "P038",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "No regulator requires agent-level controls yet, and when the examiners asked how we use AI, we answered with our existing model-risk and supervision policies. I don't spend budget on a control nobody is asking me to evidence.",
+  "objection": "You want to put a proxy with no customers and no SOC 2 into our trade and payment path. Our third-party risk review would stop that before I could even argue for it, and the free pilot still makes me sign a letter of intent naming a price.",
+  "would_change_my_mind": "An examiner or a FINRA notice explicitly asking us to show controls and an audit trail for customer AI agents, together with a finished SOC 2 Type II report.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

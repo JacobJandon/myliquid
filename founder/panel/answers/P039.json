@@ -1,0 +1,13 @@
+{
+  "id": "P039",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Nothing goes into our trade path without a SOC 2 report, references and a security review, and this vendor has none of the three, so it can't even get through procurement, free pilot or not. And our terms already put agent risk on the customer, so I don't feel enough pain to make an exception for an unaudited proxy sitting in front of our MCP server.",
+  "objection": "An early-stage startup with no customers and no SOC 2 becomes a single point of failure and a new attack surface in front of every agent trade on our venue; if their proxy goes down or gets compromised, that's my outage and my incident, not theirs.",
+  "would_change_my_mind": "A completed SOC 2 Type II plus two or three referenceable venues or brokers already running it in production, ideally combined with a regulator or our auditors starting to ask how we control customer agents.",
+  "price_too_cheap": 300,
+  "price_cheap": 1500,
+  "price_expensive": 6000,
+  "price_too_expensive": 15000
+}

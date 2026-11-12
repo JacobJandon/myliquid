@@ -1,0 +1,13 @@
+{
+  "id": "P034",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't put a pre-customer vendor with no SOC 2 in the execution path of customer trades, and nobody I answer to has asked me a question this would answer yet. A competitor's press release isn't an examiner's letter.",
+  "objection": "The identity check rests on AINRA passports, a registry the vendor's own founder started, so the thing vouching for the agent is the vendor grading its own homework. If my examiner asks why I trusted that registry, 'the proxy vendor runs it' is the worst answer I could give.",
+  "would_change_my_mind": "An examiner or auditor asking us how we identify and limit customer agents, with the identity check backed by an independent Know-Your-Agent standard rather than the founder's registry, and a finished SOC 2 Type II report.",
+  "price_too_cheap": 500,
+  "price_cheap": 2500,
+  "price_expensive": 10000,
+  "price_too_expensive": 25000
+}

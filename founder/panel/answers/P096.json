@@ -1,0 +1,13 @@
+{
+  "id": "P096",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our customer terms already put agent risk on the customer, and nobody, not FINRA, not our board, not our customers, is asking me for an agent gate yet. I like being first and I'd take a demo, but I'm not signing up when I don't feel the pain.",
+  "objection": "This would put an unaudited startup with zero customers inline on every customer trade. If it goes down, orders stop, and I'd lose that vendor-risk review before the pilot even started. Free for six months doesn't help if I also have to give you an LOI with a price and a public reference.",
+  "would_change_my_mind": "A regulator saying our terms don't cover us, meaning FINRA or SEC guidance or an exam finding that holds the broker responsible for supervising customer agents, or a real agent incident on our MCP server.",
+  "price_too_cheap": 250,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

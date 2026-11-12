@@ -1,0 +1,13 @@
+{
+  "id": "P090",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I'm building next year's budget right now and this isn't in it. A metered tool from a startup with no customers loses to a headcount line every time. At most I'd let my engineers poke at the free Developer tier. That isn't buying.",
+  "objection": "Per-action pricing is hard to budget. If agent traffic takes off, my bill takes off with it, and I can't walk into a budget review with 'it depends how much the bots trade.' On top of that, it's a pre-SOC 2 vendor sitting inline on order flow, and my vendor risk team will stall it anyway.",
+  "would_change_my_mind": "A flat annual price with a hard cap I can put on one budget line, somewhere around $10,000 a year, with no overage surprises.",
+  "price_too_cheap": 100,
+  "price_cheap": 400,
+  "price_expensive": 1500,
+  "price_too_expensive": 3000
+}

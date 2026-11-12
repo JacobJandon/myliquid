@@ -1,0 +1,13 @@
+{
+  "id": "P042",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't trust an AI with my money, and I'm not signing up for another monthly subscription with no price on it just to have a cartoon pet move my index funds around. I already buy my ETFs monthly in my broker app for free.",
+  "objection": "Letting an AI invest and pay for me with real money, even with limits, through a broker partner that isn't even named yet. If it screws up, it's my small account that takes the hit.",
+  "would_change_my_mind": "A long public track record on real money with a named, licensed broker, plus a flat price of a couple of dollars a month or less, cheaper than what I'd pay a robo-advisor on my balance.",
+  "price_too_cheap": 0.5,
+  "price_cheap": 2,
+  "price_expensive": 4,
+  "price_too_expensive": 7
+}

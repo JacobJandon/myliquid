@@ -1,0 +1,13 @@
+{
+  "id": "P073",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "A proxy that checks caps, sends big orders to a human and has a kill switch is a quarter of work for my team, and we'd own it in our own execution path. The competitor news makes me want to ship faster, but I'd still have us build it before I'd sign a letter of intent with a startup that has no customers.",
+  "objection": "I'd be putting an unproven vendor with no SOC 2 and no customers in front of every agent trade. If their proxy goes down or makes a bad call, my customers' orders stall and I'm the one explaining it to the examiners.",
+  "would_change_my_mind": "If our clearing firm or a regulator started requiring verified agent passports and they were the only practical way to plug in quickly.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

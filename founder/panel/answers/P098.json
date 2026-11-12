@@ -1,0 +1,13 @@
+{
+  "id": "P098",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "No examiner has asked us about agent controls yet, and I'm not putting a vendor with no customers and no SOC 2 inline in front of our trade and payment path. If we need caps, a kill switch and an approval queue, my engineers can build that on top of the logging we already have.",
+  "objection": "This proxy sits on every agent trade and payment. If it fails or gets breached, that's my exam finding, and 'the startup's audit was planned' won't hold up with vendor risk or a regulator.",
+  "would_change_my_mind": "An examiner or our auditor asking how we identify and limit customer AI agents, and the vendor showing a finished SOC 2 Type II plus a live reference at another regulated venue.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

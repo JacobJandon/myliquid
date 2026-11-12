@@ -1,0 +1,13 @@
+{
+  "id": "P050",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The caps, approval queue, kill switch and hash-chained audit log are a quarter's work for my team, so the only part I can't build is agent identity. That's the AINRA registry your own founder started, and I won't make a pre-SOC 2 startup with no customers the trust anchor for every agent order on my venue. Even free, the design-partner deal wants my name as a reference and a signed LOI, and I'm not putting either on that.",
+  "objection": "Why would I trust an identity registry the vendor's founder started? If that registry gets gamed or shuts down, my regulators come to me, not to them.",
+  "would_change_my_mind": "If the passport check ran against an independent, multi-party Know-Your-Agent standard that no single vendor controls, I'd take a pilot to get to market faster than my competitor.",
+  "price_too_cheap": 500,
+  "price_cheap": 2000,
+  "price_expensive": 8000,
+  "price_too_expensive": 15000
+}

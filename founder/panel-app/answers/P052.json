@@ -1,0 +1,13 @@
+{
+  "id": "P052",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "My money already goes into index funds every month on autopilot and I barely look at it, so an AI pet that invests and rebalances for me solves a problem I don't have. And a demo-money app with an unpriced paid plan isn't worth signing up for on my commute.",
+  "objection": "Why would I pay a monthly fee for an agent to manage what a free recurring index buy already does, and hand spending and trading power to an app that isn't even a real broker yet?",
+  "would_change_my_mind": "A real-money account at a licensed broker that clearly costs less than what I pay now in total, and shows it beats my plain monthly index buy after fees.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P004",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "No regulator has written a rule or brought an enforcement case that says I need a separate gate in front of agent MCP calls. Until one does, caps, a kill switch and a decision log are things my team can build ourselves on the API keys we already issue. The price is fine, but I'm not putting a line in next year's budget for a vendor with no customers and no SOC 2 to fix a problem the rules don't make me fix yet.",
+  "objection": "We can build this ourselves, and 'mapped to FINRA's expectations' means guidance and speeches, not a rule I'll be examined on. Also, putting a pre-SOC 2 startup's proxy in front of order flow is a vendor-risk headache my compliance team won't sign off on lightly.",
+  "would_change_my_mind": "A written FINRA rule, an exam finding or an enforcement action that specifically requires pre-trade controls and audit evidence for customer AI agents, plus a finished SOC 2 report from the vendor.",
+  "price_too_cheap": 300,
+  "price_cheap": 800,
+  "price_expensive": 3000,
+  "price_too_expensive": 6000
+}

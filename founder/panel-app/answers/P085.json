@@ -1,0 +1,13 @@
+{
+  "id": "P085",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already ask Claude about my portfolio, but then I make the trades myself, and that's on purpose. A cute pet that invests and pays for me with real money is exactly the part I don't want to hand over, and with no broker named and no price set there's nothing here for me to sign up for yet.",
+  "objection": "I don't trust an AI to act with my money, even within limits. A kill switch and a downloadable record only help after something has already gone wrong, and I'd still be the one stuck explaining a bad trade to myself.",
+  "would_change_my_mind": "A named, licensed broker holding the money with SIPC coverage, plus a few months of watching it run on demo money where it only suggests and I approve every trade.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 12,
+  "price_too_expensive": 20
+}

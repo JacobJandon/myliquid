@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Right now it's demo money, and the real version has no named broker and no price, so there's nothing real to sign up for. I'm not putting my paycheck behind an AI pet from an app I've never heard of.",
+  "objection": "Robinhood is free and I can already ask Claude what to buy. Why would I pay every month for an agent to make trades I like making myself, with an unnamed broker holding my money?",
+  "would_change_my_mind": "Naming the actual licensed broker (one I recognize, SIPC-covered) along with a real monthly price.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

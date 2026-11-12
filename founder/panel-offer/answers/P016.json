@@ -1,0 +1,13 @@
+{
+  "id": "P016",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "A proxy that checks keys, enforces caps, routes big orders to a person and has a kill switch is a quarter's work for my team, and we'd own it instead of putting a startup's code in front of customer order flow. The price isn't the problem; we just build this kind of thing ourselves.",
+  "objection": "A vendor with no customers and no SOC 2 sitting in our order path, even in shadow mode. Vendor risk review and security sign-off would cost more staff time than the $1,500, and if they fold in two years I'm left with a control I can't maintain in front of FINRA.",
+  "would_change_my_mind": "My engineering lead telling me we can't ship the equivalent, exam-ready control mapping included, inside a quarter.",
+  "price_too_cheap": 400,
+  "price_cheap": 1500,
+  "price_expensive": 5000,
+  "price_too_expensive": 10000
+}

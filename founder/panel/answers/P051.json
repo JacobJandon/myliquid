@@ -1,0 +1,13 @@
+{
+  "id": "P051",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "You're asking me to put a pre-SOC 2 startup with zero customers inline on every agent trade, and to trust an identity registry your own founder started. My engineers already rate-limit every key, so at most I'd poke at the free tier. I won't sign a letter of intent with a price in it.",
+  "objection": "AINRA passports are the vendor's own registry, so the identity check is only as neutral as the company selling it. If you go under or your proxy goes down, my agents' order flow stops with you.",
+  "would_change_my_mind": "A completed SOC 2 plus support for an independent Know-Your-Agent standard that isn't controlled by MyLiquid, with the proxy available self-hosted or open source so it can't become a single point of failure.",
+  "price_too_cheap": 100,
+  "price_cheap": 400,
+  "price_expensive": 1500,
+  "price_too_expensive": 4000
+}

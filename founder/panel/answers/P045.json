@@ -1,0 +1,13 @@
+{
+  "id": "P045",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Our agent volume is tiny today and no written rule or enforcement action tells me what agent controls have to look like, so I'm not putting a proxy in front of customer trades yet. The exam question on AI I can answer with our current policies and manual review.",
+  "objection": "A startup with no customers and no SOC 2 sitting in the order path for customer trades is a vendor risk I'd have to explain to examiners. And the 'free' pilot asks me for a reference and a letter of intent naming a price, which I won't sign for an unaudited vendor.",
+  "would_change_my_mind": "A FINRA rule, notice or enforcement action that spells out supervision requirements for AI agents trading in customer accounts.",
+  "price_too_cheap": 200,
+  "price_cheap": 750,
+  "price_expensive": 3000,
+  "price_too_expensive": 8000
+}

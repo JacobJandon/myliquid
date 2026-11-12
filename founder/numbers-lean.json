@@ -1,0 +1,71 @@
+{
+ "business": "MyLiquid Gate (Growth plan), lean: no engineer or BD hire before paying customers",
+ "unit": "paying customer-month",
+ "price": 1500,
+ "variable": [
+  {
+   "label": "Card processing on a $1,500 invoice (2.9% + $0.30, research.md) [worst case; ACH is cheaper]",
+   "cost": 43.8
+  },
+  {
+   "label": "Compute and database for 1M governed actions (estimate: plan says fractions of a cent per 1,000)",
+   "cost": 25
+  },
+  {
+   "label": "Evidence storage and exports (estimate)",
+   "cost": 5
+  }
+ ],
+ "fixed_monthly": [
+  {
+   "label": "Two founders, below-market ($180k/yr, plan \u00a78)",
+   "cost": 15000
+  },
+  {
+   "label": "Fractional CCO (plan \u00a78)",
+   "cost": 4000
+  },
+  {
+   "label": "Infrastructure, market data, Claude API ($30k/yr, plan \u00a78)",
+   "cost": 2500
+  },
+  {
+   "label": "Insurance: E&O, cyber, D&O ($25k/yr, plan \u00a78)",
+   "cost": 2083
+  },
+  {
+   "label": "Go to market: events, hackathons, design, travel ($50k/yr, plan \u00a78)",
+   "cost": 4167
+  },
+  {
+   "label": "SOC 2 compliance platform (~$10k/yr, research.md range $7.5-15k)",
+   "cost": 833
+  }
+ ],
+ "startup": [
+  {
+   "label": "Legal: incorporation, regulatory opinion, contracts, trademark (plan \u00a78)",
+   "cost": 40000
+  },
+  {
+   "label": "SOC 2 Type I and II audits plus pen test ($70k plan \u00a78 minus the platform above)",
+   "cost": 60000
+  }
+ ],
+ "days_per_month": 1,
+ "plan_per_day": 13,
+ "ramp_per_day": [
+  0,
+  0,
+  0,
+  0,
+  1,
+  1,
+  2,
+  4,
+  6,
+  8,
+  10,
+  13
+ ]
+}

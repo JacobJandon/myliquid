@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "My team already rate-limits every key and could build caps, an approval queue and a kill switch for agent accounts inside a quarter, and no regulator is asking me for this yet. I don't buy what I can build, especially not something that sits in my order path.",
+  "objection": "Putting a pre-revenue startup with no customers and no SOC 2 as a proxy in front of every customer trade is a latency, uptime and vendor-risk problem I'd have to defend to my own compliance people, for a requirement that doesn't exist yet.",
+  "would_change_my_mind": "FINRA or the SEC making agent identity checks and decision evidence an explicit exam expectation, so the passport verification and export formats become something I can't credibly build and keep current myself.",
+  "price_too_cheap": 200,
+  "price_cheap": 500,
+  "price_expensive": 2500,
+  "price_too_expensive": 6000
+}

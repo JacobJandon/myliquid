@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "No regulator requires agent-specific controls yet, and neither Robinhood nor Coinbase has shown me they run something like this, so I'm not going to be the design partner. The $1,500 isn't the issue; pushing a startup with no customers and no SOC 2 through vendor risk to sit in front of our MCP server is weeks of work for something nobody is asking us for.",
+  "objection": "It isn't required. On top of that, I'd be the first customer of a vendor with no SOC 2. Shadow mode lowers the risk, but my security team still has to approve software inside our network, and I can't point to anyone bigger who has done it.",
+  "would_change_my_mind": "FINRA putting out a notice or exam finding that expects specific controls on orders placed by AI agents, or seeing Robinhood or Coinbase put a gate like this in front of their agent trading.",
+  "price_too_cheap": 200,
+  "price_cheap": 800,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

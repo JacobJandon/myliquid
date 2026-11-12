@@ -1,0 +1,41 @@
+{
+  "business": "MyLiquid Gate (runtime controls for AI agents at brokers, crypto venues and neobanks)",
+  "target": "the person who would sign for agent controls (head of product, CTO or chief compliance officer) at a US mid-size broker, crypto venue or neobank that opened, or plans to open, customer accounts to AI agents",
+  "where": "United States, sold online and through design partners",
+  "_sources": "Segments from docs/discovery/1-problem-and-audience.md (segment D) and docs/startup/plan.md (who buys, in order). Objections from founder/board.md and founder/competitors.md. Segment shares, salary ranges and behaviour shares are estimates, not data; no interviews have been done yet.",
+  "age": [32, 58],
+  "segments": [
+    {"name": "Mid-size retail broker", "share": 0.35, "income": [180000, 380000]},
+    {"name": "Crypto venue", "share": 0.25, "income": [160000, 400000]},
+    {"name": "Neobank or fintech with investing", "share": 0.20, "income": [150000, 320000]},
+    {"name": "Trading-platform vendor", "share": 0.12, "income": [170000, 350000]},
+    {"name": "Agentic trading startup", "share": 0.08, "income": [120000, 250000]}
+  ],
+  "behaviours": [
+    {"name": "Builds in-house by default", "share": 0.18, "how": "Has an engineering team and buys only what it cannot build in a quarter."},
+    {"name": "Compliance-led", "share": 0.18, "how": "Buys when an examiner, auditor or regulator asks a question the firm cannot answer."},
+    {"name": "Waits for regulation", "share": 0.14, "how": "Acts on written rules and enforcement actions, not on reports and speeches."},
+    {"name": "Fast follower", "share": 0.14, "how": "Watches what Robinhood and Coinbase do and copies it within two quarters."},
+    {"name": "Vendor-risk cautious", "share": 0.12, "how": "Every vendor in the trade path needs a SOC 2 report, references and a security review."},
+    {"name": "Budget-squeezed", "share": 0.12, "how": "Every new tool competes with headcount; prefers free tiers and open source."},
+    {"name": "Early adopter", "share": 0.12, "how": "Likes being first and will run a pilot with a startup if it moves fast."}
+  ],
+  "objections": [
+    "We can build this ourselves",
+    "No regulator requires this yet",
+    "I won't put a startup without a SOC 2 report in our order path",
+    "Our agent volume is tiny today",
+    "Our terms already put agent risk on the customer",
+    "Another hop in the order path means latency and a new point of failure",
+    "Why would I trust an identity registry the vendor's founder started?",
+    "Per-action pricing is hard to budget"
+  ],
+  "habits": [
+    "your firm opened an MCP server for customers' agents this year",
+    "you sit on the weekly risk committee",
+    "your last regulatory exam asked how the firm uses AI",
+    "you are planning next year's budget this quarter",
+    "your engineers already rate-limit every API key",
+    "a competitor announced agent trading last month"
+  ]
+}

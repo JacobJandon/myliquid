@@ -1,0 +1,13 @@
+{
+  "id": "P045",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like asking Claude about my portfolio, but I still press the buttons myself, and a cartoon pet moving my retirement money feels like a toy, not a tool. With no broker named, no price and only demo money so far, I'm not paying or even signing up for the paid plan yet.",
+  "objection": "Handing an AI permission to trade and pay with my real money when I don't know which broker holds it, who is liable if it makes a bad call, and the whole thing is dressed up as a Tamagotchi.",
+  "would_change_my_mind": "A named, licensed broker holding the money with SIPC coverage, plus a few months of seeing its demo decisions beat or match what I'd have done myself, with a serious no-pet view.",
+  "price_too_cheap": 3,
+  "price_cheap": 8,
+  "price_expensive": 20,
+  "price_too_expensive": 35
+}

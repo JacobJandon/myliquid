@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "A proxy that logs MCP calls, checks caps per key and has a kill switch is something my team can build in a quarter. We already rate-limit every key, so we'd extend what we have instead of putting a vendor in the order path.",
+  "objection": "You have no customers and haven't started SOC 2, and you're asking to sit in front of order flow. Even in shadow mode, my compliance team will spend more time doing vendor due diligence on you than my engineers would spend building the logging.",
+  "would_change_my_mind": "If our compliance team or a FINRA examiner said the exam pack's control mapping is something we couldn't credibly produce ourselves in a quarter, I'd run the refundable pilot.",
+  "price_too_cheap": 300,
+  "price_cheap": 750,
+  "price_expensive": 3000,
+  "price_too_expensive": 8000
+}

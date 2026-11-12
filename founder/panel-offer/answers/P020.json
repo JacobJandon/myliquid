@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Per-agent caps, a human-review queue and a kill switch in front of our own MCP server are something my team can build inside a quarter, so by default we build it. Even in shadow mode this is an unaudited startup's proxy sitting inline on our order path, and that's not where I take a chance, competitor announcement or not.",
+  "objection": "It's another hop in the order path: added latency and a new single point of failure from a vendor with no customers and no SOC 2. If it hiccups, my matching flow hiccups. Also, a FINRA and MAS SAFR mapping doesn't speak to how a US crypto venue actually gets examined.",
+  "would_change_my_mind": "A true out-of-path shadow mode that reads a mirrored copy of our MCP traffic asynchronously, plus published p99 latency and fail-open/fail-closed behavior for when we switch on enforcement.",
+  "price_too_cheap": 300,
+  "price_cheap": 750,
+  "price_expensive": 4000,
+  "price_too_expensive": 10000
+}

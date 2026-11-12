@@ -1,0 +1,13 @@
+{
+  "id": "P094",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason": "I might play with the free demo pet for a few days because I like keeping streaks, but I'm not signing up to let an AI move my real retirement money, and I don't even know which broker it would be or what it costs.",
+  "reason_code": "trust",
+  "objection": "I don't trust an AI with my money. Asking ChatGPT a question is one thing, but letting it invest and pay for me is another, and a cute pet makes it feel more like a game than something I'd trust with real savings.",
+  "would_change_my_mind": "Knowing the licensed broker partner by name, with my account insured like it is at my robo-adviser, plus a few months of watching the demo agent behave sensibly before any real money is involved.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 15,
+  "price_too_expensive": 25
+}

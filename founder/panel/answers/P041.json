@@ -1,0 +1,13 @@
+{
+  "id": "P041",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "No written rule or enforcement action tells me I need a separate agent-control layer yet, and my engineers already rate-limit every key. I'm not putting an unaudited startup's proxy in my order path just to get ahead of a rule that doesn't exist.",
+  "objection": "Another hop in the order path means added latency and a new single point of failure, and it comes from a company with no customers and no SOC 2 report. If it goes down or slows down, my customers' orders fail, and that's my problem with the regulator, not theirs.",
+  "would_change_my_mind": "A FINRA rule, notice or enforcement action that specifically requires controls and human approval on AI-agent trading in customer accounts.",
+  "price_too_cheap": 200,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

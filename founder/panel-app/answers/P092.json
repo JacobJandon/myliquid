@@ -1,0 +1,13 @@
+{
+  "id": "P092",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The pet and the streak thing honestly hook me, and I'd mess around with the free demo money on my commute. But putting my real money behind an AI, through a broker you haven't even named, at a price you haven't set? I'm not signing up for that yet.",
+  "objection": "I don't trust an AI with my money. A cute pet and a kill switch don't tell me who actually holds my account or who pays if the agent makes a dumb trade.",
+  "would_change_my_mind": "Months of the demo agent doing sensible things with my demo portfolio, plus a named, licensed broker that I recognize holding the real money.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 8,
+  "price_too_expensive": 15
+}

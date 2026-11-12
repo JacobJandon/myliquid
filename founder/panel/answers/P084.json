@@ -1,0 +1,13 @@
+{
+  "id": "P084",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "No written rule or enforcement action makes us govern customers' agents yet, and our terms already put agent risk on the customer. I'm not putting a pre-SOC 2 startup in the trade path of our MCP server ahead of a requirement.",
+  "objection": "It's a proxy in front of every order from a vendor with no customers and no SOC 2. If it fails closed I halt trading, if it fails open I paid for nothing. And FINRA and MAS evidence headings don't match who actually examines a US crypto venue.",
+  "would_change_my_mind": "A regulator we answer to publishing a written rule, or an enforcement action, that requires venues to verify and limit customers' AI agents. Then I'd take the free pilot, but only after their SOC 2 is done.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

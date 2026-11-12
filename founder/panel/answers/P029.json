@@ -1,0 +1,13 @@
+{
+  "id": "P029",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "No FINRA rule or enforcement action on agents trading in customer accounts makes me do this today, and our engineers already rate-limit every API key. I'm not putting an unaudited startup's proxy in my order path before the regulators have said what they expect.",
+  "objection": "Another hop in the order path means latency and a new point of failure, and it comes from a vendor with no customers and no SOC 2. If their proxy goes down or slows down, my customers' orders are the ones that get hurt, and I'm the one explaining it to the regulator.",
+  "would_change_my_mind": "A written FINRA rule or a real enforcement action over a broker's lack of controls on AI agents trading customer accounts, plus a finished SOC 2 report.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 5000,
+  "price_too_expensive": 12000
+}

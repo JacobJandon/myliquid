@@ -1,0 +1,13 @@
+{
+  "id": "P033",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "My broker already buys the same index funds for me every payday for free, and I barely open it. I don't need a pet agent rebalancing and paying for things, and paying a monthly fee for something I already get free makes no sense.",
+  "objection": "A Tamagotchi feels unserious for my actual savings, and right now it's demo money with no broker or price named, so I'd be signing up for a fee on a promise.",
+  "would_change_my_mind": "If it ran inside a licensed broker I already trust, let me turn the pet off, and cost a couple of dollars a month while clearly beating what my free recurring buy does.",
+  "price_too_cheap": 1,
+  "price_cheap": 3,
+  "price_expensive": 7,
+  "price_too_expensive": 12
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P039",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I pay a robo-adviser maybe eight bucks a month in fees and that already feels like plenty, so I'm not adding a subscription with no price on it yet just to have a cute pet do roughly the same rebalancing. A waitlist for a paid plan with an unknown price is a no from me.",
+  "objection": "It's a brand-new app that wants an AI to move my real money and connect to a broker that isn't even named yet. I'd want to know who holds my account and my data before I hand over anything.",
+  "would_change_my_mind": "A real-money version with no monthly fee, or one that costs less than my robo-adviser all-in, through a named, SIPC-insured broker.",
+  "price_too_cheap": 1,
+  "price_cheap": 2,
+  "price_expensive": 5,
+  "price_too_expensive": 9
+}

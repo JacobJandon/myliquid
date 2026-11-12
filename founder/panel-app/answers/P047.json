@@ -1,0 +1,13 @@
+{
+  "id": "P047",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't trust an AI with my money, and this is a brand I've never heard of with no reviews and no named broker yet. My robo-adviser already handles my paydays without a cartoon pet, so I'm not signing up for a paid real-money plan on a demo.",
+  "objection": "An unknown startup's AI agent placing trades and making payments with my real paycheck, before there's a single review or a licensed broker I can actually name.",
+  "would_change_my_mind": "The licensed broker partner being a name I already know, plus a solid pile of independent reviews from people using it with real money for a while.",
+  "price_too_cheap": 2,
+  "price_cheap": 5,
+  "price_expensive": 15,
+  "price_too_expensive": 30
+}

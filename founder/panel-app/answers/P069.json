@@ -1,0 +1,13 @@
+{
+  "id": "P069",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I already invest monthly in a free broker app and ask Claude for free, so paying a monthly fee for an agent to do the same thing makes no sense to me. A demo-money pet doesn't tell me it would be worth paying for, and you won't even say what it costs.",
+  "objection": "It's another subscription with no price on top of a broker partner that will probably have its own fees, and fees eat returns on index funds. I don't see what it does that my broker's auto-invest doesn't already do for free.",
+  "would_change_my_mind": "A real-money version that's free, or a small flat fee clearly lower than what it saves me, with the broker partner named and no hidden trading fees.",
+  "price_too_cheap": 1,
+  "price_cheap": 2,
+  "price_expensive": 6,
+  "price_too_expensive": 10
+}
